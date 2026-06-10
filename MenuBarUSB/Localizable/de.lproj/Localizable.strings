@@ -342,3 +342,4 @@
 "revert_to_the_original_name" = "Zum ursprünglichen Namen zurückkehren";
 "automation_category" = "Automatisierung";
 "no_custom_association_to_undo" = "Es wurde keine externe Audiodatei hinzugefügt";
+"golden_gate_ethernet_message" = "macOS 27 und neuer zeigen den Ethernet-Status nativ an.";

@@ -342,3 +342,4 @@
 "revert_to_the_original_name" = "恢复为原始名称";
 "automation_category" = "自动化";
 "no_custom_association_to_undo" = "未添加外部音频文件";
+"golden_gate_ethernet_message" = "macOS 27 及更高版本会原生显示以太网状态。";

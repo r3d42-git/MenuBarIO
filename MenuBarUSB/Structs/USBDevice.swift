@@ -21,7 +21,11 @@ struct USBDevice: ~Copyable {
     let isExternalStorage: Bool?
 
     var uniqueId: String {
-        return "\(vendorId)-\(productId)-\(String(describing: locationId))"
+        let serial = serialNumber?.trimmingCharacters(in: .whitespaces) ?? ""
+        if !serial.isEmpty {
+            return "\(vendorId)-\(productId)-\(serial)"
+        }
+        return "\(vendorId)-\(productId)"
     }
 
     var speedDescription: String {

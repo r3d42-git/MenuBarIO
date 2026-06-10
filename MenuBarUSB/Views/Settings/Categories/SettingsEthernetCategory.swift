@@ -43,6 +43,15 @@ struct SettingsEthernetCategory: View {
                 }
             )
             
+            if #available(macOS 27, *) {
+                HStack(spacing: 5) {
+                    Image(systemName: "info.circle")
+                    Text("golden_gate_ethernet_message")
+                }
+                .foregroundStyle(.gray)
+                .font(.footnote)
+            }
+            
             HStack {
                 
                 Image(systemName: showExperimentalEthernet ? "chevron.down" : "chevron.right")

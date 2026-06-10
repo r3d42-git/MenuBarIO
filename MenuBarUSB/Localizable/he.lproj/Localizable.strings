@@ -342,3 +342,4 @@
 "revert_to_the_original_name" = "חזור לשם המקורי";
 "automation_category" = "אוטומציה";
 "no_custom_association_to_undo" = "לא נוסף קובץ שמע חיצוני";
+"golden_gate_ethernet_message" = "macOS 27 וגרסאות חדשות יותר מציגות את מצב ה-Ethernet באופן מובנה.";

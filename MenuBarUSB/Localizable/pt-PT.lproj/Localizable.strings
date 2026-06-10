@@ -342,3 +342,4 @@
 "revert_to_the_original_name" = "Reverter para o nome original";
 "automation_category" = "Automação";
 "no_custom_association_to_undo" = "Nenhum ficheiro de áudio externo adicionado";
+"golden_gate_ethernet_message" = "O macOS 27 Golden Gate e posteriores apresentam nativamente o estado Ethernet.";

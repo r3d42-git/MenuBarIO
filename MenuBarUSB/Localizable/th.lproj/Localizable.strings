@@ -342,3 +342,4 @@
 "revert_to_the_original_name" = "กลับเป็นชื่อเดิม";
 "automation_category" = "ระบบอัตโนมัติ";
 "no_custom_association_to_undo" = "ไม่มีการเพิ่มไฟล์เสียงภายนอก";
+"golden_gate_ethernet_message" = "macOS 27 และเวอร์ชันใหม่กว่าจะแสดงสถานะ Ethernet โดยตรง.";
