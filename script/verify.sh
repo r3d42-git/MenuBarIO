@@ -10,6 +10,8 @@ fi
 
 cd "$ROOT_DIR"
 ./script/privacy_audit.sh
+swiftc -typecheck script/generate_dmg_background.swift
+bash -n script/create_installer_dmg.sh script/release.sh script/publish_release.sh
 
 xcodebuild test -quiet \
   -project MenuBarUSB.xcodeproj \
@@ -17,9 +19,7 @@ xcodebuild test -quiet \
   -configuration Debug \
   -destination 'platform=macOS,arch=arm64' \
   -derivedDataPath "$DERIVED_DATA_PATH" \
-  CODE_SIGN_IDENTITY=- \
-  CODE_SIGN_STYLE=Manual \
-  DEVELOPMENT_TEAM=''
+  CODE_SIGNING_ALLOWED=NO
 
 xcodebuild analyze -quiet \
   -project MenuBarUSB.xcodeproj \

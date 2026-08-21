@@ -15,6 +15,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PRODUCT_NAME="MenuBarUSB-TB"
 BUNDLE_IDENTIFIER="de.r3d.menubarusb.tb"
 ARCHITECTURES="${MENUBARUSB_ARCHS:-arm64}"
+VOLUME_NAME="$PRODUCT_NAME installieren"
+APPLICATIONS_LINK_NAME="Programme"
 RELEASE_DIR="${MENUBARUSB_RELEASE_DIR:-$ROOT_DIR/.release/$VERSION}"
 ARCHIVE_PATH="$RELEASE_DIR/$PRODUCT_NAME.xcarchive"
 APP_PATH="$ARCHIVE_PATH/Products/Applications/$PRODUCT_NAME.app"
@@ -90,13 +92,12 @@ done
 mkdir -p "$STAGING_DIR"
 ditto "$APP_PATH" "$STAGING_DIR/$PRODUCT_NAME.app"
 ditto "$ROOT_DIR/LICENSE" "$STAGING_DIR/LICENSE"
-
-hdiutil create \
-  -volname "$PRODUCT_NAME $VERSION" \
-  -srcfolder "$STAGING_DIR" \
-  -ov \
-  -format UDZO \
-  "$DMG_PATH"
+"$ROOT_DIR/script/create_installer_dmg.sh" \
+  "$STAGING_DIR" \
+  "$DMG_PATH" \
+  "$VOLUME_NAME" \
+  "$PRODUCT_NAME.app" \
+  "$APPLICATIONS_LINK_NAME"
 
 codesign --force --sign "$MENUBARUSB_SIGNING_IDENTITY" --timestamp "$DMG_PATH"
 codesign --verify --verbose=2 "$DMG_PATH"
@@ -109,6 +110,14 @@ spctl --assess --type open --context context:primary-signature --verbose=4 "$DMG
 MOUNT_DIR="$(mktemp -d /private/tmp/menubarusb-release-mount.XXXXXX)"
 hdiutil attach -readonly -nobrowse -mountpoint "$MOUNT_DIR" "$DMG_PATH" >/dev/null
 codesign --verify --deep --strict --verbose=2 "$MOUNT_DIR/$PRODUCT_NAME.app"
+if [[ ! -L "$MOUNT_DIR/$APPLICATIONS_LINK_NAME" || "$(readlink "$MOUNT_DIR/$APPLICATIONS_LINK_NAME")" != "/Applications" ]]; then
+  echo "Installer DMG is missing the $APPLICATIONS_LINK_NAME link to /Applications." >&2
+  exit 1
+fi
+if [[ ! -f "$MOUNT_DIR/.background/installer-background.png" || ! -f "$MOUNT_DIR/LICENSE" ]]; then
+  echo "Installer DMG is missing its required background or license." >&2
+  exit 1
+fi
 
 (
   cd "$RELEASE_DIR"

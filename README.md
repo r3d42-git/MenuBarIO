@@ -19,7 +19,7 @@ It is an independent fork of [rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi
 
 ## Compatibility
 
-**Version 0.1.0 supports Apple Silicon Macs (`arm64`) running macOS 13 or
+**Version 0.1.1 supports Apple Silicon Macs (`arm64`) running macOS 13 or
 newer. Intel Macs are not supported by this release.**
 
 ## Build and test

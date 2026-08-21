@@ -14,6 +14,11 @@ Der Befehl verwendet ein isoliertes DerivedData-Verzeichnis und führt aus:
 - die XCTest-Tests für Geräteidentität, Hub-Klassifizierung, Thunderbolt-Link-Geschwindigkeit, Billboard-Erkennung sowie die Bereinigung entfernter Funktionen;
 - den Xcode Static Analyzer für die Release-Konfiguration.
 
+Die Unit-Tests laufen bewusst ohne Debug-Signatur: Sie prüfen reine
+Modell- und Datenlogik, und der unsignierte lokale Test-Host vermeidet einen
+Gatekeeper-Dialog. Das signierte, notarisiert ausgelieferte Produkt wird davon
+nicht berührt und wird im Release-Skript separat geprüft.
+
 Zum reinen Starttest der App:
 
 ```bash
@@ -48,3 +53,11 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
 
 Für die signierte Auslieferung danach die vollständige Anleitung in
 [`RELEASE.md`](RELEASE.md) befolgen.
+
+## DMG-Layout-Abnahme
+
+Nach Änderungen am Paketbau das erzeugte DMG im Finder öffnen. Es muss eine
+kompakte Installationsansicht mit App, Pfeil und **Programme**-Alias zeigen.
+Die App muss sich auf **Programme** ziehen lassen; `LICENSE` muss weiterhin
+vorhanden sein. Der Release-Skript prüft Alias, Hintergrund und Lizenz zudem
+automatisiert im frisch eingebundenen DMG.
