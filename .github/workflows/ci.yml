@@ -13,6 +13,8 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v5
+      - name: Install ripgrep for the privacy audit
+        run: brew install ripgrep
       - name: Audit privacy boundaries
         run: ./script/privacy_audit.sh
       - name: Run unit tests
