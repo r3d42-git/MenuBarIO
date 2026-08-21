@@ -15,8 +15,6 @@ struct StorageButton: View {
     @State private var hovering = false
     
     enum CodableType {
-        case sound
-        case soundAssociation
         case stored
         case renamed
         case camouflaged
@@ -62,20 +60,6 @@ struct StorageButton: View {
                 legacyIcon: "app.connected.to.app.below.fill",
                 count: CSM.Heritage.count
             )
-        case .soundAssociation:
-            return CodableTypeProperty(
-                labelKey: "undo_all_devices_sound_associations",
-                icon: "speaker.wave.3",
-                legacyIcon: "speaker.wave.3",
-                count: CSM.SoundDevices.count
-            )
-        case .sound:
-            return CodableTypeProperty(
-                labelKey: "clear_all_custom_hardware_sounds",
-                icon: "document",
-                legacyIcon: "waveform",
-                count: CSM.Sound.count
-            )
         case .stored:
             return CodableTypeProperty(
                 labelKey: "delete_device_history",
@@ -113,10 +97,6 @@ struct StorageButton: View {
             return misc.formatBytes(misc.sizeOfCodableArray(CodableStorageManager.Camouflaged.items))
         case .heritage:
             return misc.formatBytes(misc.sizeOfCodableArray(CodableStorageManager.Heritage.items))
-        case .soundAssociation:
-            return misc.formatBytes(misc.sizeOfCodableArray(CodableStorageManager.SoundDevices.items))
-        case .sound:
-            return misc.formatBytes(misc.sizeOfCodableArray(CodableStorageManager.Sound.items))
         case .stored:
             return misc.formatBytes(misc.sizeOfCodableArray(CodableStorageManager.Stored.items))
         case .log:

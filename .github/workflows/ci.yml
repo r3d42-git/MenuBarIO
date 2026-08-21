@@ -1,0 +1,33 @@
+name: Verify macOS app
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Audit privacy boundaries
+        run: ./script/privacy_audit.sh
+      - name: Run unit tests
+        run: >-
+          xcodebuild test
+          -project MenuBarUSB.xcodeproj
+          -scheme MenuBarUSB
+          -configuration Debug
+          -destination 'platform=macOS,arch=arm64'
+          CODE_SIGNING_ALLOWED=NO
+      - name: Run static analysis
+        run: >-
+          xcodebuild analyze
+          -project MenuBarUSB.xcodeproj
+          -scheme MenuBarUSB
+          -configuration Release
+          -destination 'platform=macOS,arch=arm64'
+          CODE_SIGNING_ALLOWED=NO

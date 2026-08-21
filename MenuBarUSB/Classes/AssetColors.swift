@@ -15,5 +15,4 @@ final class AssetColors {
     static var update: Color { Color("Update") }
     static var warning: Color { Color("Warning") }
     static var toolbarButton: Color { Color("ToolbarButton") }
-    static var ltcCoin: Color { Color("LTC") }
 }

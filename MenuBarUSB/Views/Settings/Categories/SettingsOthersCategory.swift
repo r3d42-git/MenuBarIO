@@ -17,11 +17,9 @@ struct SettingsOthersCategory: View {
     @AS(Key.forceEnglish) private var forceEnglish = false
     @AS(Key.listToolBar) private var listToolBar = false
     @AS(Key.hideUpdate) private var hideUpdate = false
-    @AS(Key.hideDonate) private var hideDonate = false
     @AS(Key.disableHaptic) private var disableHaptic = false
     @AS(Key.noTextButtons) private var noTextButtons = false
     @AS(Key.profilerButton) private var profilerButton = false
-    @AS(Key.trafficButton) private var trafficButton = false
     @AS(Key.windowWidth) private var windowWidth: WindowWidth = .normal
     
     private func setWindowWidth(increase: Bool) {
@@ -72,22 +70,16 @@ struct SettingsOthersCategory: View {
                 incompatibilities: nil,
                 onToggle: { _ in }
             )
-            ToggleRow(
-                label: "hide_check_update",
-                description: "hide_check_update_description",
-                binding: $hideUpdate,
-                activeRowID: $activeRowID,
-                incompatibilities: nil,
-                onToggle: { _ in }
-            )
-            ToggleRow(
-                label: "hide_donate",
-                description: "hide_donate_description",
-                binding: $hideDonate,
-                activeRowID: $activeRowID,
-                incompatibilities: nil,
-                onToggle: { _ in }
-            )
+            if Utils.Miscellaneous.latestRepoGithubApi != nil {
+                ToggleRow(
+                    label: "hide_check_update",
+                    description: "hide_check_update_description",
+                    binding: $hideUpdate,
+                    activeRowID: $activeRowID,
+                    incompatibilities: nil,
+                    onToggle: { _ in }
+                )
+            }
             ToggleRow(
                 label: "disable_haptic_feedback",
                 description: "disable_haptic_feedback_description",
@@ -109,12 +101,8 @@ struct SettingsOthersCategory: View {
                 description: "profiler_shortcut_description",
                 binding: $profilerButton,
                 activeRowID: $activeRowID,
-                incompatibilities: [trafficButton],
-                onToggle: { value in
-                    if value == true {
-                        trafficButton = false
-                    }
-                }
+                incompatibilities: nil,
+                onToggle: { _ in }
             )
             
             HStack {

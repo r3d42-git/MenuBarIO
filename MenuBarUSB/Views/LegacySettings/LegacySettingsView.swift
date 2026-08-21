@@ -24,7 +24,6 @@ struct LegacySettingsView: View {
     @State private var showContextMenuOptions = false
     @State private var showHeritageOptions = false
     @State private var showOthersOptions = false
-    @State private var showDonateOptions = false
     @State private var showStorageOptions = false
 
     private func untoggleAll() {
@@ -35,7 +34,6 @@ struct LegacySettingsView: View {
         showContextMenuOptions = false
         showStorageOptions = false
         showHeritageOptions = false
-        showDonateOptions = false
     }
 
     var body: some View {
@@ -47,7 +45,7 @@ struct LegacySettingsView: View {
                 .opacity(0.03)
             
             VStack(alignment: .leading, spacing: 20) {
-                LegacySettingsHorizontalTopBar(showDonateOptions: $showDonateOptions, untoggleAll: untoggleAll)
+                LegacySettingsHorizontalTopBar()
 
                 Divider()
 
@@ -91,9 +89,6 @@ struct LegacySettingsView: View {
                         LegacySettingsStorageCategory(showOthersOptions: $showOthersOptions)
                     }
 
-                    if showDonateOptions {
-                        LegacySettingsDonateCategory()
-                    }
                 }
                 Spacer()
 

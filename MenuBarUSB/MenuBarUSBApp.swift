@@ -23,17 +23,13 @@ struct MenuBarUSBApp: App {
     @AS(Key.macBarIcon) private var macBarIcon: String = "cable.connector"
     @AS(Key.showEthernet) private var showEthernet = false
     @AS(Key.forceEnglish) private var forceEnglish = false
-    @AS(Key.newVersionNotification) private var newVersionNotification = false
-    @AS(Key.internetMonitoring) private var internetMonitoring = false
     
     init() {
-        if newVersionNotification {
-            Task {
-                if await Utils.App.hasUpdate() {
-                    Utils.TemplateNotification.updateAvailable()
-                }
-            }
-        }
+        AppDefaults.register()
+        Utils.App.removeLegacyHardwareSoundData()
+        Utils.App.removeLegacyDonationData()
+        Utils.App.removeLegacyAutomaticUpdateData()
+        Utils.App.removeLegacyEthernetTrafficData()
     }
     
     private var countText: some View {
@@ -50,10 +46,7 @@ struct MenuBarUSBApp: App {
         return AnyView (
             HStack(spacing: 5) {
                 let image = HStack(spacing: 7) {
-                    if manager.trafficMonitorRunning == false && internetMonitoring {
-                        Image(systemName: "pause.fill")
-                    }
-                    Image(manager.ethernetTraffic ? "ETHERNET_DOT" : "ETHERNET")
+                    Image("ETHERNET")
                     Image(systemName: macBarIcon)
                 }
                     .asImage()
@@ -137,8 +130,6 @@ struct MenuBarUSBApp: App {
             view { MainListView(currentWindow: $currentWindow) }
         case .settings:
             view { SettingsView(currentWindow: $currentWindow) }
-        case .donate:
-            view { DonateView(currentWindow: $currentWindow) }
         case .heritage:
             view { HeritageView(currentWindow: $currentWindow) }
         case .inheritanceTree:

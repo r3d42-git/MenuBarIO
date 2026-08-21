@@ -16,11 +16,11 @@ struct LegacySettingsHorizontalTopBar: View {
     @State private var latestVersion: String = ""
     @State private var releaseURL: URL? = nil
     
-    @Binding var showDonateOptions: Bool
-    let untoggleAll: () -> Void
-    
-    @AS(Key.hideDonate) private var hideDonate = false
     @AS(Key.hideUpdate) private var hideUpdate = false
+
+    private var updateFeedConfigured: Bool {
+        Utils.Miscellaneous.latestRepoGithubApi != nil
+    }
     
     private var updateButtonLabel: String {
         
@@ -50,8 +50,8 @@ struct LegacySettingsHorizontalTopBar: View {
         releaseURL = nil
         
         guard
-            let url = URL(
-                string: Utils.Miscellaneous.latestRepoGithubApi)
+            let feedURL = Utils.Miscellaneous.latestRepoGithubApi,
+            let url = URL(string: feedURL)
         else {
             checkingUpdate = false
             return
@@ -78,7 +78,7 @@ struct LegacySettingsHorizontalTopBar: View {
         
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("MenuBarUSB")
+                Text("MenuBarUSB-TB")
                     .font(.title2)
                     .bold()
                 Text(
@@ -111,32 +111,13 @@ struct LegacySettingsHorizontalTopBar: View {
 
             if !updateAvailable {
                 HStack {
-                    if !hideUpdate {
+                    if !hideUpdate && updateFeedConfigured {
                         Button(updateButtonLabel.localized) {
                             updateButtonAction()
                         }
                         .foregroundStyle(updateAvailable ? AssetColors.update : .primary)
                     }
                     
-                    if !hideDonate && !hideUpdate {
-                        Text("|")
-                            .padding(.horizontal, 5)
-                            .opacity(0.3)
-                    }
-
-                    if !hideDonate {
-
-                        Button {
-                            if showDonateOptions {
-                                showDonateOptions = false
-                            } else {
-                                untoggleAll()
-                                showDonateOptions = true
-                            }
-                        } label: {
-                            Text("donate")
-                        }
-                    }
                 }
             }
         }

@@ -16,7 +16,6 @@ struct LegacySettingsOthersCategory: View {
     @AS(Key.listToolBar) private var listToolBar = false
     @AS(Key.noTextButtons) private var noTextButtons = false
     @AS(Key.hideUpdate) private var hideUpdate = false
-    @AS(Key.hideDonate) private var hideDonate = false
     @AS(Key.disableHaptic) private var disableHaptic = false
     @AS(Key.hideMenubarIcon) private var hideMenubarIcon = false
     @AS(Key.hideCount) private var hideCount = false
@@ -38,22 +37,16 @@ struct LegacySettingsOthersCategory: View {
             incompatibilities: nil,
             onToggle: { _ in }
         )
-        ToggleRow(
-            label: "hide_check_update",
-            description: "hide_check_update_description",
-            binding: $hideUpdate,
-            activeRowID: $activeRowID,
-            incompatibilities: nil,
-            onToggle: { _ in }
-        )
-        ToggleRow(
-            label: "hide_donate",
-            description: "hide_donate_description",
-            binding: $hideDonate,
-            activeRowID: $activeRowID,
-            incompatibilities: nil,
-            onToggle: { _ in }
-        )
+        if Utils.Miscellaneous.latestRepoGithubApi != nil {
+            ToggleRow(
+                label: "hide_check_update",
+                description: "hide_check_update_description",
+                binding: $hideUpdate,
+                activeRowID: $activeRowID,
+                incompatibilities: nil,
+                onToggle: { _ in }
+            )
+        }
         ToggleRow(
             label: "disable_haptic_feedback",
             description: "disable_haptic_feedback_description",

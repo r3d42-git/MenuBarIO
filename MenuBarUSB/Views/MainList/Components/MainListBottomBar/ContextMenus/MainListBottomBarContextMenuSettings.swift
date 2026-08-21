@@ -14,22 +14,16 @@ struct MainListBottomBarContextMenuSettings: View {
     
     @AS(Key.listToolBar) private var listToolBar = false
     @AS(Key.storeDevices) private var storeDevices = false
-    @AS(Key.showEthernet) private var showEthernet = false
-    @AS(Key.internetMonitoring) private var internetMonitoring = false
-    
-    private var trafficMonitorOn: Bool {
-        return showEthernet && internetMonitoring
-    }
     
     private var isTrulyEmpty: Bool {
-        let connectedCount: Int = manager.count
+        let hasConnectedDevices = !manager.devices.isEmpty
         let storedCount: Int = CSM.Stored.filteredDevices(manager.devices).count
 
-        if connectedCount == 0 && storeDevices == false {
+        if !hasConnectedDevices && storeDevices == false {
             return true
         }
 
-        if connectedCount == 0 && storedCount == 0 {
+        if !hasConnectedDevices && storedCount == 0 {
             return true
         }
 
@@ -57,19 +51,5 @@ struct MainListBottomBarContextMenuSettings: View {
             }
         }
 
-        if trafficMonitorOn {
-            Divider()
-
-            if !manager.trafficMonitorRunning {
-                Button { manager.startEthernetMonitoring() } label: {
-                    Label("resume_traffic_monitor", systemImage: "play.fill")
-                }
-                .disabled(!manager.ethernetCableConnected)
-            } else {
-                Button { manager.stopEthernetMonitoring() } label: {
-                    Label("stop_traffic_monitor", systemImage: "pause.fill")
-                }
-            }
-        }
     }
 }

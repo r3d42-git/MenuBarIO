@@ -20,15 +20,8 @@ struct MainListBottomBar: View {
     @AS(Key.showEthernet) private var showEthernet = false
     @AS(Key.listToolBar) private var listToolBar = false
     @AS(Key.storeDevices) private var storeDevices = false
-    @AS(Key.trafficButton) private var trafficButton = false
     @AS(Key.profilerButton) private var profilerButton = false
     @AS(Key.powerSourceInfo) private var powerSourceInfo = false
-    @AS(Key.internetMonitoring) private var internetMonitoring = false
-    @AS(Key.disableTrafficButtonLabel) private var disableTrafficButtonLabel = false
-    
-    private var showTrafficButtonLabel: Bool {
-        return !camouflagedIndicator && !disableTrafficButtonLabel
-    }
     
     private var showEyeSlash: Bool {
         if noTextButtons {
@@ -39,9 +32,6 @@ struct MainListBottomBar: View {
     }
     
     private func goToSettings() {
-        if manager.trafficMonitorRunning {
-            manager.stopEthernetMonitoring()
-        }
         if #available(macOS 15.0, *) {
             currentWindow = .settings
         } else {
@@ -54,18 +44,6 @@ struct MainListBottomBar: View {
             return AnyView(Image(systemName: systemImage))
         } else {
             return AnyView(Label(text, systemImage: systemImage))
-        }
-    }
-    
-    private var trafficMonitorInactive: Bool {
-        return !manager.trafficMonitorRunning
-    }
-    
-    private func toggleTrafficMonitoring() {
-        if manager.trafficMonitorRunning {
-            manager.stopEthernetMonitoring()
-        } else {
-            manager.startEthernetMonitoring()
         }
     }
     
@@ -102,24 +80,6 @@ struct MainListBottomBar: View {
                                 MainListBottomBarContextMenuProfiler()
                             }
                     }
-                }
-            }
-
-            if trafficButton {
-                Button {
-                    toggleTrafficMonitoring()
-                } label: {
-                    if showTrafficButtonLabel {
-                        Label(
-                            manager.trafficMonitorRunning ? "running" : "paused",
-                            systemImage: manager.trafficMonitorRunning ? "stop.fill" : "waveform.badge.magnifyingglass"
-                        )
-                    } else {
-                        Image(systemName: manager.trafficMonitorRunning ? "stop.fill" : "waveform.badge.magnifyingglass")
-                    }
-                }
-                .contextMenu {
-                    MainListBottomBarContextMenuTraffic()
                 }
             }
 

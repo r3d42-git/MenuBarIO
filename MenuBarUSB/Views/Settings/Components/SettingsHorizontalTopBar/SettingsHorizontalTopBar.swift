@@ -16,10 +16,11 @@ struct SettingsHorizontalTopBar: View {
     @State private var latestVersion: String = ""
     @State private var releaseURL: URL? = nil
     
-    @Binding var currentWindow: AppWindow
-    
     @AS(Key.hideUpdate) private var hideUpdate = false
-    @AS(Key.hideDonate) private var hideDonate = false
+
+    private var updateFeedConfigured: Bool {
+        Utils.Miscellaneous.latestRepoGithubApi != nil
+    }
     
     private var updateButtonLabel: String {
         
@@ -49,8 +50,8 @@ struct SettingsHorizontalTopBar: View {
         releaseURL = nil
         
         guard
-            let url = URL(
-                string: Utils.Miscellaneous.latestRepoGithubApi)
+            let feedURL = Utils.Miscellaneous.latestRepoGithubApi,
+            let url = URL(string: feedURL)
         else {
             checkingUpdate = false
             return
@@ -74,7 +75,7 @@ struct SettingsHorizontalTopBar: View {
     
     var body: some View {
         HStack {
-            if !hideUpdate {
+            if !hideUpdate && updateFeedConfigured {
                 Button(updateButtonLabel.localized) {
                     updateButtonAction()
                 }
@@ -84,22 +85,6 @@ struct SettingsHorizontalTopBar: View {
                 }
             }
             
-            if !hideDonate && !hideUpdate {
-                Text("|")
-                    .padding(.horizontal, 5)
-                    .opacity(0.3)
-            }
-            
-            if !hideDonate {
-                
-                Button("donate") {
-                    currentWindow = .donate
-                }
-                .contextMenu {
-                    SettingsHorizontalTopBarContextMenuDonate(currentWindow: $currentWindow)
-                }
-                
-            }
         }
     }
 }

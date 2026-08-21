@@ -20,6 +20,8 @@ struct MainListDeviceList: View {
     @State private var devicesShowingMore: [USBDeviceWrapper] = []
     
     @Binding var isRenamingDeviceId: String
+    @Binding var deviceGroupExpanded: Bool
+    @Binding var hubGroupExpanded: Bool
     
     @AS(Key.powerSourceInfo) private var powerSourceInfo = false
     @AS(Key.indexIndicator) private var indexIndicator = false
@@ -38,8 +40,6 @@ struct MainListDeviceList: View {
     @AS(Key.disableContextMenuHeritage) private var disableContextMenuHeritage = false
     @AS(Key.bigNames) private var bigNames = false
     @AS(Key.storeDevices) private var storeDevices = false
-    @AS(Key.playHardwareSound) private var playHardwareSound = false
-    @AS(Key.hardwareSound) private var hardwareSound: String = ""
     @AS(Key.searchEngine) private var searchEngine: SearchEngine = .google
     
     private var sortedDevices: [USBDeviceWrapper] {
@@ -96,6 +96,14 @@ struct MainListDeviceList: View {
         }
 
         return sortedFamilies.flatMap { $0 }
+    }
+
+    private var deviceGroupDevices: [USBDeviceWrapper] {
+        sortedDevices.filter { !$0.item.isHub }
+    }
+
+    private var hubGroupDevices: [USBDeviceWrapper] {
+        sortedDevices.filter { $0.item.isHub }
     }
     
     private func devicesShowingMoreHas(_ device: borrowing USBDevice) -> Bool {
@@ -241,7 +249,7 @@ struct MainListDeviceList: View {
     }
     
     private func deviceId(_ device: borrowing USBDevice) -> String {
-        return String(format: "%04X:%04X", device.vendorId, device.productId)
+        return device.hardwareIdentifier
     }
     
     private func indentLevel(for device: borrowing USBDevice) -> CGFloat {
@@ -264,6 +272,163 @@ struct MainListDeviceList: View {
 
         let multiply: CGFloat = increasedIndentationGap ? 36 : 16
         return CGFloat(level) * multiply
+    }
+
+    private func groupHeader(
+        title: String,
+        icon: String,
+        count: Int,
+        isExpanded: Binding<Bool>
+    ) -> some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                isExpanded.wrappedValue.toggle()
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: isExpanded.wrappedValue ? "chevron.down" : "chevron.right")
+                    .font(.system(size: 9, weight: .bold))
+                    .frame(width: 10)
+
+                Image(systemName: icon)
+                    .font(.system(size: 10, weight: .semibold))
+
+                Text(title)
+                    .font(.system(size: 11, weight: .semibold))
+
+                Spacer()
+
+                Text("\(count)")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 6)
+            .padding(.vertical, 5)
+            .background(.primary.opacity(0.08), in: RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private func connectedDeviceRows(
+        _ devices: [USBDeviceWrapper],
+        indexOffset: Int
+    ) -> some View {
+        ForEach(Array(devices.enumerated()), id: \.element.id) { index, device in
+            connectedDeviceRow(device, index: index + indexOffset)
+        }
+    }
+
+    @ViewBuilder
+    private func connectedDeviceRow(_ device: USBDeviceWrapper, index: Int) -> some View {
+        let uniqueId = device.item.uniqueId
+        let indent = disableInheritanceLayout ? 0 : indentLevel(for: device.item)
+
+        LazyVStack(alignment: .leading, spacing: 2) {
+            HStack {
+                if isRenaming(device: uniqueId) {
+                    deviceRenameView(deviceId: uniqueId)
+                } else {
+                    if indexIndicator {
+                        indexIndicatorView(index)
+                    }
+                    deviceTitleView(device.item.name, deviceId: uniqueId)
+                }
+
+                Spacer()
+
+                if showSecondaryInfo(for: device.item) {
+                    if let vendor = device.item.vendor, !vendor.isEmpty {
+                        Text(vendor)
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.primary)
+                            .lineLimit(1)
+                    }
+                }
+            }
+            .padding(.leading, indent)
+            .onHover { hovering in
+                if mouseHoverInfo {
+                    if hovering {
+                        isHoveringDeviceId = uniqueId
+                        Utils.System.hapticFeedback()
+                    } else if isHoveringDeviceId == uniqueId {
+                        isHoveringDeviceId = ""
+                    }
+                }
+            }
+
+            if showTechInfo(for: device.item) {
+                HStack {
+                    Text(device.item.connectionDescription)
+                        .font(.system(size: 9))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                    Spacer()
+
+                    if showSecondaryInfo(for: device.item) {
+                        Text(deviceId(device.item))
+                            .font(.system(size: 9))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+                .padding(.leading, indent)
+
+                HStack {
+                    if let transportVersion = device.item.transportVersion {
+                        Text("\("protocol".localized) \(transportVersion)")
+                            .font(.system(size: 9))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    } else if let usbVer = device.item.usbVersionBCD {
+                        let usbVersion: String? = Utils.USB.usbVersionLabel(from: usbVer)
+                        Text("\("usb_version".localized) \(usbVersion ?? String(format: "0x%04X", usbVer))")
+                            .font(.system(size: 9))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+
+                    Spacer()
+
+                    if showSecondaryInfo(for: device.item) {
+                        if let serial = device.item.serialNumber, !serial.isEmpty {
+                            Text("\("serial_number".localized) \(serial)")
+                                .font(.system(size: 9))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                }
+                .padding(.leading, indent)
+
+                if showPortMax {
+                    if let portMax = device.item.portMaxSpeedMbps {
+                        Text("\("port_max".localized) \(portMax >= 1000 ? String(format: "%.1f Gbps", Double(portMax) / 1000.0) : "\(portMax) Mbps")")
+                            .font(.system(size: 9))
+                            .foregroundStyle(.secondary)
+                            .padding(.leading, indent)
+                            .lineLimit(1)
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 3)
+        .animation(.spring(duration: 0.15), value: showSecondaryInfo(for: device.item))
+        .animation(.spring(duration: 0.15), value: showTechInfo(for: device.item))
+        .contextMenu {
+            MainListDeviceListContextMenuDevice(
+                inputText: $inputText,
+                isRenamingDeviceId: $isRenamingDeviceId,
+                devicesShowingMore: $devicesShowingMore,
+                device: device,
+                sortedDevices: sortedDevices,
+                searchOnWeb: searchOnWeb(_:)
+            )
+        }
+
+        Divider()
     }
     
     
@@ -306,157 +471,75 @@ struct MainListDeviceList: View {
         }
         ScrollView(showsIndicators: showScrollBar) {
             LazyVStack(alignment: .leading, spacing: 4) {
-                ForEach(Array(sortedDevices.enumerated()), id: \.element.id) { index, device in
-                    let uniqueId: String = device.item.uniqueId
-                    let indent = disableInheritanceLayout ? 0 : indentLevel(for: device.item)
+                groupHeader(
+                    title: "usb_devices".localized,
+                    icon: "desktopcomputer",
+                    count: deviceGroupDevices.count,
+                    isExpanded: $deviceGroupExpanded
+                )
 
-                    LazyVStack(alignment: .leading, spacing: 2) {
-                        HStack {
-                            if isRenaming(device: uniqueId) {
-                                deviceRenameView(deviceId: uniqueId)
-                            } else {
-                                if indexIndicator {
-                                    indexIndicatorView(index)
+                if deviceGroupExpanded {
+                    connectedDeviceRows(deviceGroupDevices, indexOffset: 0)
+
+                    if storeDevices {
+                        ForEach(CSM.Stored.filteredDevices(manager.devices)) { device in
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    if storedIndicator {
+                                        Image("offline")
+                                            .renderingMode(.template)
+                                            .resizable()
+                                            .frame(width: 14, height: 14)
+                                            .scaledToFit()
+                                            .padding(3)
+                                    }
+                                    if isRenaming(device: device.deviceId) {
+                                        deviceRenameView(deviceId: device.deviceId)
+                                    } else {
+                                        deviceTitleView(device.name, deviceId: device.deviceId)
+                                    }
+                                    Spacer()
                                 }
-                                deviceTitleView(device.item.name, deviceId: uniqueId)
-                            }
-
-                            Spacer()
-
-                            if showSecondaryInfo(for: device.item) {
-                                if let vendor = device.item.vendor, !vendor.isEmpty {
-                                    Text(vendor)
-                                        .font(.system(size: 12, weight: .semibold))
-                                        .foregroundColor(.primary)
-                                        .lineLimit(1)
-                                }
-                            }
-                        }
-                        .padding(.leading, indent)
-                        .onHover { hovering in
-                            if mouseHoverInfo {
-                                if hovering {
-                                    isHoveringDeviceId = uniqueId
-                                    Utils.System.hapticFeedback()
-                                } else if isHoveringDeviceId == uniqueId {
-                                    isHoveringDeviceId = ""
-                                }
-                            }
-                        }
-
-                        if showTechInfo(for: device.item) {
-                            HStack {
-                                Text(device.item.speedDescription)
-                                    .font(.system(size: 9))
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                                Spacer()
-
-                                if showSecondaryInfo(for: device.item) {
-                                    Text(deviceId(device.item))
+                                if showDisconnectedText(for: device.deviceId) {
+                                    Text("disconnected")
                                         .font(.system(size: 9))
                                         .foregroundStyle(.secondary)
-                                        .lineLimit(1)
                                 }
                             }
-                            .padding(.leading, indent)
-
-                            HStack {
-                                if let usbVer = device.item.usbVersionBCD {
-                                    let usbVersion: String? = Utils.USB.usbVersionLabel(from: usbVer)
-                                    Text("\("usb_version".localized) \(usbVersion ?? String(format: "0x%04X", usbVer))")
-                                        .font(.system(size: 9))
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(1)
-                                }
-
-                                Spacer()
-
-                                if showSecondaryInfo(for: device.item) {
-                                    if let serial = device.item.serialNumber, !serial.isEmpty {
-                                        Text("\("serial_number".localized) \(serial)")
-                                            .font(.system(size: 9))
-                                            .foregroundStyle(.secondary)
-                                            .lineLimit(1)
+                            .opacity(isRenaming(device: device.deviceId) ? 1.0 : 0.5)
+                            .padding(.top, 3)
+                            .onHover { hovering in
+                                if mouseHoverInfo {
+                                    if hovering {
+                                        isHoveringDeviceId = device.deviceId
+                                        Utils.System.hapticFeedback()
+                                    } else if isHoveringDeviceId == device.deviceId {
+                                        isHoveringDeviceId = ""
                                     }
                                 }
                             }
-                            .padding(.leading, indent)
-
-                            if showPortMax {
-                                if let portMax = device.item.portMaxSpeedMbps {
-                                    Text("\("port_max".localized) \(portMax >= 1000 ? String(format: "%.1f Gbps", Double(portMax) / 1000.0) : "\(portMax) Mbps")")
-                                        .font(.system(size: 9))
-                                        .foregroundStyle(.secondary)
-                                        .padding(.leading, indent)
-                                        .lineLimit(1)
-                                }
+                            .contextMenu {
+                                MainListDeviceListContextMenuOfflineDevice(
+                                    inputText: $inputText,
+                                    isRenamingDeviceId: $isRenamingDeviceId,
+                                    storedDevice: device
+                                )
                             }
+                            Divider()
+                                .padding(.top, 3)
                         }
                     }
-                    .padding(.vertical, 3)
-                    .animation(.spring(duration: 0.15), value: showSecondaryInfo(for: device.item))
-                    .animation(.spring(duration: 0.15), value: showTechInfo(for: device.item))
-                    .contextMenu {
-                        MainListDeviceListContextMenuDevice(
-                            inputText: $inputText,
-                            isRenamingDeviceId: $isRenamingDeviceId,
-                            devicesShowingMore: $devicesShowingMore,
-                            device: device,
-                            sortedDevices: sortedDevices,
-                            searchOnWeb: searchOnWeb(_:)
-                        )
-                    }
-
-                    Divider()
                 }
-                if storeDevices {
-                    ForEach(CSM.Stored.filteredDevices(manager.devices)) { device in
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack {
-                                if storedIndicator {
-                                    Image("offline")
-                                        .renderingMode(.template)
-                                        .resizable()
-                                        .frame(width: 14, height: 14)
-                                        .scaledToFit()
-                                        .padding(3)
-                                }
-                                if isRenaming(device: device.deviceId) {
-                                    deviceRenameView(deviceId: device.deviceId)
-                                } else {
-                                    deviceTitleView(device.name, deviceId: device.deviceId)
-                                }
-                                Spacer()
-                            }
-                            if showDisconnectedText(for: device.deviceId) {
-                                Text("disconnected")
-                                    .font(.system(size: 9))
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .opacity(isRenaming(device: device.deviceId) ? 1.0 : 0.5)
-                        .padding(.top, 3)
-                        .onHover { hovering in
-                            if mouseHoverInfo {
-                                if hovering {
-                                    isHoveringDeviceId = device.deviceId
-                                    Utils.System.hapticFeedback()
-                                } else if isHoveringDeviceId == device.deviceId {
-                                    isHoveringDeviceId = ""
-                                }
-                            }
-                        }
-                        .contextMenu {
-                            MainListDeviceListContextMenuOfflineDevice(
-                                inputText: $inputText,
-                                isRenamingDeviceId: $isRenamingDeviceId,
-                                storedDevice: device
-                            )
-                        }
-                        Divider()
-                            .padding(.top, 3)
-                    }
+
+                groupHeader(
+                    title: "usb_hubs".localized,
+                    icon: "circle.grid.2x2",
+                    count: hubGroupDevices.count,
+                    isExpanded: $hubGroupExpanded
+                )
+
+                if hubGroupExpanded {
+                    connectedDeviceRows(hubGroupDevices, indexOffset: deviceGroupDevices.count)
                 }
             }
             .padding(.horizontal, 4)

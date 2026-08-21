@@ -7,6 +7,20 @@
 
 import Foundation
 
+enum ConnectionTransport: String {
+    case usb
+    case thunderbolt
+
+    var displayName: String {
+        switch self {
+        case .usb:
+            return "USB"
+        case .thunderbolt:
+            return "Thunderbolt/USB4"
+        }
+    }
+}
+
 struct USBDevice: ~Copyable {
     let id = UUID()
     let name: String
@@ -19,12 +33,70 @@ struct USBDevice: ~Copyable {
     let portMaxSpeedMbps: Int?
     let usbVersionBCD: Int?
     let isExternalStorage: Bool?
+    /// USB device class 9 identifies a standards-compliant USB hub.
+    let deviceClass: Int?
+    /// USB-C Billboard interfaces expose alternate-mode status. A Thunderbolt
+    /// dock may expose one in addition to its native Thunderbolt topology.
+    let isThunderboltBillboard: Bool
+    let transport: ConnectionTransport
+    /// Friendly transport protocol label, for example "USB4 v2".
+    let transportVersion: String?
+    /// Stable bus-specific ID. Thunderbolt UIDs must not be shown as USB serial numbers.
+    let transportIdentifier: String?
+
+    init(
+        name: String,
+        vendor: String?,
+        vendorId: Int,
+        productId: Int,
+        serialNumber: String?,
+        locationId: UInt32?,
+        speedMbps: Int?,
+        portMaxSpeedMbps: Int?,
+        usbVersionBCD: Int?,
+        isExternalStorage: Bool?,
+        deviceClass: Int? = nil,
+        isThunderboltBillboard: Bool = false,
+        transport: ConnectionTransport = .usb,
+        transportVersion: String? = nil,
+        transportIdentifier: String? = nil
+    ) {
+        self.name = name
+        self.vendor = vendor
+        self.vendorId = vendorId
+        self.productId = productId
+        self.serialNumber = serialNumber
+        self.locationId = locationId
+        self.speedMbps = speedMbps
+        self.portMaxSpeedMbps = portMaxSpeedMbps
+        self.usbVersionBCD = usbVersionBCD
+        self.isExternalStorage = isExternalStorage
+        self.deviceClass = deviceClass
+        self.isThunderboltBillboard = isThunderboltBillboard
+        self.transport = transport
+        self.transportVersion = transportVersion
+        self.transportIdentifier = transportIdentifier
+    }
 
     var uniqueId: String {
+        if transport == .thunderbolt {
+            let identifier = transportIdentifier?.trimmingCharacters(in: .whitespaces)
+            let fallback = locationId.map(String.init) ?? "unknown"
+            return "thunderbolt-\(vendorId)-\(productId)-\(identifier?.isEmpty == false ? identifier! : fallback)"
+        }
+
         let serial = serialNumber?.trimmingCharacters(in: .whitespaces) ?? ""
         if !serial.isEmpty {
             return "\(vendorId)-\(productId)-\(serial)"
         }
+
+        // VID/PID alone identifies a product model, not one physical device.
+        // The USB location ID keeps identical, serial-less devices distinct while
+        // they are connected to separate ports.
+        if let locationId {
+            return "\(vendorId)-\(productId)-\(String(format: "%08X", locationId))"
+        }
+
         return "\(vendorId)-\(productId)"
     }
 
@@ -42,5 +114,23 @@ struct USBDevice: ~Copyable {
             }
         }
         return parts.joined(separator: " ")
+    }
+
+    var connectionDescription: String {
+        guard transport == .thunderbolt else { return speedDescription }
+
+        if let speedMbps {
+            return "\(transport.displayName) — \(Utils.USB.prettyMbps(speedMbps))"
+        }
+        return transport.displayName
+    }
+
+    var hardwareIdentifier: String {
+        let identifier = String(format: "%04X:%04X", vendorId, productId)
+        return transport == .thunderbolt ? "TB \(identifier)" : identifier
+    }
+
+    var isHub: Bool {
+        transport == .usb && deviceClass == 9
     }
 }

@@ -16,7 +16,11 @@ extension View {
         let size = view.fittingSize
         view.frame = CGRect(origin: .zero, size: size)
 
-        let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds)!
+        guard let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else {
+            let image = NSImage(size: size)
+            image.isTemplate = true
+            return image
+        }
         view.cacheDisplay(in: view.bounds, to: rep)
 
         let image = NSImage(size: size)

@@ -1,0 +1,213 @@
+import XCTest
+@testable import MenuBarUSB
+
+final class USBDeviceTests: XCTestCase {
+    func testSeriallessUSBDevicesRemainDistinctByLocation() {
+        let first = USBDevice(
+            name: "USB Device",
+            vendor: "Example",
+            vendorId: 0x1234,
+            productId: 0x5678,
+            serialNumber: nil,
+            locationId: 0x0010_0000,
+            speedMbps: nil,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: nil
+        )
+        let second = USBDevice(
+            name: "USB Device",
+            vendor: "Example",
+            vendorId: 0x1234,
+            productId: 0x5678,
+            serialNumber: nil,
+            locationId: 0x0020_0000,
+            speedMbps: nil,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: nil
+        )
+
+        XCTAssertNotEqual(first.uniqueId, second.uniqueId)
+    }
+
+    func testHubClassificationOnlyAppliesToUSBClassNine() {
+        let usbHub = USBDevice(
+            name: "Hub",
+            vendor: nil,
+            vendorId: 0,
+            productId: 0,
+            serialNumber: nil,
+            locationId: nil,
+            speedMbps: nil,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: nil,
+            deviceClass: 9
+        )
+        let thunderboltDevice = USBDevice(
+            name: "Dock",
+            vendor: nil,
+            vendorId: 0,
+            productId: 0,
+            serialNumber: nil,
+            locationId: nil,
+            speedMbps: 40_000,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: nil,
+            deviceClass: 9,
+            transport: .thunderbolt
+        )
+
+        XCTAssertTrue(usbHub.isHub)
+        XCTAssertFalse(thunderboltDevice.isHub)
+    }
+
+    func testThunderboltDescriptionUsesItsNegotiatedLinkSpeed() {
+        let device = USBDevice(
+            name: "SSD",
+            vendor: "Example",
+            vendorId: 0x1111,
+            productId: 0x2222,
+            serialNumber: nil,
+            locationId: 1,
+            speedMbps: 80_000,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: nil,
+            transport: .thunderbolt,
+            transportVersion: "USB4 v2",
+            transportIdentifier: "ABC"
+        )
+
+        XCTAssertEqual(device.connectionDescription, "Thunderbolt/USB4 — 80.0 Gbps")
+        XCTAssertEqual(device.uniqueId, "thunderbolt-4369-8738-ABC")
+    }
+
+    func testThunderboltBillboardIsExplicitOptIn() {
+        let regularUSBDevice = USBDevice(
+            name: "USB Device",
+            vendor: "Example",
+            vendorId: 1,
+            productId: 1,
+            serialNumber: nil,
+            locationId: nil,
+            speedMbps: nil,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: false
+        )
+        let billboard = USBDevice(
+            name: "Thunderbolt4 Mini Dock",
+            vendor: "Anker",
+            vendorId: 0x291A,
+            productId: 0x8358,
+            serialNumber: "11AD1D0AB6073C0A31200B00",
+            locationId: 0x0215_0000,
+            speedMbps: 12,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: 0x0201,
+            isExternalStorage: false,
+            isThunderboltBillboard: true
+        )
+
+        XCTAssertFalse(regularUSBDevice.isThunderboltBillboard)
+        XCTAssertTrue(billboard.isThunderboltBillboard)
+    }
+
+    func testLegacyHardwareSoundDataIsRemoved() throws {
+        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        ["soundDevices", "customHardwareSounds", "hardwareSound", "playHardwareSound"].forEach {
+            defaults.set("legacy-value", forKey: $0)
+        }
+
+        let appSupport = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let soundDirectory = appSupport
+            .appendingPathComponent("local.menubarusb.tests", isDirectory: true)
+            .appendingPathComponent("Sounds", isDirectory: true)
+        try FileManager.default.createDirectory(at: soundDirectory, withIntermediateDirectories: true)
+        try Data("legacy sound".utf8).write(to: soundDirectory.appendingPathComponent("sound.mp3"))
+        defer { try? FileManager.default.removeItem(at: appSupport) }
+
+        Utils.App.removeLegacyHardwareSoundData(
+            defaults: defaults,
+            bundleIdentifier: "local.menubarusb.tests",
+            applicationSupportDirectory: appSupport
+        )
+
+        XCTAssertFalse(FileManager.default.fileExists(atPath: soundDirectory.path))
+        ["soundDevices", "customHardwareSounds", "hardwareSound", "playHardwareSound"].forEach {
+            XCTAssertNil(defaults.object(forKey: $0))
+        }
+    }
+
+    func testLegacyDonationPreferenceIsRemoved() {
+        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        defaults.set(true, forKey: "hideDonate")
+        Utils.App.removeLegacyDonationData(defaults: defaults)
+
+        XCTAssertNil(defaults.object(forKey: "hideDonate"))
+    }
+
+    func testLegacyAutomaticUpdatePreferenceIsRemoved() {
+        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        defaults.set(true, forKey: "newVersionNotification")
+        Utils.App.removeLegacyAutomaticUpdateData(defaults: defaults)
+
+        XCTAssertNil(defaults.object(forKey: "newVersionNotification"))
+    }
+
+    func testLegacyEthernetTrafficPreferencesAreRemoved() {
+        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        ["internetMonitoring", "trafficButton", "disableTrafficButtonLabel", "fastMonitor"].forEach {
+            defaults.set(true, forKey: $0)
+        }
+        Utils.App.removeLegacyEthernetTrafficData(defaults: defaults)
+
+        ["internetMonitoring", "trafficButton", "disableTrafficButtonLabel", "fastMonitor"].forEach {
+            XCTAssertNil(defaults.object(forKey: $0))
+        }
+    }
+
+    func testCuratedInitialDefaultsDoNotOverwriteExistingPreferences() {
+        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        AppDefaults.register(in: defaults)
+        XCTAssertTrue(defaults.bool(forKey: StorageKeys.showPortMax))
+        XCTAssertTrue(defaults.bool(forKey: StorageKeys.longList))
+        XCTAssertFalse(defaults.bool(forKey: StorageKeys.showScrollBar))
+        XCTAssertTrue(defaults.bool(forKey: StorageKeys.bigNames))
+        XCTAssertTrue(defaults.bool(forKey: StorageKeys.showEthernet))
+        XCTAssertFalse(defaults.bool(forKey: StorageKeys.storeConnectionLogs))
+
+        defaults.set(false, forKey: StorageKeys.longList)
+        AppDefaults.register(in: defaults)
+        XCTAssertFalse(defaults.bool(forKey: StorageKeys.longList))
+    }
+}

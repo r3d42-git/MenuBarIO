@@ -6,84 +6,8 @@
 //
 
 import Foundation
-import AppKit
 
 final class CodableStorageManager {
-    final class Sound {
-        @CodableAppStorage(Key.customHardwareSounds)
-        static var items: [HardwareSound] = []
-
-        static var all: [HardwareSound] {
-            return items
-        }
-
-        static subscript(_ key: String) -> HardwareSound? {
-            return items.first(where: { $0.uniqueId == key })
-        }
-
-        static var count: Int {
-            return items.count
-        }
-
-        static func add(_ custom: HardwareSound) {
-            if custom.titleKey.lowercased() == "mute" { return }
-            items.removeAll { $0.uniqueId == custom.uniqueId }
-            items.append(custom)
-        }
-
-        static func remove(withId id: String) {
-            let item = items.first(where: { $0.uniqueId == id })
-            if item != nil {
-                Utils.App.deleteFromAppStorage(item!.connect)
-                Utils.App.deleteFromAppStorage(item!.disconnect ?? "")
-            }
-            items.removeAll { $0.uniqueId == id }
-            let soundDevices = SoundDevices.getBySoundId(id)
-            for i in soundDevices {
-                SoundDevices.remove(i.deviceId)
-            }
-        }
-
-        static func clear() {
-            items.removeAll(keepingCapacity: false)
-        }
-    }
-
-    final class SoundDevices {
-        @CodableAppStorage(Key.soundDevices)
-        static var items: [DeviceSound] = []
-
-        static subscript(_ deviceId: String) -> DeviceSound? {
-            return items.first(where: { $0.deviceId == deviceId })
-        }
-
-        static var count: Int {
-            return items.count
-        }
-
-        static func getBySoundId(_ soundId: String) -> [DeviceSound] {
-            return items.filter { $0.soundId == soundId }
-        }
-
-        static func getByBothIds(device: String, sound: String) -> DeviceSound? {
-            return items.first { $0.soundId == sound && $0.deviceId == device }
-        }
-
-        static func add(_ deviceId: String?, _ soundId: String?) {
-            if deviceId == nil || soundId == nil { return }
-            items.removeAll { $0.deviceId == deviceId }
-            items.append(DeviceSound(deviceId: deviceId!, soundId: soundId!))
-        }
-
-        static func remove(_ deviceId: String) {
-            items.removeAll { $0.deviceId == deviceId }
-        }
-
-        static func clear() {
-            items.removeAll(keepingCapacity: false)
-        }
-    }
-
     final class Stored {
         @CodableAppStorage(Key.storedDevices)
         static var items: [StoredDevice] = []

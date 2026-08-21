@@ -6,13 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		8061FE122E60BD2000A07182 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8061FE102E60BD1C00A07182 /* Info.plist */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
-		8061FDFA2E60BBDB00A07182 /* MenuBarUSB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MenuBarUSB.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8061FDFA2E60BBDB00A07182 /* MenuBarUSB-TB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MenuBarUSB-TB.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8061FE102E60BD1C00A07182 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A00100000000000000000003 /* MenuBarUSBTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MenuBarUSBTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -21,10 +18,32 @@
 			path = MenuBarUSB;
 			sourceTree = "<group>";
 		};
+		A00100000000000000000002 /* MenuBarUSBTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MenuBarUSBTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXContainerItemProxy section */
+		A00100000000000000000008 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8061FDF22E60BBDB00A07182 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8061FDF92E60BBDB00A07182;
+			remoteInfo = MenuBarUSB;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		8061FDF72E60BBDB00A07182 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00100000000000000000006 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -39,6 +58,7 @@
 			children = (
 				8061FE102E60BD1C00A07182 /* Info.plist */,
 				8061FDFC2E60BBDB00A07182 /* MenuBarUSB */,
+				A00100000000000000000002 /* MenuBarUSBTests */,
 				8061FDFB2E60BBDB00A07182 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -46,7 +66,8 @@
 		8061FDFB2E60BBDB00A07182 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8061FDFA2E60BBDB00A07182 /* MenuBarUSB.app */,
+				8061FDFA2E60BBDB00A07182 /* MenuBarUSB-TB.app */,
+				A00100000000000000000003 /* MenuBarUSBTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -73,10 +94,41 @@
 			packageProductDependencies = (
 			);
 			productName = MenuBarUSB;
-			productReference = 8061FDFA2E60BBDB00A07182 /* MenuBarUSB.app */;
+			productReference = 8061FDFA2E60BBDB00A07182 /* MenuBarUSB-TB.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A00100000000000000000004 /* MenuBarUSBTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A00100000000000000000009 /* Build configuration list for PBXNativeTarget "MenuBarUSBTests" */;
+			buildPhases = (
+				A00100000000000000000005 /* Sources */,
+				A00100000000000000000006 /* Frameworks */,
+				A00100000000000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A00100000000000000000010 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A00100000000000000000002 /* MenuBarUSBTests */,
+			);
+			name = MenuBarUSBTests;
+			packageProductDependencies = (
+			);
+			productName = MenuBarUSBTests;
+			productReference = A00100000000000000000003 /* MenuBarUSBTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
+
+/* Begin PBXTargetDependency section */
+		A00100000000000000000010 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8061FDF92E60BBDB00A07182 /* MenuBarUSB */;
+			targetProxy = A00100000000000000000008 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXProject section */
 		8061FDF22E60BBDB00A07182 /* Project object */ = {
@@ -128,6 +180,7 @@
 			projectRoot = "";
 			targets = (
 				8061FDF92E60BBDB00A07182 /* MenuBarUSB */,
+				A00100000000000000000004 /* MenuBarUSBTests */,
 			);
 		};
 /* End PBXProject section */
@@ -137,7 +190,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8061FE122E60BD2000A07182 /* Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00100000000000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,6 +204,13 @@
 
 /* Begin PBXSourcesBuildPhase section */
 		8061FDF62E60BBDB00A07182 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A00100000000000000000005 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -283,7 +349,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
@@ -301,20 +367,20 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
 				"INFOPLIST_FILE[sdk=*]" = Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MenuBarUSB;
+				INFOPLIST_KEY_CFBundleDisplayName = "MenuBarUSB-TB";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "MenuBarUSB needs permission to execute system events.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 3.5;
+				MARKETING_VERSION = 0.1.0;
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-Xfrontend -warn-long-expression-type-checking=100";
-				PRODUCT_BUNDLE_IDENTIFIER = rafael.MenuBarUSB;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = de.r3d.menubarusb.tb;
+				PRODUCT_MODULE_NAME = MenuBarUSB;
+				PRODUCT_NAME = "MenuBarUSB-TB";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -327,11 +393,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MenuBarUSB/MenuBarUSB.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -348,22 +415,52 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
 				"INFOPLIST_FILE[sdk=*]" = Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MenuBarUSB;
+				INFOPLIST_KEY_CFBundleDisplayName = "MenuBarUSB-TB";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "MenuBarUSB needs permission to execute system events.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 3.5;
-				PRODUCT_BUNDLE_IDENTIFIER = rafael.MenuBarUSB;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.r3d.menubarusb.tb;
+				PRODUCT_MODULE_NAME = MenuBarUSB;
+				PRODUCT_NAME = "MenuBarUSB-TB";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A00100000000000000000011 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.r3d.menubarusb.tb.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MenuBarUSB-TB.app/Contents/MacOS/MenuBarUSB-TB";
+			};
+			name = Debug;
+		};
+		A00100000000000000000012 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.r3d.menubarusb.tb.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MenuBarUSB-TB.app/Contents/MacOS/MenuBarUSB-TB";
 			};
 			name = Release;
 		};
@@ -384,6 +481,15 @@
 			buildConfigurations = (
 				8061FE072E60BBDC00A07182 /* Debug */,
 				8061FE082E60BBDC00A07182 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A00100000000000000000009 /* Build configuration list for PBXNativeTarget "MenuBarUSBTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00100000000000000000011 /* Debug */,
+				A00100000000000000000012 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct LogsView: View {
     
-    @Environment(\.openURL) var openURL
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var manager: USBDeviceManager
     @Binding var currentWindow: AppWindow
@@ -24,7 +23,6 @@ struct LogsView: View {
     @State private var recentsOnly: Bool = false
     @State private var recentsAmount: Int = 50
     @State private var showTimeDifferences: Bool = false
-    @State private var hoveringAppTool: Bool = false
     
     private var totalValidLogs: Int {
         CSM.ConnectionLog.items
@@ -261,45 +259,22 @@ struct LogsView: View {
                 
                 Spacer()
                 
-                if !hoveringAppTool {
-                    Group {
-                        Button {
-                            CSM.ConnectionLog.clear()
-                            manager.refresh()
-                        } label: {
-                            Label("\(totalValidLogs)", systemImage: "trash")
-                        }
-                        .foregroundStyle(.red)
-                        
-                        Button {
-                            exportAllLogsToJSON()
-                        } label: {
-                            Label("export", systemImage: "document")
-                        }
+                Group {
+                    Button {
+                        CSM.ConnectionLog.clear()
+                        manager.refresh()
+                    } label: {
+                        Label("\(totalValidLogs)", systemImage: "trash")
                     }
-                    .disabled(CSM.ConnectionLog.count <= 0)
+                    .foregroundStyle(.red)
                     
-                }
-                
-                if hoveringAppTool {
-                    Text("analysis_tool")
-                        .bold()
-                        .lineLimit(1)
-                }
-                
-                Image("analysis_tool_icon")
-                    .resizable()
-                    .frame(width: 24, height: 24)
-                    .onHover { hovering in
-                        withAnimation(.linear) {
-                            hoveringAppTool = hovering
-                        }
+                    Button {
+                        exportAllLogsToJSON()
+                    } label: {
+                        Label("export", systemImage: "document")
                     }
-                    .onTapGesture {
-                        let url = URL(string: Utils.Miscellaneous.analysisToolUrl)
-                        openURL(url!)
-                    }
-                    .opacity(hoveringAppTool ? 1.0 : 0.4)
+                }
+                .disabled(CSM.ConnectionLog.count <= 0)
             }
             
             ScrollViewReader { proxy in

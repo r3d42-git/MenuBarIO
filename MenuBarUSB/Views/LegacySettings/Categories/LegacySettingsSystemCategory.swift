@@ -2,27 +2,16 @@
 //  LegacySettingsSystemCategory.swift
 //  MenuBarUSB
 //
-//  Created by rafael on 17/04/26.
-//
 
-import SwiftUI
 import ServiceManagement
+import SwiftUI
 
 struct LegacySettingsSystemCategory: View {
-    
-    @EnvironmentObject var manager: USBDeviceManager
-    
-    @State private var isPlayingSound = false
-    
     @Binding var activeRowID: UUID?
-    
+
     @AS(Key.launchAtLogin) private var launchAtLogin = false
     @AS(Key.showNotifications) private var showNotifications = false
-    @AS(Key.newVersionNotification) private var newVersionNotification = false
-    @AS(Key.reduceTransparency) private var reduceTransparency = false
     @AS(Key.disableNotifCooldown) private var disableNotifCooldown = false
-    @AS(Key.playHardwareSound) private var playHardwareSound = false
-    @AS(Key.hardwareSound) private var hardwareSound: String = ""
 
     private func toggleLoginItem(enabled: Bool) {
         do {
@@ -35,7 +24,7 @@ struct LegacySettingsSystemCategory: View {
             print("Error:", error)
         }
     }
-    
+
     var body: some View {
         ToggleRow(
             label: "open_on_startup",
@@ -43,17 +32,7 @@ struct LegacySettingsSystemCategory: View {
             binding: $launchAtLogin,
             activeRowID: $activeRowID,
             incompatibilities: nil,
-            onToggle: { value in
-                toggleLoginItem(enabled: value)
-            }
-        )
-        ToggleRow(
-            label: "new_version_notification",
-            description: "new_version_notification_description",
-            binding: $newVersionNotification,
-            activeRowID: $activeRowID,
-            incompatibilities: nil,
-            onToggle: { _ in }
+            onToggle: { toggleLoginItem(enabled: $0) }
         )
         ToggleRow(
             label: "show_notification",
@@ -61,11 +40,11 @@ struct LegacySettingsSystemCategory: View {
             binding: $showNotifications,
             activeRowID: $activeRowID,
             incompatibilities: nil,
-            onToggle: { value in
-                if value == false {
-                    disableNotifCooldown = false
-                } else {
+            onToggle: { enabled in
+                if enabled {
                     Utils.System.requestNotificationPermission()
+                } else {
+                    disableNotifCooldown = false
                 }
             }
         )
@@ -75,56 +54,8 @@ struct LegacySettingsSystemCategory: View {
             binding: $disableNotifCooldown,
             activeRowID: $activeRowID,
             incompatibilities: nil,
-            disabled: showNotifications == false,
+            disabled: !showNotifications,
             onToggle: { _ in }
         )
-        ToggleRow(
-            label: "play_hardware_sound",
-            description: "play_hardware_sound_description",
-            binding: $playHardwareSound,
-            activeRowID: $activeRowID,
-            incompatibilities: nil,
-            onToggle: { _ in }
-        )
-        HStack {
-            Menu {
-                ForEach(HardwareSound.all, id: \.uniqueId) { sound in
-                    Button(LocalizedStringKey(sound.titleKey)) {
-                        hardwareSound = sound.uniqueId
-                    }
-                }
-            } label: {
-                let sound = HardwareSound[hardwareSound]
-                let title = LocalizedStringKey(sound?.titleKey ?? "none_default")
-                Text(title)
-            }
-            .contextMenu {
-                Button("undo_all_devices_sound_associations") {
-                    CSM.SoundDevices.clear()
-                    Utils.App.restart()
-                }
-            }
-
-            if hardwareSound != "" {
-                Button {
-                    isPlayingSound = true
-                    let sound = HardwareSound[hardwareSound]
-                    Utils.System.playSound(sound?.connect)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                        Utils.System.playSound(sound?.disconnect)
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.4) {
-                        isPlayingSound = false
-                    }
-                } label: {
-                    Image(systemName: "play.fill")
-                }
-                .buttonStyle(.borderless)
-            }
-            Spacer()
-        }
-        .frame(maxWidth: 290)
-        .disabled(isPlayingSound || !playHardwareSound)
-        .opacity(playHardwareSound ? 1.0 : 0.1)
     }
 }

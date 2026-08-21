@@ -34,16 +34,6 @@ struct SettingsStorageCategory: View {
                 manager.refresh()
             }
             
-            StorageButton(type: .soundAssociation) {
-                CSM.SoundDevices.clear()
-                manager.refresh()
-            }
-            
-            StorageButton(type: .sound) {
-                CSM.Sound.clear()
-                manager.refresh()
-            }
-            
             StorageButton(type: .stored) {
                 CSM.Stored.clear()
                 manager.refresh()

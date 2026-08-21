@@ -34,27 +34,8 @@ final class Utils {
             performer.perform(.generic, performanceTime: .now)
         }
 
-        static func playSound(_ sound: String?, limit: TimeInterval = 8) {
-            guard let sound = sound else { return }
-
-            var audio: NSSound? = nil
-
-            if let systemSound = NSSound(named: NSSound.Name(sound)) {
-                audio = systemSound
-            } else if let url = Bundle.main.url(forResource: sound, withExtension: "mp3"),
-                      let mp3Sound = NSSound(contentsOf: url, byReference: false)
-            {
-                audio = mp3Sound
-            } else {
-                let fileURL = URL(fileURLWithPath: sound)
-                if FileManager.default.fileExists(atPath: fileURL.path),
-                   let fileSound = NSSound(contentsOf: fileURL, byReference: true)
-                {
-                    audio = fileSound
-                }
-            }
-
-            guard let audio else { return }
+        static func playSystemSound(named sound: String, limit: TimeInterval = 8) {
+            guard let audio = NSSound(named: NSSound.Name(sound)) else { return }
 
             audio.play()
             let stopTime = min(limit, audio.duration)
@@ -120,13 +101,6 @@ final class Utils {
     
     final class TemplateNotification {
         
-        static func updateAvailable() {
-            Utils.System.sendNotification(
-                title: "update_notification_title",
-                body: "update_notification_body"
-            )
-        }
-        
         static func deviceConnection(devices: String, connected: Bool) {
             if connected {
                 Utils.System.sendNotification(
@@ -170,19 +144,6 @@ final class Utils {
             Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
         }
 
-        static func hasUpdate() async -> Bool {
-            guard let url = URL(string: Utils.Miscellaneous.latestRepoGithubApi) else { return false }
-
-            do {
-                let (data, _) = try await URLSession.shared.data(from: url)
-                let release = try JSONDecoder().decode(GitHubRelease.self, from: data)
-                let latest = release.tag_name.replacingOccurrences(of: "v", with: "")
-                return Utils.App.isVersion(Utils.App.appVersion, olderThan: latest)
-            } catch {
-                return false
-            }
-        }
-
         static func exit() {
             NSApp.terminate(nil)
         }
@@ -205,46 +166,44 @@ final class Utils {
             return v1Components.count < v2Components.count
         }
 
-        static func deleteFromAppStorage(_ pathOrFilename: String) {
-            let fileManager = FileManager.default
-            let inputURL = URL(fileURLWithPath: pathOrFilename)
-
-            if inputURL.path.hasPrefix("/") {
-                if fileManager.fileExists(atPath: inputURL.path) {
-                    do {
-                        try fileManager.removeItem(at: inputURL)
-                        print("File removed (absolute path): \(inputURL.path)")
-                    } catch {
-                        print("Error removing absolute file: \(error)")
-                    }
-                } else {
-                    print("Absolute file not found: \(inputURL.path)")
-                }
-                return
-            }
-
-            guard let appSupport = try? fileManager.url(
+        static func removeLegacyHardwareSoundData(
+            defaults: UserDefaults = .standard,
+            bundleIdentifier: String? = Bundle.main.bundleIdentifier,
+            applicationSupportDirectory: URL? = FileManager.default.urls(
                 for: .applicationSupportDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: false
-            ) else {
-                print("Could not access Application Support directory.")
-                return
-            }
+                in: .userDomainMask
+            ).first,
+            fileManager: FileManager = .default
+        ) {
+            [
+                "soundDevices",
+                "customHardwareSounds",
+                "hardwareSound",
+                "playHardwareSound",
+            ].forEach(defaults.removeObject(forKey:))
 
-            let fileURL = appSupport.appendingPathComponent(pathOrFilename)
+            guard let bundleIdentifier, let applicationSupportDirectory else { return }
+            let legacySounds = applicationSupportDirectory
+                .appendingPathComponent(bundleIdentifier, isDirectory: true)
+                .appendingPathComponent("Sounds", isDirectory: true)
+            try? fileManager.removeItem(at: legacySounds)
+        }
 
-            if fileManager.fileExists(atPath: fileURL.path) {
-                do {
-                    try fileManager.removeItem(at: fileURL)
-                    print("File removed (app storage): \(fileURL.path)")
-                } catch {
-                    print("Error removing file from app storage: \(error)")
-                }
-            } else {
-                print("File not found in app storage: \(fileURL.path)")
-            }
+        static func removeLegacyDonationData(defaults: UserDefaults = .standard) {
+            defaults.removeObject(forKey: "hideDonate")
+        }
+
+        static func removeLegacyAutomaticUpdateData(defaults: UserDefaults = .standard) {
+            defaults.removeObject(forKey: "newVersionNotification")
+        }
+
+        static func removeLegacyEthernetTrafficData(defaults: UserDefaults = .standard) {
+            [
+                "internetMonitoring",
+                "trafficButton",
+                "disableTrafficButtonLabel",
+                "fastMonitor",
+            ].forEach(defaults.removeObject(forKey:))
         }
 
         static func deleteStorageData() {
@@ -334,57 +293,21 @@ final class Utils {
     }
 
     final class Miscellaneous {
-        static let contactEmail = "contatorafaelswi@gmail.com"
-        static let githubUrl = "https://github.com/rafaelSwi/MenuBarUSB"
-        static let linkedinUrl = "https://www.linkedin.com/in/rafaelneuwirth/"
-        static let linkedinProfile = "in/rafaelneuwirth"
-        static let btcAddress = "bc1qvluxh224489mt6svp23kr0u8y2upn009pa546t"
-        static let ltcAddress = "ltc1qz42uw4plam83f2sud2rckzewvdwm9vs4rfazl5"
-        static let analysisToolUrl = "https://github.com/rafaelSwi/MenuBarUSBAnalysisTool"
-        static let latestRepoGithubApi = "https://api.github.com/repos/rafaelSwi/MenuBarUSB/releases/latest"
-
-        static func generateQRCode(from string: String) -> NSImage? {
-            let context = CIContext()
-            let filter = CIFilter.qrCodeGenerator()
-            filter.message = Data(string.utf8)
-
-            guard let outputImage = filter.outputImage else { return nil }
-
-            let scaled = outputImage.transformed(by: CGAffineTransform(scaleX: 12, y: 12))
-
-            if let cgimg = context.createCGImage(scaled, from: scaled.extent) {
-                return NSImage(cgImage: cgimg, size: NSSize(width: 300, height: 300))
+        static let githubUrl = "https://github.com/r3d42-git/MenuBarUSB-TB"
+        /// Forks opt in by supplying their own GitHub Releases API endpoint in
+        /// the app's Info.plist. Falling back to the upstream feed would make a
+        /// separately signed build advertise someone else's updates.
+        static var latestRepoGithubApi: String? {
+            guard let url = Bundle.main.object(
+                forInfoDictionaryKey: "MenuBarUSBUpdateFeedURL"
+            ) as? String else {
+                return nil
             }
-            return nil
+
+            let trimmed = url.trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.isEmpty ? nil : trimmed
         }
 
-        struct QRCodeView: View {
-            let text: String
-            @State private var hovered = false
-
-            var body: some View {
-                let blurAmount: CGFloat = hovered ? 0 : (hovered ? 0 : 6)
-
-                Group {
-                    if let image = generateQRCode(from: text) {
-                        Image(nsImage: image)
-                            .interpolation(.none)
-                            .resizable()
-                            .scaledToFit()
-                            .blur(radius: blurAmount)
-                            .animation(.easeInOut(duration: 0.5), value: blurAmount)
-                            .onHover { hovering in
-                                if hovering {
-                                    hovered = true
-                                }
-                            }
-                    } else {
-                        Color.gray
-                    }
-                }
-            }
-        }
-        
         static func sizeOfCodableArray<T: Codable>(_ value: T) -> Int {
             let encoder = PropertyListEncoder()
             encoder.outputFormat = .binary

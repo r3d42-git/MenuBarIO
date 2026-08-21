@@ -1,0 +1,21 @@
+# macOS and Xcode user state
+.DS_Store
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+
+# Local release outputs and credentials
+*.xcarchive/
+*.dmg
+*.pkg
+*.zip
+*.p12
+*.p8
+*.mobileprovision
+.release/
+
+# Keep the reproducible Codex Run action, ignore other local Codex state.
+.codex/*
+!.codex/environments/
+!.codex/environments/environment.toml

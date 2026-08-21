@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
+forbidden_pattern='analytics|telemetry|sentry|firebase|mixpanel|amplitude|crashlytics|posthog|bugsnag|appcenter'
+if rg -n -i --glob '*.swift' "$forbidden_pattern" MenuBarUSB; then
+  echo "Privacy audit failed: telemetry or analytics code was found." >&2
+  exit 1
+fi
+
+if rg -n --glob '*.swift' '@AS\(Key\.newVersionNotification|hasUpdate\(' MenuBarUSB; then
+  echo "Privacy audit failed: an automatic update check was found." >&2
+  exit 1
+fi
+
+if rg -n --glob '*.swift' '@AS\(Key\.(internetMonitoring|trafficButton|disableTrafficButtonLabel|fastMonitor)|startEthernetMonitoring|stopEthernetMonitoring|ethernetTraffic|trafficMonitorRunning|ETHERNET_DOT' MenuBarUSB; then
+  echo "Privacy audit failed: removed Ethernet traffic monitoring was found." >&2
+  exit 1
+fi
+
+expected_urlsession_files=$'MenuBarUSB/Views/LegacySettings/Components/LegacySettingsHorizontalTopBar.swift\nMenuBarUSB/Views/Settings/Components/SettingsHorizontalTopBar/SettingsHorizontalTopBar.swift'
+actual_urlsession_files="$(rg -l --glob '*.swift' 'URLSession' MenuBarUSB | LC_ALL=C sort || true)"
+if [[ "$actual_urlsession_files" != "$expected_urlsession_files" ]]; then
+  echo "Privacy audit failed: URLSession is only permitted for the manual update controls." >&2
+  exit 1
+fi
+
+feed_url="$(plutil -extract MenuBarUSBUpdateFeedURL raw Info.plist)"
+if [[ "$feed_url" != 'https://api.github.com/repos/r3d42-git/MenuBarUSB-TB/releases/latest' ]]; then
+  echo "Privacy audit failed: the configured update feed is unexpected." >&2
+  exit 1
+fi
+
+echo "Privacy audit passed: no telemetry, no automatic network requests, no Ethernet traffic monitor, and only the manual GitHub update check uses URLSession."

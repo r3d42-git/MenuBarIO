@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8061FDF92E60BBDB00A07182"
-               BuildableName = "MenuBarUSB.app"
+               BuildableName = "MenuBarUSB-TB.app"
                BlueprintName = "MenuBarUSB"
                ReferencedContainer = "container:MenuBarUSB.xcodeproj">
             </BuildableReference>
@@ -29,6 +29,18 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A00100000000000000000004"
+               BuildableName = "MenuBarUSBTests.xctest"
+               BlueprintName = "MenuBarUSBTests"
+               ReferencedContainer = "container:MenuBarUSB.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -45,7 +57,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8061FDF92E60BBDB00A07182"
-            BuildableName = "MenuBarUSB.app"
+            BuildableName = "MenuBarUSB-TB.app"
             BlueprintName = "MenuBarUSB"
             ReferencedContainer = "container:MenuBarUSB.xcodeproj">
          </BuildableReference>
@@ -62,7 +74,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8061FDF92E60BBDB00A07182"
-            BuildableName = "MenuBarUSB.app"
+            BuildableName = "MenuBarUSB-TB.app"
             BlueprintName = "MenuBarUSB"
             ReferencedContainer = "container:MenuBarUSB.xcodeproj">
          </BuildableReference>

@@ -24,9 +24,7 @@ struct MainListDeviceListContextMenuDevice: View {
     @AS(Key.disableContextMenuSearch) private var disableContextMenuSearch = false
     @AS(Key.contextMenuCopyAll) private var contextMenuCopyAll = false
     @AS(Key.mouseHoverInfo) private var mouseHoverInfo = false
-    @AS(Key.playHardwareSound) private var playHardwareSound = false
     @AS(Key.hideTechInfo) private var hideTechInfo = false
-    @AS(Key.hardwareSound) private var hardwareSound: String = ""
     
     private func devicesShowingMoreDoesNotHave(_ device: borrowing USBDevice) -> Bool {
         for dev in devicesShowingMore {
@@ -42,7 +40,7 @@ struct MainListDeviceListContextMenuDevice: View {
     }
     
     private func deviceId(_ device: borrowing USBDevice) -> String {
-        return String(format: "%04X:%04X", device.vendorId, device.productId)
+        return device.hardwareIdentifier
     }
     
     private func showRestoreName(for deviceId: String) -> Bool {
@@ -218,7 +216,7 @@ struct MainListDeviceListContextMenuDevice: View {
                 Divider()
 
                 Menu {
-                    ForEach(sortedDevices) { d in
+                    ForEach(sortedDevices.filter { $0.item.isHub == device.item.isHub }) { d in
                         Button {
                             CSM.Heritage.add(withId: d.item.uniqueId, inheritsFrom: uniqueId)
                             manager.refresh()
@@ -234,47 +232,6 @@ struct MainListDeviceListContextMenuDevice: View {
             }
         }
 
-        if playHardwareSound {
-            Divider()
-
-            Menu {
-                Button {
-                    CSM.SoundDevices.add(uniqueId, "mute")
-                    manager.refresh()
-                } label: {
-                    let isSelected = CSM.SoundDevices.getByBothIds(device: uniqueId, sound: "mute") != nil
-                    Text(isSelected ? "‣   \("mute".localized)" : "mute")
-                }
-
-                Divider()
-
-                ForEach(HardwareSound.all, id: \.uniqueId) { sound in
-                    Button {
-                        CSM.SoundDevices.add(uniqueId, sound.uniqueId)
-                        manager.refresh()
-                    } label: {
-                        let selected = CSM.SoundDevices.getByBothIds(device: uniqueId, sound: sound.uniqueId) != nil
-                        let title = sound.titleKey.localized
-                        var text = selected ? "‣   \(title)" : title
-                        if HardwareSound[hardwareSound]?.titleKey == sound.titleKey {
-                            text += " ＊"
-                        }
-                        return Text(text)
-                    }
-                }
-
-                if CSM.SoundDevices[uniqueId] != nil {
-                    Divider()
-                    Button("undo") {
-                        CSM.SoundDevices.remove(uniqueId)
-                        manager.refresh()
-                    }
-                }
-            } label: {
-                Label("sound", systemImage: "speaker.wave.3")
-            }
-        }
-
         if !disableContextMenuSearch {
             Divider()
 
@@ -286,8 +243,7 @@ struct MainListDeviceListContextMenuDevice: View {
                 }
 
                 Button {
-                    let id = String(format: "%04X:%04X", device.item.vendorId, device.item.productId)
-                    searchOnWeb(id)
+                    searchOnWeb(device.item.hardwareIdentifier)
                 } label: {
                     Label("search_id", systemImage: "globe")
                 }

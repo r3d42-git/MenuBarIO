@@ -13,8 +13,6 @@ struct SettingsView: View {
     
     @Environment(\.openURL) var openURL
     @Environment(\.openWindow) private var openWindow
-    @EnvironmentObject var manager: USBDeviceManager
-    
     @Binding var currentWindow: AppWindow
     
     @State private var activeRowID: UUID? = nil
@@ -23,18 +21,13 @@ struct SettingsView: View {
     
     @AS(Key.settingsCategory) private var category: SettingsCategory = .system
     @AS(Key.reduceTransparency) private var reduceTransparency = false
-    @AS(Key.internetMonitoring) private var internetMonitoring = false
-    
-    private var isTrafficMonitoringPausedForSettings: Bool {
-        return internetMonitoring && !manager.trafficMonitorRunning && manager.ethernetCableConnected
-    }
     
     var body: some View {
         
         VStack(alignment: .leading, spacing: 20) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("MenuBarUSB")
+                    Text("MenuBarUSB-TB")
                         .font(.title2)
                         .bold()
                     Text(
@@ -49,26 +42,7 @@ struct SettingsView: View {
                 
                 Spacer()
                 
-                SettingsHorizontalTopBar(currentWindow: $currentWindow)
-            }
-            
-            if isTrafficMonitoringPausedForSettings {
-                HStack {
-                    Image(systemName: "network.slash")
-                    Text("traffic_monitor_inactive_settings")
-                        .font(.footnote)
-                }
-                .foregroundStyle(.white)
-                .padding(.vertical, 4)
-                .padding(.horizontal, 6)
-                .background(Color.black.opacity(0.7))
-                .cornerRadius(5)
-                .onAppear {
-                    manager.stopEthernetMonitoring()
-                }
-                .contextMenu {
-                    SettingsContextMenuTrafficWarning(currentWindow: $currentWindow)
-                }
+                SettingsHorizontalTopBar()
             }
             
             VStack(alignment: .leading, spacing: 3) {
@@ -117,15 +91,11 @@ struct SettingsView: View {
                 }
                 
                 if category == .ethernet {
-                    SettingsEthernetCategory(currentWindow: $currentWindow, activeRowID: $activeRowID)
+                    SettingsEthernetCategory(activeRowID: $activeRowID)
                 }
                 
                 if category == .heritage {
                     SettingsHeritageCategory(currentWindow: $currentWindow, activeRowID: $activeRowID)
-                }
-                
-                if category == .automation {
-                 SettingsAutomationCategory(activeRowID: $activeRowID)
                 }
                 
                 if category == .others {

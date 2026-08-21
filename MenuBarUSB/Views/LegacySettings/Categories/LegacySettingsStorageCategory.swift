@@ -36,16 +36,6 @@ struct LegacySettingsStorageCategory: View {
             manager.refresh()
         }
         
-        StorageButton(type: .soundAssociation) {
-            CSM.SoundDevices.clear()
-            manager.refresh()
-        }
-        
-        StorageButton(type: .sound) {
-            CSM.Sound.clear()
-            manager.refresh()
-        }
-        
         StorageButton(type: .stored) {
             CSM.Stored.clear()
             manager.refresh()
@@ -78,7 +68,7 @@ struct LegacySettingsStorageCategory: View {
                         Utils.App.deleteStorageData()
                         tryingToResetSettings = false
                         showOthersOptions = false
-                        Utils.System.playSound("Bottle")
+                        Utils.System.playSystemSound(named: "Bottle")
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                             Utils.App.restart()
                         }

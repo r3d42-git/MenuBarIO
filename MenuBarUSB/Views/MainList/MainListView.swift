@@ -19,6 +19,8 @@ struct MainListView: View {
     @AS(Key.storeDevices) private var storeDevices = false
     @AS(Key.listToolBar) private var listToolBar = false
     @AS(Key.windowWidth) private var windowWidth: WindowWidth = .normal
+    @AS(Key.deviceGroupExpanded) private var deviceGroupExpanded = true
+    @AS(Key.hubGroupExpanded) private var hubGroupExpanded = false
     
     private var windowHeight: CGFloat? {
         if isTrulyEmpty {
@@ -33,7 +35,9 @@ struct MainListView: View {
             multiplier -= 12
         }
         
-        var total = manager.count
+        // The status counter excludes hubs, but popup sizing must account for all
+        // currently visible entries (including the expandable hub group).
+        var total = manager.devices.count
         if storeDevices {
             total += CSM.Stored.filteredDevices(manager.devices).count
         }
@@ -55,14 +59,14 @@ struct MainListView: View {
     }
     
     private var isTrulyEmpty: Bool {
-        let connectedCount: Int = manager.count
+        let hasConnectedDevices = !manager.devices.isEmpty
         let storedCount: Int = CSM.Stored.filteredDevices(manager.devices).count
         
-        if connectedCount == 0 && storeDevices == false {
+        if !hasConnectedDevices && storeDevices == false {
             return true
         }
         
-        if connectedCount == 0 && storedCount == 0 {
+        if !hasConnectedDevices && storedCount == 0 {
             return true
         }
         
@@ -83,7 +87,11 @@ struct MainListView: View {
                 if isTrulyEmpty {
                     MainListEmptyListMessage()
                 } else {
-                    MainListDeviceList(isRenamingDeviceId: $isRenamingDeviceId)
+                    MainListDeviceList(
+                        isRenamingDeviceId: $isRenamingDeviceId,
+                        deviceGroupExpanded: $deviceGroupExpanded,
+                        hubGroupExpanded: $hubGroupExpanded
+                    )
                 }
             }
             .padding(3)
