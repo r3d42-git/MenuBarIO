@@ -1,3 +1,34 @@
+# Privacy and network access
+
+MenuBarUSB-TB has no telemetry, analytics SDKs, crash reporters, accounts,
+server API or background network access. It does not transmit device, usage or
+settings data.
+
+## Local data
+
+The app reads USB, Thunderbolt and Ethernet metadata through macOS system APIs
+and stores settings, custom device names and – only when explicitly enabled –
+connection logs exclusively in the user's local profile. Connection logs are
+disabled by default. The Ethernet indicator processes only the local link
+status; it does not inspect packets, destinations or traffic data.
+
+## Explicitly user-triggered access
+
+The app connects only after a clear user action:
+
+- **“Check for Updates”** downloads this project's public GitHub Releases
+  response. The source code sends no device or usage data. As with every HTTPS
+  connection, GitHub receives technical transport metadata such as the IP
+  address.
+- Searching for a device opens the selected search engine in the default
+  browser and sends the search term chosen by the user to that website.
+- Links to the repository or release page open in the default browser.
+
+There is no automatic update check at app launch. The `script/privacy_audit.sh`
+script enforces these boundaries in local verification and GitHub Actions.
+
+---
+
 # Datenschutz und Netzwerkzugriffe
 
 MenuBarUSB-TB hat keine Telemetrie, Analyse-SDKs, Crash-Reporter, Konten,

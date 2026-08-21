@@ -66,3 +66,82 @@ then independently re-checks the exact GitHub download with:
 
 The update feed is configured for this public repository. It will become
 usable after its first GitHub Release is published.
+
+---
+
+# Release – Deutsch
+
+`script/release.sh` erzeugt ein mit Developer ID signiertes, notarisiertes und
+gestapeltes DMG sowie die zugehörige Prüfsumme `.dmg.sha256`. Es prüft die App
+vor dem Paketbau, validiert das notarisierte DMG, bindet dann genau dieses DMG
+schreibgeschützt ein und prüft die enthaltene App erneut. Das ausgelieferte
+Image öffnet sich als kleines Installationsfenster: Die App kann auf den
+sichtbaren Alias **Programme** gezogen werden, der auf `/Applications` zeigt.
+`LICENSE` und der Installationshintergrund bleiben im Image enthalten und
+werden während des Release geprüft.
+
+## Regel für das DMG-Design
+
+Jedes DMG-Release dieser App verwendet dasselbe direkte Installationsmuster:
+App-Symbol links, **Programme** rechts, dazwischen ein Pfeil und eine kurze
+Anweisung. Nicht auf einen ungeordneten Finder-Ordner zurückfallen. Das Layout
+wird ausschließlich mit macOS-Werkzeugen und versionsverwalteten Skripten
+erstellt; es fügt weder Netzwerkzugriff noch eine Drittanbieter-Abhängigkeit
+für den Paketbau hinzu. Weil Finder das Fensterlayout speichert, ein DMG aus
+einer entsperrten lokalen macOS-Sitzung mit verfügbarem Finder erstellen; ein
+kopfloser Release bricht bewusst vor dem Paketbau ab.
+
+Vor jedem Release `./script/verify.sh` ausführen und die Hardware-Abnahme in
+[`TESTING.md`](TESTING.md) abschließen. Das Skript führt die XCTest-Suite und
+den Xcode Static Analyzer in isoliertem DerivedData aus. Dieselben beiden
+Prüfungen laufen in GitHub Actions bei Pushes auf `main` und Pull Requests;
+dieser CI-Ablauf enthält bewusst keine Signierungs- oder
+Notarisierungszugangsdaten.
+
+Die Produktidentität ist auf `MenuBarUSB-TB` mit der Bundle-ID
+`de.r3d.menubarusb.tb` festgelegt. Das Projekt verwendet standardmäßig das
+Entwicklerteam `G6JH37W285` und das lokale `notarytool`-Schlüsselbundprofil
+`MenuBarUSB-TB-notary`. Vor dem ersten Release sicherstellen, dass das
+entsprechende Developer-ID-Application-Zertifikat verfügbar ist, und dieses
+Profil interaktiv anlegen:
+
+```bash
+./script/store_notary_credentials.sh 'YOUR-APPLE-ID'
+```
+
+`notarytool` fragt nach dem app-spezifischen Passwort und speichert es nur im
+lokalen Schlüsselbund. Dieses Passwort unter
+[account.apple.com](https://account.apple.com/) unter **Anmeldung und
+Sicherheit → App-spezifische Passwörter** erzeugen; es nicht in der
+Shell-Historie, Datei, einem Patch oder Repository ablegen. Apple dokumentiert
+diesen Ablauf in seinem [Notarisierungsleitfaden](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).
+
+Den Release nur mit für diesen Fork geeigneten Werten ausführen:
+
+```bash
+MENUBARUSB_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
+./script/release.sh 0.1.1
+```
+
+Version 0.1.1 wird bewusst nur für **Apple Silicon (`arm64`)** ausgeliefert
+und benötigt macOS 13 oder neuer. Intel-Macs werden von dieser Version nicht
+unterstützt. Das Release-Skript prüft den angeforderten ausführbaren Slice. Ein
+künftiger Universal-Release erfordert ausdrücklich eine zusätzliche
+Hardware-Abnahme auf beiden Architekturen.
+
+Das Release-Skript bricht bei nicht übergebenen oder nicht ignorierten
+unversionierten Dateien ab, führt die XCTest-Suite und die statische Analyse
+aus und prüft anschließend die signierte App, das notarisierte DMG und die App
+in genau diesem DMG. Es lädt nichts hoch.
+
+Nach Prüfung und Push des Release-Commits und seines annotierten Tags
+`vVERSION` das DMG, seine Prüfsumme und die versionsbezogenen Release Notes
+veröffentlichen. Das Skript prüft danach den exakten GitHub-Download
+unabhängig erneut mit:
+
+```bash
+./script/publish_release.sh 0.1.1
+```
+
+Der Update-Feed ist für dieses öffentliche Repository eingerichtet. Er wird
+nach Veröffentlichung des ersten GitHub Release nutzbar.

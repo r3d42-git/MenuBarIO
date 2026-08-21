@@ -1,3 +1,38 @@
+# Differences from MenuBarUSB
+
+MenuBarUSB-TB is based on the publicly available
+[`rafaelSwi/MenuBarUSB`](https://github.com/rafaelSwi/MenuBarUSB) project under
+the MIT License. This document records deliberate, product-relevant changes
+for future upstream comparisons.
+
+- Product identity, bundle identifier and release channel are independent:
+  `MenuBarUSB-TB` / `de.r3d.menubarusb.tb`.
+- Thunderbolt and USB4 devices are discovered alongside USB through IOKit;
+  link speed, transport and USB4 version are displayed.
+- The list separates devices from pure USB hubs and permits both groups to be
+  collapsed and expanded.
+- Connection and device identity, IOKit ownership, Ethernet monitoring and UI
+  threading have been hardened; unit tests, analysis and CI were added.
+- Hardware sounds, including all MP3 resources, their import, assignment and
+  legacy-value cleanup, have been removed.
+- Donation, cryptocurrency and related hiding features have been removed.
+- The link and image assets for the upstream-only analysis tool have been
+  removed because this fork has no compatible companion of its own.
+- Tested local initial values have been set as product-wide defaults. Telemetry
+  and automatic update checks are removed; the privacy audit limits network
+  access to explicitly triggered actions.
+- The experimental Ethernet traffic monitor – including byte counters, timer,
+  pause/start controls and blinking icon – has been removed. The local
+  indicator of a connected LAN cable remains.
+- Signing, notarization and release verification use the project-specific
+  scripts in `script/`, including a fresh download and a repeat verification of
+  the published DMG.
+
+The complete technical difference remains traceable through Git against the
+`upstream` remote.
+
+---
+
 # Abweichungen zu MenuBarUSB
 
 MenuBarUSB-TB basiert auf dem öffentlich verfügbaren Projekt

@@ -1,3 +1,67 @@
+# Testing
+
+## Quick check before every commit
+
+```bash
+./script/verify.sh
+```
+
+The command uses an isolated DerivedData directory and runs:
+
+- the privacy audit: no telemetry, no automatic update check, and only the
+  manual update controls may use `URLSession`;
+- the XCTest suite for device identity, hub classification, Thunderbolt link
+  speed, Billboard detection and removal of retired features;
+- the Xcode Static Analyzer for the Release configuration.
+
+The unit tests intentionally run without a debug signature: they test pure
+model and data logic, and the unsigned local test host avoids a Gatekeeper
+dialog. This does not affect the signed and notarized product delivered to
+users, which is verified separately by the release script.
+
+For an app-launch smoke test only:
+
+```bash
+./script/build_and_run.sh --verify
+```
+
+The same unit tests and analysis run in GitHub Actions for pull requests and
+every push to `main`.
+
+## Hardware acceptance before a release
+
+These cases require real hardware and cannot be meaningfully emulated in CI.
+After every change to IOKit discovery, check them once:
+
+1. Connect a normal USB device and at least one USB hub. The device must appear
+   under **USB Devices**, the hub under **USB Hubs**; the counter counts devices
+   only.
+2. Connect a Thunderbolt/USB4 device (for example, an SSD enclosure). Its name,
+   vendor, Thunderbolt/USB4 version and negotiated link speed must be visible.
+3. Connect a Thunderbolt dock with a USB-C Billboard interface. The dock must
+   appear once only as a Thunderbolt device, not additionally as a slow USB
+   interface.
+4. Connect two identical USB devices without serial numbers to different ports.
+   Both must remain visible and retain separate settings.
+5. Disconnect and reconnect each device. The list, group counter, log and
+   notifications may react only once per physical device.
+6. If the Ethernet indicator is enabled, turn its setting off and on twice. The
+   cable icon may appear only when a wired link is active and must not initiate
+   a network connection from the app.
+
+For signed distribution, then follow the complete instructions in
+[`RELEASE.md`](RELEASE.md).
+
+## DMG layout acceptance
+
+After changing the packaging process, open the generated DMG in Finder. It
+must show a compact installation view with the app, arrow and **Programme**
+alias. The app must be draggable to **Programme**; `LICENSE` must remain
+present. The release script also automatically checks the alias, background and
+license in the freshly mounted DMG.
+
+---
+
 # Tests
 
 ## Schnellprüfung vor jedem Commit
