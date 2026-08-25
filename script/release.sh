@@ -14,7 +14,9 @@ VERSION="$1"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PRODUCT_NAME="MenuBarUSB-TB"
 BUNDLE_IDENTIFIER="de.r3d.menubarusb.tb"
-ARCHITECTURES="${MENUBARUSB_ARCHS:-arm64}"
+# Distribution is deliberately Universal. Do not make this configurable: a
+# release must contain both supported Mac architectures.
+ARCHITECTURES="arm64 x86_64"
 VOLUME_NAME="$PRODUCT_NAME installieren"
 APPLICATIONS_LINK_NAME="Programme"
 RELEASE_DIR="${MENUBARUSB_RELEASE_DIR:-$ROOT_DIR/.release/$VERSION}"

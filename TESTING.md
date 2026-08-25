@@ -12,6 +12,8 @@ The command uses an isolated DerivedData directory and runs:
 - the XCTest suite for device identity, hub classification, Thunderbolt link
   speed, Billboard detection and removal of retired features;
 - the Xcode Static Analyzer for the Release configuration.
+- a Release app containing both Apple-Silicon (`arm64`) and Intel (`x86_64`)
+  slices; `lipo` verifies both slices in the resulting executable.
 
 The unit tests intentionally run without a debug signature: they test pure
 model and data logic, and the unsigned local test host avoids a Gatekeeper
@@ -24,8 +26,11 @@ For an app-launch smoke test only:
 ./script/build_and_run.sh --verify
 ```
 
-The same unit tests and analysis run in GitHub Actions for pull requests and
-every push to `main`.
+GitHub Actions runs the same checks natively on an Apple-Silicon runner and an
+Intel runner for pull requests and every push to `main`. The local XCTest run
+uses the architecture of the current Mac; it can be selected explicitly with
+`MENUBARUSB_TEST_ARCH=arm64` or `MENUBARUSB_TEST_ARCH=x86_64` when that native
+architecture is available.
 
 ## Hardware acceptance before a release
 
@@ -47,6 +52,9 @@ After every change to IOKit discovery, check them once:
 6. If the Ethernet indicator is enabled, turn its setting off and on twice. The
    cable icon may appear only when a wired link is active and must not initiate
    a network connection from the app.
+7. Before the first Universal release, repeat cases 1–6 on an Intel Mac. If an
+   Intel Mac is unavailable, record the approved exception in the release notes
+   instead of claiming physical Intel-device acceptance.
 
 For signed distribution, then follow the complete instructions in
 [`RELEASE.md`](RELEASE.md).
@@ -75,6 +83,8 @@ Der Befehl verwendet ein isoliertes DerivedData-Verzeichnis und führt aus:
   Netzwerk-Client-Code;
 - die XCTest-Tests für Geräteidentität, Hub-Klassifizierung, Thunderbolt-Link-Geschwindigkeit, Billboard-Erkennung sowie die Bereinigung entfernter Funktionen;
 - den Xcode Static Analyzer für die Release-Konfiguration.
+- eine Release-App mit Apple-Silicon- (`arm64`) und Intel-Slice (`x86_64`);
+  `lipo` prüft beide Slices in der erzeugten ausführbaren Datei.
 
 Die Unit-Tests laufen bewusst ohne Debug-Signatur: Sie prüfen reine
 Modell- und Datenlogik, und der unsignierte lokale Test-Host vermeidet einen
@@ -87,8 +97,11 @@ Zum reinen Starttest der App:
 ./script/build_and_run.sh --verify
 ```
 
-Die gleichen Unit-Tests und die Analyse laufen in GitHub Actions bei Pull
-Requests und bei jedem Push auf `main`.
+GitHub Actions führt dieselben Prüfungen bei Pull Requests und jedem Push auf
+`main` nativ auf einem Apple-Silicon- und einem Intel-Runner aus. Die lokalen
+XCTest-Tests verwenden die Architektur des aktuellen Macs; sie kann mit
+`MENUBARUSB_TEST_ARCH=arm64` beziehungsweise `MENUBARUSB_TEST_ARCH=x86_64`
+ausdrücklich gewählt werden, wenn diese Architektur nativ verfügbar ist.
 
 ## Hardware-Abnahme vor einem Release
 
@@ -112,6 +125,10 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
 6. Falls die Ethernet-Anzeige aktiviert ist: Einstellung zweimal ein- und
    ausschalten. Das Kabelsymbol darf nur bei aktivem kabelgebundenem Link
    erscheinen und darf keine Netzwerkverbindung der App auslösen.
+7. Vor dem ersten Universal-Release die Fälle 1–6 auf einem Intel-Mac
+   wiederholen. Falls kein Intel-Mac verfügbar ist, die genehmigte Ausnahme in
+   den Release Notes dokumentieren, statt eine physische Intel-Geräteabnahme zu
+   behaupten.
 
 Für die signierte Auslieferung danach die vollständige Anleitung in
 [`RELEASE.md`](RELEASE.md) befolgen.

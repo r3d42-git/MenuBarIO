@@ -18,8 +18,11 @@ It is an independent fork of [rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi
 
 ## Compatibility
 
-**Version 0.1.1 supports Apple Silicon Macs (`arm64`) running macOS 13 or
-newer. Intel Macs are not supported by this release.**
+The current development branch builds a **Universal** app for Apple Silicon
+(`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. The released
+version 0.1.1 remains Apple-Silicon-only. Before the first Universal release,
+the device acceptance cases in [TESTING.md](TESTING.md) still need to be run on
+an Intel Mac (or that exception must be explicitly accepted for the release).
 
 ## Build and test
 
@@ -69,8 +72,12 @@ Ansicht.
 
 ## Kompatibilität
 
-**Version 0.1.1 unterstützt Apple-Silicon-Macs (`arm64`) mit macOS 13 oder
-neuer. Intel-Macs werden von dieser Version nicht unterstützt.**
+Der aktuelle Entwicklungsstand baut eine **Universal-App** für Apple-Silicon-
+(`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die veröffentlichte
+Version 0.1.1 bleibt ausschließlich für Apple Silicon. Vor dem ersten
+Universal-Release müssen die Geräte-Abnahmefälle aus
+[TESTING.md](TESTING.md) noch auf einem Intel-Mac ausgeführt werden (oder diese
+Ausnahme muss für den Release ausdrücklich akzeptiert werden).
 
 ## Bauen und testen
 
