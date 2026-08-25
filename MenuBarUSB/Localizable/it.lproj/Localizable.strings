@@ -4,6 +4,8 @@
 "usb_device" = "Dispositivo USB";
 "usb_devices" = "Dispositivi USB";
 "usb_hubs" = "Hub USB";
+"bluetooth_devices" = "Dispositivi Bluetooth";
+"connected_devices" = "Dispositivi connessi";
 "protocol" = "Protocollo:";
 "no_devices_found" = "Nessun dispositivo trovato";
 "about" = "Informazioni";

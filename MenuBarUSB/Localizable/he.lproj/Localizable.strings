@@ -4,6 +4,8 @@
 "usb_device" = "מכשיר USB";
 "usb_devices" = "מכשירי USB";
 "usb_hubs" = "רכזות USB";
+"bluetooth_devices" = "מכשירי Bluetooth";
+"connected_devices" = "מכשירים מחוברים";
 "protocol" = "פרוטוקול:";
 "no_devices_found" = "לא נמצאו מכשירים";
 "about" = "אודות";

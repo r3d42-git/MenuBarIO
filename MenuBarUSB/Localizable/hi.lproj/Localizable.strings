@@ -4,6 +4,8 @@
 "usb_device" = "यूएसबी डिवाइस";
 "usb_devices" = "यूएसबी डिवाइस";
 "usb_hubs" = "USB हब";
+"bluetooth_devices" = "ब्लूटूथ डिवाइस";
+"connected_devices" = "कनेक्ट किए गए डिवाइस";
 "protocol" = "प्रोटोकॉल:";
 "no_devices_found" = "कोई डिवाइस नहीं मिला";
 "about" = "के बारे में";

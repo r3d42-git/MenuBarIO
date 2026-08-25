@@ -5,17 +5,20 @@
 //  Created by rafael on 19/04/26.
 //
 
+import AppKit
 import SwiftUI
 
 struct MainListDeviceList: View {
     
     @EnvironmentObject var manager: USBDeviceManager
+    @EnvironmentObject var bluetoothManager: BluetoothDeviceManager
     @State private var isHoveringDeviceId: String = ""
     @State private var isHoveringPowerSupply: Bool = false
     @State private var devicesShowingMore: [USBDeviceWrapper] = []
     
     @Binding var deviceGroupExpanded: Bool
     @Binding var hubGroupExpanded: Bool
+    @Binding var bluetoothGroupExpanded: Bool
     
     @AS(Key.powerSourceInfo) private var powerSourceInfo = false
     @AS(Key.powerSupplyAsCharger) private var powerSupplyAsCharger = false
@@ -68,8 +71,8 @@ struct MainListDeviceList: View {
         return mouseHoverInfo && isHoveringDeviceId == device.uniqueId
     }
 
-    private func deviceTitleView(_ name: String?) -> some View {
-        Text(name ?? "usb_device".localized)
+    private func deviceTitleView(_ name: String) -> some View {
+        Text(name)
             .font(.system(size: bigNames ? 17 : 14, weight: .semibold))
             .foregroundColor(.primary)
             .lineLimit(1)
@@ -217,6 +220,67 @@ struct MainListDeviceList: View {
         Divider()
             .padding(.leading, 42)
     }
+
+    @ViewBuilder
+    private func connectedBluetoothDeviceRows(_ devices: [BluetoothDevice]) -> some View {
+        ForEach(devices) { device in
+            connectedBluetoothDeviceRow(device)
+        }
+    }
+
+    @ViewBuilder
+    private func bluetoothDeviceIcon(for device: BluetoothDevice) -> some View {
+        switch device.icon {
+        case .system(let symbolName):
+            Image(systemName: symbolName)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(.secondary)
+        case .bluetoothTemplate:
+            if let image = NSImage(named: NSImage.bluetoothTemplateName) {
+                Image(nsImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 12, height: 15)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func connectedBluetoothDeviceRow(_ device: BluetoothDevice) -> some View {
+        HStack(spacing: 10) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    .fill(.primary.opacity(0.08))
+                    .frame(width: 32, height: 32)
+                bluetoothDeviceIcon(for: device)
+            }
+
+            deviceTitleView(device.name)
+
+            Spacer(minLength: 12)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(
+            isHoveringDeviceId == device.id
+                ? Color.primary.opacity(0.07)
+                : Color.clear,
+            in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+        )
+        .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .onHover { hovering in
+            if hovering {
+                isHoveringDeviceId = device.id
+            } else if isHoveringDeviceId == device.id {
+                isHoveringDeviceId = ""
+            }
+        }
+        .animation(.easeInOut(duration: 0.12), value: isHoveringDeviceId)
+
+        Divider()
+            .padding(.leading, 42)
+    }
     
     
     var body: some View {
@@ -275,6 +339,17 @@ struct MainListDeviceList: View {
 
                 if hubGroupExpanded {
                     connectedDeviceRows(hubGroupDevices)
+                }
+
+                groupHeader(
+                    title: "bluetooth_devices".localized,
+                    icon: "bluetooth",
+                    count: bluetoothManager.count,
+                    isExpanded: $bluetoothGroupExpanded
+                )
+
+                if bluetoothGroupExpanded {
+                    connectedBluetoothDeviceRows(bluetoothManager.devices)
                 }
             }
             .padding(.horizontal, 2)

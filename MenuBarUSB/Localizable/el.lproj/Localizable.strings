@@ -4,6 +4,8 @@
 "usb_device" = "Συσκευή USB";
 "usb_devices" = "Συσκευές USB";
 "usb_hubs" = "Διανομείς USB";
+"bluetooth_devices" = "Συσκευές Bluetooth";
+"connected_devices" = "Συνδεδεμένες συσκευές";
 "protocol" = "Πρωτόκολλο:";
 "no_devices_found" = "Δεν βρέθηκαν συσκευές";
 "about" = "Σχετικά";

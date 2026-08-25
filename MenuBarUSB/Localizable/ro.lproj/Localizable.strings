@@ -4,6 +4,8 @@
 "usb_device" = "Dispozitiv USB";
 "usb_devices" = "Dispozitive USB";
 "usb_hubs" = "Hub-uri USB";
+"bluetooth_devices" = "Dispozitive Bluetooth";
+"connected_devices" = "Dispozitive conectate";
 "protocol" = "Protocol:";
 "no_devices_found" = "Niciun dispozitiv găsit";
 "about" = "Despre";

@@ -4,6 +4,8 @@
 "usb_device" = "USBデバイス";
 "usb_devices" = "USBデバイス";
 "usb_hubs" = "USBハブ";
+"bluetooth_devices" = "Bluetoothデバイス";
+"connected_devices" = "接続中のデバイス";
 "protocol" = "プロトコル:";
 "no_devices_found" = "デバイスが見つかりません";
 "about" = "情報";

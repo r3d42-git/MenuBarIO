@@ -4,6 +4,8 @@
 "usb_device" = "อุปกรณ์ USB";
 "usb_devices" = "อุปกรณ์ USB";
 "usb_hubs" = "USB ฮับ";
+"bluetooth_devices" = "อุปกรณ์บลูทูธ";
+"connected_devices" = "อุปกรณ์ที่เชื่อมต่อ";
 "protocol" = "โปรโตคอล:";
 "no_devices_found" = "ไม่พบอุปกรณ์";
 "about" = "เกี่ยวกับ";

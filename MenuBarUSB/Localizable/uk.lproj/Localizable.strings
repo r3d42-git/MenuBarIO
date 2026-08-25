@@ -4,6 +4,8 @@
 "usb_device" = "USB-пристрій";
 "usb_devices" = "USB-пристрої";
 "usb_hubs" = "USB-концентратори";
+"bluetooth_devices" = "Пристрої Bluetooth";
+"connected_devices" = "Підключені пристрої";
 "protocol" = "Протокол:";
 "no_devices_found" = "Пристрої не знайдено";
 "about" = "Інформація";

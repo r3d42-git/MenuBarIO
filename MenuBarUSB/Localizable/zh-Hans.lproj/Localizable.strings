@@ -4,6 +4,8 @@
 "usb_device" = "USB设备";
 "usb_devices" = "USB设备";
 "usb_hubs" = "USB 集线器";
+"bluetooth_devices" = "蓝牙设备";
+"connected_devices" = "已连接的设备";
 "protocol" = "协议：";
 "no_devices_found" = "未找到设备";
 "about" = "关于";

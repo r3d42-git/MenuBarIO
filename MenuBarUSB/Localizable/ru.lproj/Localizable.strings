@@ -4,6 +4,8 @@
 "usb_device" = "USB-устройство";
 "usb_devices" = "USB-устройства";
 "usb_hubs" = "USB-концентраторы";
+"bluetooth_devices" = "Устройства Bluetooth";
+"connected_devices" = "Подключенные устройства";
 "protocol" = "Протокол:";
 "no_devices_found" = "Устройства не найдены";
 "about" = "Информация";

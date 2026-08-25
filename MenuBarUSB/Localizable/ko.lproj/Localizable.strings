@@ -4,6 +4,8 @@
 "usb_device" = "USB 장치";
 "usb_devices" = "USB 장치들";
 "usb_hubs" = "USB 허브";
+"bluetooth_devices" = "Bluetooth 기기";
+"connected_devices" = "연결된 기기";
 "protocol" = "프로토콜:";
 "no_devices_found" = "장치를 찾을 수 없음";
 "about" = "정보";

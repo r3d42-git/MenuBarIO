@@ -4,6 +4,8 @@
 "usb_device" = "USB-enhed";
 "usb_devices" = "USB-enheder";
 "usb_hubs" = "USB-hubs";
+"bluetooth_devices" = "Bluetooth-enheder";
+"connected_devices" = "Tilsluttede enheder";
 "protocol" = "Protokol:";
 "no_devices_found" = "Ingen enheder fundet";
 "about" = "Om";

@@ -4,6 +4,8 @@
 "usb_device" = "جهاز USB";
 "usb_devices" = "أجهزة USB";
 "usb_hubs" = "محاور USB";
+"bluetooth_devices" = "أجهزة Bluetooth";
+"connected_devices" = "الأجهزة المتصلة";
 "protocol" = "البروتوكول:";
 "no_devices_found" = "لم يتم العثور على أي أجهزة";
 "about" = "حول";

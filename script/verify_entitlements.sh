@@ -10,6 +10,7 @@ entitlements_path="$1"
 required_entitlements=(
   "com.apple.security.app-sandbox"
   "com.apple.security.device.usb"
+  "com.apple.security.device.bluetooth"
 )
 
 if ! plutil -lint "$entitlements_path" >/dev/null; then
@@ -32,7 +33,7 @@ actual_entitlements="$(
 while IFS= read -r entitlement; do
   [[ -z "$entitlement" ]] && continue
   case "$entitlement" in
-    "com.apple.security.app-sandbox"|"com.apple.security.device.usb") ;;
+    "com.apple.security.app-sandbox"|"com.apple.security.device.usb"|"com.apple.security.device.bluetooth") ;;
     *)
       echo "Entitlement verification failed: unexpected entitlement: $entitlement" >&2
       exit 1

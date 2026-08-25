@@ -4,6 +4,8 @@
 "usb_device" = "Dispositiu USB";
 "usb_devices" = "Dispositius USB";
 "usb_hubs" = "Concentradors USB";
+"bluetooth_devices" = "Dispositius Bluetooth";
+"connected_devices" = "Dispositius connectats";
 "protocol" = "Protocol:";
 "no_devices_found" = "No s'han trobat dispositius";
 "about" = "Més";

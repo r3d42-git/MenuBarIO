@@ -4,6 +4,8 @@
 "usb_device" = "USB Cihazı";
 "usb_devices" = "USB Cihazları";
 "usb_hubs" = "USB Hub'ları";
+"bluetooth_devices" = "Bluetooth Aygıtları";
+"connected_devices" = "Bağlı Aygıtlar";
 "protocol" = "Protokol:";
 "no_devices_found" = "Cihaz bulunamadı";
 "about" = "Hakkında";

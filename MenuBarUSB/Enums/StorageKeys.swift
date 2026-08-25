@@ -13,6 +13,7 @@ enum StorageKeys {
     static let longList = "longList"
     static let deviceGroupExpanded = "deviceGroupExpanded"
     static let hubGroupExpanded = "hubGroupExpanded"
+    static let bluetoothGroupExpanded = "bluetoothGroupExpanded"
     static let hideTechInfo = "hideTechInfo"
     static let powerSourceInfo = "powerSourceInfo"
     static let reduceTransparency = "reduceTransparency"
@@ -43,6 +44,7 @@ enum AppDefaults {
         StorageKeys.showScrollBar: false,
         StorageKeys.bigNames: true,
         StorageKeys.showEthernet: true,
+        StorageKeys.bluetoothGroupExpanded: false,
     ]
 
     static func register(in defaults: UserDefaults = .standard) {
