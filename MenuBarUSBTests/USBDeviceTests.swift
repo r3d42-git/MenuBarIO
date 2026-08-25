@@ -204,10 +204,29 @@ final class USBDeviceTests: XCTestCase {
         XCTAssertFalse(defaults.bool(forKey: StorageKeys.showScrollBar))
         XCTAssertTrue(defaults.bool(forKey: StorageKeys.bigNames))
         XCTAssertTrue(defaults.bool(forKey: StorageKeys.showEthernet))
-        XCTAssertFalse(defaults.bool(forKey: StorageKeys.storeConnectionLogs))
 
         defaults.set(false, forKey: StorageKeys.longList)
         AppDefaults.register(in: defaults)
         XCTAssertFalse(defaults.bool(forKey: StorageKeys.longList))
+    }
+
+    func testRemovedFeatureDataIsCleared() {
+        let suiteName = "MenuBarUSBTests.(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let removedKeys = [
+            "storedDevices", "inheritedDevices", "connectionLogs",
+            "showNotifications", "searchEngine", "storeConnectionLogs",
+            "listToolBar", "forceEnglish",
+            "renamedDevices", "camouflagedDevices", "pinnedDevices",
+        ]
+        removedKeys.forEach { defaults.set("legacy-value", forKey: $0) }
+
+        Utils.App.removeRemovedFeatureData(defaults: defaults)
+
+        removedKeys.forEach { XCTAssertNil(defaults.object(forKey: $0)) }
     }
 }

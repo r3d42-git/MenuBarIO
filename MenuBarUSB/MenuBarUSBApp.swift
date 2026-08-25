@@ -22,14 +22,13 @@ struct MenuBarUSBApp: App {
     @AS(Key.hideMenubarIcon) private var hideMenubarIcon = false
     @AS(Key.macBarIcon) private var macBarIcon: String = "cable.connector"
     @AS(Key.showEthernet) private var showEthernet = false
-    @AS(Key.forceEnglish) private var forceEnglish = false
-    
     init() {
         AppDefaults.register()
         Utils.App.removeLegacyHardwareSoundData()
         Utils.App.removeLegacyDonationData()
         Utils.App.removeLegacyAutomaticUpdateData()
         Utils.App.removeLegacyEthernetTrafficData()
+        Utils.App.removeRemovedFeatureData()
     }
     
     private var countText: some View {
@@ -90,7 +89,6 @@ struct MenuBarUSBApp: App {
             .appBackground(isReduceTransparencyOn)
             .colorSchemeForce(light: forceLightMode, dark: forceDarkMode)
             .environmentObject(manager)
-            .environment(\.locale, forceEnglish ? Locale(identifier: "en") : Locale.current)
     }
     
     // Auxiliary function for views in separate windows
@@ -114,13 +112,6 @@ struct MenuBarUSBApp: App {
             LegacySettingsView()
         }
         
-        appWindow("connection_logs", id: "connection_logs") {
-            LogsView(currentWindow: $currentWindow, window: true)
-        }
-        
-        appWindow("inheritance_tree", id: "inheritance_tree") {
-            InheritanceTreeView(currentWindow: $currentWindow, window: true)
-        }
     }
     
     @ViewBuilder
@@ -130,12 +121,6 @@ struct MenuBarUSBApp: App {
             view { MainListView(currentWindow: $currentWindow) }
         case .settings:
             view { SettingsView(currentWindow: $currentWindow) }
-        case .heritage:
-            view { HeritageView(currentWindow: $currentWindow) }
-        case .inheritanceTree:
-            view { InheritanceTreeView(currentWindow: $currentWindow, window: false) }
-        case .logs:
-            view { LogsView(currentWindow: $currentWindow, window: false) }
         }
     }
     

@@ -9,8 +9,6 @@ import SwiftUI
 
 struct SettingsInterfaceCategory: View {
     
-    @EnvironmentObject var manager: USBDeviceManager
-    
     @Binding var activeRowID: UUID?
     
     @AS(Key.hideTechInfo) private var hideTechInfo = false
@@ -19,7 +17,6 @@ struct SettingsInterfaceCategory: View {
     @AS(Key.showScrollBar) private var showScrollBar = false
     @AS(Key.longList) private var longList = false
     @AS(Key.bigNames) private var bigNames = false
-    @AS(Key.storeDevices) private var storeDevices = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
@@ -75,15 +72,6 @@ struct SettingsInterfaceCategory: View {
                 activeRowID: $activeRowID,
                 incompatibilities: nil,
                 onToggle: { _ in }
-            )
-            ToggleRow(
-                label: "show_previously_connected",
-                description: "show_previously_connected_description",
-                binding: $storeDevices,
-                activeRowID: $activeRowID,
-                incompatibilities: nil,
-                willRestart: true,
-                onToggle: { _ in Utils.App.restart() }
             )
         }
     }

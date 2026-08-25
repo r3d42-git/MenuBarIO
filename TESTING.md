@@ -8,8 +8,7 @@
 
 The command uses an isolated DerivedData directory and runs:
 
-- the privacy audit: no telemetry, no automatic update check, and only the
-  manual update controls may use `URLSession`;
+- the privacy audit: no telemetry, update checks or network client code;
 - the XCTest suite for device identity, hub classification, Thunderbolt link
   speed, Billboard detection and removal of retired features;
 - the Xcode Static Analyzer for the Release configuration.
@@ -43,8 +42,8 @@ After every change to IOKit discovery, check them once:
    interface.
 4. Connect two identical USB devices without serial numbers to different ports.
    Both must remain visible and retain separate settings.
-5. Disconnect and reconnect each device. The list, group counter, log and
-   notifications may react only once per physical device.
+5. Disconnect and reconnect each device. The list and group counter must
+   react only once per physical device.
 6. If the Ethernet indicator is enabled, turn its setting off and on twice. The
    cable icon may appear only when a wired link is active and must not initiate
    a network connection from the app.
@@ -72,9 +71,8 @@ license in the freshly mounted DMG.
 
 Der Befehl verwendet ein isoliertes DerivedData-Verzeichnis und führt aus:
 
-- die Datenschutzprüfung: keine Telemetrie, keine automatische
-  Update-Abfrage und nur die manuellen Update-Schaltflächen dürfen
-  `URLSession` verwenden;
+- die Datenschutzprüfung: keine Telemetrie, Update-Abfragen oder
+  Netzwerk-Client-Code;
 - die XCTest-Tests für Geräteidentität, Hub-Klassifizierung, Thunderbolt-Link-Geschwindigkeit, Billboard-Erkennung sowie die Bereinigung entfernter Funktionen;
 - den Xcode Static Analyzer für die Release-Konfiguration.
 
@@ -109,8 +107,8 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
 4. Zwei baugleiche USB-Geräte ohne Seriennummer an unterschiedliche Ports
    anschließen. Beide müssen sichtbar bleiben und getrennte Einstellungen
    behalten.
-5. Geräte jeweils ab- und wieder anstecken. Liste, Gruppenzähler, Log und
-   Benachrichtigungen dürfen pro physischem Gerät nur einmal reagieren.
+5. Geräte jeweils ab- und wieder anstecken. Liste und Gruppenzähler dürfen pro
+   physischem Gerät nur einmal reagieren.
 6. Falls die Ethernet-Anzeige aktiviert ist: Einstellung zweimal ein- und
    ausschalten. Das Kabelsymbol darf nur bei aktivem kabelgebundenem Link
    erscheinen und darf keine Netzwerkverbindung der App auslösen.

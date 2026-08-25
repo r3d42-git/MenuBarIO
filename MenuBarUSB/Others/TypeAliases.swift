@@ -8,5 +8,4 @@
 import SwiftUI
 
 typealias AS = AppStorage
-typealias CSM = CodableStorageManager
 typealias Key = StorageKeys

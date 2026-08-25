@@ -20,17 +20,14 @@ if rg -n --glob '*.swift' '@AS\(Key\.(internetMonitoring|trafficButton|disableTr
   exit 1
 fi
 
-expected_urlsession_files=$'MenuBarUSB/Views/LegacySettings/Components/LegacySettingsHorizontalTopBar.swift\nMenuBarUSB/Views/Settings/Components/SettingsHorizontalTopBar/SettingsHorizontalTopBar.swift'
-actual_urlsession_files="$(rg -l --glob '*.swift' 'URLSession' MenuBarUSB | LC_ALL=C sort || true)"
-if [[ "$actual_urlsession_files" != "$expected_urlsession_files" ]]; then
-  echo "Privacy audit failed: URLSession is only permitted for the manual update controls." >&2
+if rg -n --glob '*.swift' 'URLSession|URLRequest|URL\(' MenuBarUSB; then
+  echo "Privacy audit failed: the minimal app must not contain network client code." >&2
   exit 1
 fi
 
-feed_url="$(plutil -extract MenuBarUSBUpdateFeedURL raw Info.plist)"
-if [[ "$feed_url" != 'https://api.github.com/repos/r3d42-git/MenuBarUSB-TB/releases/latest' ]]; then
-  echo "Privacy audit failed: the configured update feed is unexpected." >&2
+if plutil -extract MenuBarUSBUpdateFeedURL raw Info.plist >/dev/null 2>&1; then
+  echo "Privacy audit failed: the removed update feed is still configured." >&2
   exit 1
 fi
 
-echo "Privacy audit passed: no telemetry, no automatic network requests, no Ethernet traffic monitor, and only the manual GitHub update check uses URLSession."
+echo "Privacy audit passed: no telemetry, network client code, or Ethernet traffic monitor."

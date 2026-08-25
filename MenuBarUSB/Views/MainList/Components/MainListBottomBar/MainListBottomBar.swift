@@ -14,22 +14,7 @@ struct MainListBottomBar: View {
     
     @Binding var currentWindow: AppWindow
     
-    @AS(Key.renamedIndicator) private var renamedIndicator = false
-    @AS(Key.camouflagedIndicator) private var camouflagedIndicator = false
-    @AS(Key.noTextButtons) private var noTextButtons = false
-    @AS(Key.showEthernet) private var showEthernet = false
-    @AS(Key.listToolBar) private var listToolBar = false
-    @AS(Key.storeDevices) private var storeDevices = false
     @AS(Key.profilerButton) private var profilerButton = false
-    @AS(Key.powerSourceInfo) private var powerSourceInfo = false
-    
-    private var showEyeSlash: Bool {
-        if noTextButtons {
-            return true
-        } else {
-            return !profilerButton
-        }
-    }
     
     private func goToSettings() {
         if #available(macOS 15.0, *) {
@@ -39,72 +24,46 @@ struct MainListBottomBar: View {
         }
     }
 
-    private func mainButtonLabel(_ text: LocalizedStringKey, _ systemImage: String) -> some View {
-        if noTextButtons {
-            return AnyView(Image(systemName: systemImage))
-        } else {
-            return AnyView(Label(text, systemImage: systemImage))
-        }
-    }
-    
     var body: some View {
-        HStack {
-            if camouflagedIndicator {
-                Group {
-                    if showEyeSlash {
-                        Image(systemName: "eye.slash")
-                    }
-                    let first = NumberConverter(manager.connectedCamouflagedDevices).converted
-                    let second = NumberConverter(CSM.Camouflaged.devices.count).converted
-                    Text("\(first)/\(second)")
-                }
-                .opacity(manager.connectedCamouflagedDevices > 0 ? 0.5 : 0.2)
-                .help("hidden_indicator")
-                .contextMenu {
-                    MainListBottomBarContextMenuCamouflagedIndicator(camouflagedIndicator: $camouflagedIndicator)
-                }
-            }
-
-            Spacer()
-
+        HStack(spacing: 8) {
             if profilerButton {
                 Button {
                     Utils.System.openSysInfo()
                 } label: {
-                    if noTextButtons {
-                        Image(systemName: "info.circle")
-                    } else {
-                        Label("profiler_abbreviated", systemImage: "info.circle")
-                            .help("open_profiler")
-                            .contextMenu {
-                                MainListBottomBarContextMenuProfiler()
-                            }
-                    }
+                    Image(systemName: "info.circle")
+                        .help("open_profiler")
+                        .contextMenu {
+                            MainListBottomBarContextMenuProfiler()
+                        }
                 }
+                .buttonStyle(.plain)
             }
 
             Button {
                 goToSettings()
             } label: {
-                mainButtonLabel("settings", "gear")
+                Label("settings", systemImage: "gearshape")
+                    .font(.subheadline.weight(.medium))
             }
-            .contextMenu {
-                MainListBottomBarContextMenuSettings()
-            }
+            .buttonStyle(.plain)
 
-            Button { manager.refresh() } label: {
-                mainButtonLabel("refresh", "arrow.clockwise")
-            }
-            .contextMenu {
-                MainListBottomBarContextMenuRefresh()
-            }
+            Spacer()
 
-            Button { Utils.App.exit() } label: {
-                mainButtonLabel("exit", "power")
+            ControlGroup {
+                Button { manager.refresh() } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .help("refresh")
+
+                Button { Utils.App.exit() } label: {
+                    Image(systemName: "power")
+                }
+                .help("exit")
+                .contextMenu {
+                    MainListBottomBarContextMenuExit()
+                }
             }
-            .contextMenu {
-                MainListBottomBarContextMenuExit()
-            }
+            .controlGroupStyle(.navigation)
         }
     }
 }

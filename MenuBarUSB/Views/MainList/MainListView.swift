@@ -11,13 +11,10 @@ struct MainListView: View {
     
     @EnvironmentObject var manager: USBDeviceManager
     
-    @State private var isRenamingDeviceId: String = ""
     @Binding var currentWindow: AppWindow
     
     @AS(Key.longList) private var longList = false
     @AS(Key.hideTechInfo) private var hideTechInfo = false
-    @AS(Key.storeDevices) private var storeDevices = false
-    @AS(Key.listToolBar) private var listToolBar = false
     @AS(Key.windowWidth) private var windowWidth: WindowWidth = .normal
     @AS(Key.deviceGroupExpanded) private var deviceGroupExpanded = true
     @AS(Key.hubGroupExpanded) private var hubGroupExpanded = false
@@ -26,80 +23,90 @@ struct MainListView: View {
         if isTrulyEmpty {
             return nil
         }
-        let baseValue: CGFloat = 200
-        var multiplier: CGFloat = 26
+        let baseValue: CGFloat = 120
+        let rowHeight: CGFloat = hideTechInfo ? 48 : 68
+
+        // The header and bottom bar live outside this scrollable device area.
+        // Device rows stay comfortably readable until scrolling becomes useful.
+        let total = manager.devices.count
+
+        let sum: CGFloat = baseValue + (CGFloat(total) * rowHeight)
+        var max: CGFloat = 420
         if longList {
-            multiplier += 15
-        }
-        if hideTechInfo {
-            multiplier -= 12
-        }
-        
-        // The status counter excludes hubs, but popup sizing must account for all
-        // currently visible entries (including the expandable hub group).
-        var total = manager.devices.count
-        if storeDevices {
-            total += CSM.Stored.filteredDevices(manager.devices).count
-        }
-        
-        var sum: CGFloat = baseValue + (CGFloat(total) * multiplier)
-        var max: CGFloat = 380
-        if longList {
-            max += 315
-        }
-        if listToolBar {
-            max += 40
-            sum += 40
+            max = 640
         }
         return sum >= max ? max : sum
     }
     
-    private var isRenaming: Bool {
-        return isRenamingDeviceId != ""
-    }
-    
     private var isTrulyEmpty: Bool {
-        let hasConnectedDevices = !manager.devices.isEmpty
-        let storedCount: Int = CSM.Stored.filteredDevices(manager.devices).count
-        
-        if !hasConnectedDevices && storeDevices == false {
-            return true
-        }
-        
-        if !hasConnectedDevices && storedCount == 0 {
-            return true
-        }
-        
-        return false
+        manager.devices.isEmpty
     }
-    
-    private var showToolbar: Bool {
-        return listToolBar && !isTrulyEmpty
+
+    private var header: some View {
+        HStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(.tint.opacity(0.16))
+                    .frame(width: 30, height: 30)
+                Image(systemName: "cable.connector")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.tint)
+            }
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text("MenuBarUSB-TB")
+                    .font(.headline)
+                Text("usb_devices")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(.blue)
+                    .frame(width: 6, height: 6)
+                Text("\(manager.devices.count)")
+                    .font(.subheadline.weight(.semibold))
+                    .monospacedDigit()
+            }
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 5)
+            .background(.primary.opacity(0.07), in: Capsule())
+            .accessibilityLabel(Text("\(manager.devices.count) \("usb_devices".localized)"))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
     }
-    
+
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
+            header
+            Divider()
+
             VStack(alignment: .leading, spacing: 6) {
-                if showToolbar {
-                    MainListToolbar()
-                }
-                
                 if isTrulyEmpty {
                     MainListEmptyListMessage()
                 } else {
                     MainListDeviceList(
-                        isRenamingDeviceId: $isRenamingDeviceId,
                         deviceGroupExpanded: $deviceGroupExpanded,
                         hubGroupExpanded: $hubGroupExpanded
                     )
                 }
             }
-            .padding(3)
-            .frame(width: WindowWidth.value, height: windowHeight)
-            
+            .padding(.horizontal, 8)
+            .padding(.vertical, 7)
+            .frame(height: windowHeight)
+
+            Divider()
+
             MainListBottomBar(currentWindow: $currentWindow)
-                .padding(10)
-                .disabled(isRenaming)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
         }
+        .frame(width: CGFloat(windowWidth.rawValue))
+        .background(.regularMaterial)
     }
 }

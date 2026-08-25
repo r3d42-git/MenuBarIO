@@ -9,16 +9,8 @@ import SwiftUI
 
 struct SettingsOthersCategory: View {
     
-    @EnvironmentObject var manager: USBDeviceManager
-    
     @Binding var activeRowID: UUID?
-        
-    @AS(Key.settingsCategory) private var category: SettingsCategory = .system
-    @AS(Key.forceEnglish) private var forceEnglish = false
-    @AS(Key.listToolBar) private var listToolBar = false
-    @AS(Key.hideUpdate) private var hideUpdate = false
-    @AS(Key.disableHaptic) private var disableHaptic = false
-    @AS(Key.noTextButtons) private var noTextButtons = false
+
     @AS(Key.profilerButton) private var profilerButton = false
     @AS(Key.windowWidth) private var windowWidth: WindowWidth = .normal
     
@@ -30,8 +22,6 @@ struct SettingsOthersCategory: View {
         if order.indices.contains(nextIndex) {
             windowWidth = order[nextIndex]
         }
-        category = .system
-        category = .others
     }
     
     private var windowWidthLabel: String {
@@ -51,51 +41,6 @@ struct SettingsOthersCategory: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            if Locale.current.language.languageCode?.identifier != "en" {
-                ToggleRow(
-                    label: "force_english",
-                    description: "force_english_description",
-                    binding: $forceEnglish,
-                    activeRowID: $activeRowID,
-                    incompatibilities: nil,
-                    willRestart: true,
-                    onToggle: { _ in Utils.App.restart() }
-                )
-            }
-            ToggleRow(
-                label: "show_toolbar",
-                description: "show_toolbar_description",
-                binding: $listToolBar,
-                activeRowID: $activeRowID,
-                incompatibilities: nil,
-                onToggle: { _ in }
-            )
-            if Utils.Miscellaneous.latestRepoGithubApi != nil {
-                ToggleRow(
-                    label: "hide_check_update",
-                    description: "hide_check_update_description",
-                    binding: $hideUpdate,
-                    activeRowID: $activeRowID,
-                    incompatibilities: nil,
-                    onToggle: { _ in }
-                )
-            }
-            ToggleRow(
-                label: "disable_haptic_feedback",
-                description: "disable_haptic_feedback_description",
-                binding: $disableHaptic,
-                activeRowID: $activeRowID,
-                incompatibilities: nil,
-                onToggle: { _ in }
-            )
-            ToggleRow(
-                label: "no_text_buttons",
-                description: "no_text_buttons_description",
-                binding: $noTextButtons,
-                activeRowID: $activeRowID,
-                incompatibilities: nil,
-                onToggle: { _ in }
-            )
             ToggleRow(
                 label: "profiler_shortcut",
                 description: "profiler_shortcut_description",

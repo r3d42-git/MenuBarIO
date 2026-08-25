@@ -18,22 +18,27 @@ struct LegacySettingsView: View {
 
     @State private var activeRowID: UUID? = nil
 
-    @State private var showSystemOptions = false
+    @State private var showSystemOptions = true
     @State private var showInterfaceOptions = false
     @State private var showUsbOptions = false
-    @State private var showContextMenuOptions = false
-    @State private var showHeritageOptions = false
     @State private var showOthersOptions = false
-    @State private var showStorageOptions = false
 
-    private func untoggleAll() {
-        showSystemOptions = false
-        showInterfaceOptions = false
-        showUsbOptions = false
-        showOthersOptions = false
-        showContextMenuOptions = false
-        showStorageOptions = false
-        showHeritageOptions = false
+    private func section<Content: View>(
+        _ label: LocalizedStringKey,
+        image: String,
+        isExpanded: Binding<Bool>,
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        DisclosureGroup(isExpanded: isExpanded) {
+            content()
+                .padding(.top, 8)
+                .padding(.leading, 2)
+        } label: {
+            Label(label, systemImage: image)
+                .font(.headline)
+        }
+        .padding(10)
+        .background(Color.gray.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
     }
 
     var body: some View {
@@ -49,48 +54,42 @@ struct LegacySettingsView: View {
 
                 Divider()
 
-                HStack(alignment: .center) {
-                    LegacySettingsCategoryButton(label: "system_category", toggle: $showSystemOptions, untoggleAll: untoggleAll)
-                    LegacySettingsCategoryButton(label: "ui_category", toggle: $showInterfaceOptions, untoggleAll: untoggleAll)
-                    LegacySettingsCategoryButton(label: "usb_category", toggle: $showUsbOptions, untoggleAll: untoggleAll)
-                    LegacySettingsCategoryButton(label: "rmb", toggle: $showContextMenuOptions, untoggleAll: untoggleAll)
-                    LegacySettingsCategoryButton(label: "heritage_category", toggle: $showHeritageOptions, untoggleAll: untoggleAll)
-                    LegacySettingsCategoryButton(label: "others_category", toggle: $showOthersOptions, untoggleAll: untoggleAll)
-                    LegacySettingsCategoryButton(label: "storage_category", toggle: $showStorageOptions, untoggleAll: untoggleAll)
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 8) {
+                        section(
+                            "system_category",
+                            image: "gearshape",
+                            isExpanded: $showSystemOptions
+                        ) {
+                            LegacySettingsSystemCategory(activeRowID: $activeRowID)
+                        }
+
+                        section(
+                            "ui_category",
+                            image: "rectangle.3.group",
+                            isExpanded: $showInterfaceOptions
+                        ) {
+                            LegacySettingsInterfaceCategory(activeRowID: $activeRowID)
+                        }
+
+                        section(
+                            "usb_category",
+                            image: "cable.connector",
+                            isExpanded: $showUsbOptions
+                        ) {
+                            LegacySettingsUSBCategory(activeRowID: $activeRowID)
+                        }
+
+                        section(
+                            "others_category",
+                            image: "ellipsis.circle",
+                            isExpanded: $showOthersOptions
+                        ) {
+                            LegacySettingsOthersCategory(activeRowID: $activeRowID)
+                        }
+
+                    }
                 }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    
-                    if showSystemOptions {
-                        LegacySettingsSystemCategory(activeRowID: $activeRowID)
-                    }
-
-                    if showInterfaceOptions {
-                        LegacySettingsInterfaceCategory(activeRowID: $activeRowID)
-                    }
-
-                    if showUsbOptions {
-                        LegacySettingsUSBCategory(activeRowID: $activeRowID)
-                    }
-
-                    if showContextMenuOptions {
-                        LegacySettingsContextMenuCategory(activeRowID: $activeRowID)
-                    }
-
-                    if showHeritageOptions {
-                        LegacySettingsHeritageCategory(activeRowID: $activeRowID)
-                    }
-
-                    if showOthersOptions {
-                        LegacySettingsOthersCategory(activeRowID: $activeRowID)
-                    }
-                    
-                    if showStorageOptions {
-                        LegacySettingsStorageCategory(showOthersOptions: $showOthersOptions)
-                    }
-
-                }
-                Spacer()
 
                 LegacySettingsHorizontalBottomBar()
             }

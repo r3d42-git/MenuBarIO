@@ -64,9 +64,6 @@ then independently re-checks the exact GitHub download with:
 ./script/publish_release.sh 0.1.1
 ```
 
-The update feed is configured for this public repository. It will become
-usable after its first GitHub Release is published.
-
 ---
 
 # Release – Deutsch
@@ -142,6 +139,3 @@ unabhängig erneut mit:
 ```bash
 ./script/publish_release.sh 0.1.1
 ```
-
-Der Update-Feed ist für dieses öffentliche Repository eingerichtet. Er wird
-nach Veröffentlichung des ersten GitHub Release nutzbar.

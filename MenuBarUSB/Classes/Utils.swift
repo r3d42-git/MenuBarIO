@@ -8,7 +8,6 @@
 import AppKit
 import Foundation
 import SwiftUI
-import UserNotifications
 
 final class Utils {
     final class System {
@@ -25,13 +24,6 @@ final class Utils {
         static func copyToClipboard(_ content: String) {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(content, forType: .string)
-        }
-
-        static func hapticFeedback() {
-            @AS(Key.disableHaptic) var disableHaptic = false
-            if disableHaptic { return }
-            let performer = NSHapticFeedbackManager.defaultPerformer
-            performer.perform(.generic, performanceTime: .now)
         }
 
         static func playSystemSound(named sound: String, limit: TimeInterval = 8) {
@@ -69,74 +61,6 @@ final class Utils {
             return lower.hasPrefix("mac")
         }
 
-        static func requestNotificationPermission() {
-            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
-                if let error = error {
-                    print("Notification permission error: \(error.localizedDescription)")
-                } else {
-                    print("Notification permission granted? \(granted)")
-                }
-            }
-        }
-
-        static func sendNotification(title: String, body: String) {
-            DispatchQueue.global(qos: .utility).async {
-                let content = UNMutableNotificationContent()
-                content.title = title.localized
-                content.body = body.localized
-                content.sound = .default
-                content.interruptionLevel = .timeSensitive
-
-                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
-                UNUserNotificationCenter.current().add(request) { error in
-                    if let error = error {
-                        print("Failed to schedule notification: \(error.localizedDescription)")
-                    } else {
-                        print("Notification scheduled.")
-                    }
-                }
-            }
-        }
-    }
-    
-    final class TemplateNotification {
-        
-        static func deviceConnection(devices: String, connected: Bool) {
-            if connected {
-                Utils.System.sendNotification(
-                    title: "usb_detected",
-                    body: devices.isEmpty
-                    ? "usb_detected_info"
-                    : String(format: "device_connected".localized, devices)
-                )
-            } else {
-                Utils.System.sendNotification(
-                    title: "usb_disconnected",
-                    body: devices.isEmpty
-                        ? "usb_disconnected_info"
-                        : String(format: "device_disconnected".localized, devices)
-                )
-            }
-        }
-        
-        static func charger(_ chargePercentage: Int?, charging: Bool) {
-            var battery = "\("battery".localized): \(chargePercentage ?? 0)%"
-            if chargePercentage == nil {
-                battery = charging ? "charger_connected_body" : "charger_disconnected_body"
-            }
-            if charging {
-                Utils.System.sendNotification(
-                    title: "charger_connected",
-                    body: battery
-                )
-            } else {
-                Utils.System.sendNotification(
-                    title: "charger_disconnected",
-                    body: "\("battery".localized): \(chargePercentage ?? 0)%"
-                )
-            }
-        }
-        
     }
 
     final class App {
@@ -154,16 +78,6 @@ final class Utils {
             task.arguments = ["-n", Bundle.main.bundlePath]
             task.launch()
             Utils.App.exit()
-        }
-
-        static func isVersion(_ v1: String, olderThan v2: String) -> Bool {
-            let v1Components = v1.split(separator: ".").compactMap { Int($0) }
-            let v2Components = v2.split(separator: ".").compactMap { Int($0) }
-            for (a, b) in zip(v1Components, v2Components) {
-                if a < b { return true }
-                if a > b { return false }
-            }
-            return v1Components.count < v2Components.count
         }
 
         static func removeLegacyHardwareSoundData(
@@ -206,25 +120,20 @@ final class Utils {
             ].forEach(defaults.removeObject(forKey:))
         }
 
-        static func deleteStorageData() {
-            let fileManager = FileManager.default
-
-            if let bundleID = Bundle.main.bundleIdentifier {
-                UserDefaults.standard.removePersistentDomain(forName: bundleID)
-                UserDefaults.standard.synchronize()
-            }
-
-            if let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
-               let caches = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first,
-               let bundleID = Bundle.main.bundleIdentifier
-            {
-                let appSupportPath = appSupport.appendingPathComponent(bundleID).path
-                let cachesPath = caches.appendingPathComponent(bundleID).path
-
-                try? fileManager.removeItem(atPath: appSupportPath)
-                try? fileManager.removeItem(atPath: cachesPath)
-            }
+        static func removeRemovedFeatureData(defaults: UserDefaults = .standard) {
+            [
+                "storedDevices", "inheritedDevices", "connectionLogs",
+                "showNotifications", "disableNotifCooldown",
+                "disableInheritanceLayout", "increasedIndentationGap",
+                "hideUpdate", "noTextButtons", "disableContextMenuSearch",
+                "disableContextMenuHeritage", "searchEngine", "storeConnectionLogs",
+                "disableHaptic", "contextMenuCopyAll", "indexIndicator",
+                "listToolBar", "storeDevices", "storedIndicator", "hidePinIndicator",
+                "forceEnglish", "renamedIndicator", "camouflagedIndicator",
+                "renamedDevices", "camouflagedDevices", "pinnedDevices",
+            ].forEach(defaults.removeObject(forKey:))
         }
+
     }
 
     final class USB {
@@ -292,41 +201,4 @@ final class Utils {
         }
     }
 
-    final class Miscellaneous {
-        static let githubUrl = "https://github.com/r3d42-git/MenuBarUSB-TB"
-        /// Forks opt in by supplying their own GitHub Releases API endpoint in
-        /// the app's Info.plist. Falling back to the upstream feed would make a
-        /// separately signed build advertise someone else's updates.
-        static var latestRepoGithubApi: String? {
-            guard let url = Bundle.main.object(
-                forInfoDictionaryKey: "MenuBarUSBUpdateFeedURL"
-            ) as? String else {
-                return nil
-            }
-
-            let trimmed = url.trimmingCharacters(in: .whitespacesAndNewlines)
-            return trimmed.isEmpty ? nil : trimmed
-        }
-
-        static func sizeOfCodableArray<T: Codable>(_ value: T) -> Int {
-            let encoder = PropertyListEncoder()
-            encoder.outputFormat = .binary
-            return (try? encoder.encode(value))?.count ?? 0
-        }
-
-        static func formatBytes(_ bytes: Int) -> String {
-            if bytes < 1024 {
-                return "\(bytes)b"
-            } else if bytes < 1024 * 1024 {
-                let kb = Double(bytes) / 1024.0
-                return String(format: "%.1fkb", kb)
-            } else if bytes < 1024 * 1024 * 1024 {
-                let mb = Double(bytes) / 1024.0 / 1024.0
-                return String(format: "%.1fmb", mb)
-            } else {
-                let gb = Double(bytes) / 1024.0 / 1024.0 / 1024.0
-                return String(format: "%.1fgb", gb)
-            }
-        }
-    }
 }

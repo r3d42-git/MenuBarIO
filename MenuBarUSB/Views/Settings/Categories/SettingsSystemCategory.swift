@@ -13,8 +13,6 @@ struct SettingsSystemCategory: View {
     @AS(Key.reduceTransparency) private var reduceTransparency = false
     @AS(Key.forceDarkMode) private var forceDarkMode = false
     @AS(Key.forceLightMode) private var forceLightMode = false
-    @AS(Key.showNotifications) private var showNotifications = false
-    @AS(Key.disableNotifCooldown) private var disableNotifCooldown = false
 
     private func toggleLoginItem(enabled: Bool) {
         do {
@@ -62,29 +60,6 @@ struct SettingsSystemCategory: View {
                 activeRowID: $activeRowID,
                 incompatibilities: [forceDarkMode],
                 onToggle: { if $0 { forceDarkMode = false } }
-            )
-            ToggleRow(
-                label: "show_notification",
-                description: "show_notification_description",
-                binding: $showNotifications,
-                activeRowID: $activeRowID,
-                incompatibilities: nil,
-                onToggle: { enabled in
-                    if enabled {
-                        Utils.System.requestNotificationPermission()
-                    } else {
-                        disableNotifCooldown = false
-                    }
-                }
-            )
-            ToggleRow(
-                label: "disable_notification_cooldown",
-                description: "disable_notification_cooldown_description",
-                binding: $disableNotifCooldown,
-                activeRowID: $activeRowID,
-                incompatibilities: nil,
-                disabled: !showNotifications,
-                onToggle: { _ in }
             )
         }
     }

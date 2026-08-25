@@ -4,7 +4,5 @@
 <dict>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
-	<key>MenuBarUSBUpdateFeedURL</key>
-	<string>https://api.github.com/repos/r3d42-git/MenuBarUSB-TB/releases/latest</string>
 </dict>
 </plist>
