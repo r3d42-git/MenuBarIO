@@ -11,7 +11,7 @@ fi
 cd "$ROOT_DIR"
 ./script/privacy_audit.sh
 swiftc -typecheck script/generate_dmg_background.swift
-bash -n script/create_installer_dmg.sh script/release.sh script/publish_release.sh
+bash -n script/create_installer_dmg.sh script/release.sh script/publish_release.sh script/verify_entitlements.sh
 
 xcodebuild test -quiet \
   -project MenuBarUSB.xcodeproj \

@@ -3,39 +3,18 @@
 //  MenuBarUSB
 //
 
-import ServiceManagement
 import SwiftUI
 
 struct SettingsSystemCategory: View {
     @Binding var activeRowID: UUID?
 
-    @AS(Key.launchAtLogin) private var launchAtLogin = false
     @AS(Key.reduceTransparency) private var reduceTransparency = false
     @AS(Key.forceDarkMode) private var forceDarkMode = false
     @AS(Key.forceLightMode) private var forceLightMode = false
 
-    private func toggleLoginItem(enabled: Bool) {
-        do {
-            if enabled {
-                try SMAppService.mainApp.register()
-            } else {
-                try SMAppService.mainApp.unregister()
-            }
-        } catch {
-            print("Error:", error)
-        }
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            ToggleRow(
-                label: "open_on_startup",
-                description: "open_on_startup_description",
-                binding: $launchAtLogin,
-                activeRowID: $activeRowID,
-                incompatibilities: nil,
-                onToggle: { toggleLoginItem(enabled: $0) }
-            )
+            LaunchAtLoginToggle(activeRowID: $activeRowID)
             ToggleRow(
                 label: "reduce_transparency",
                 description: "reduce_transparency_description",

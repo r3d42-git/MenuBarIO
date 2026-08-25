@@ -79,11 +79,7 @@ if ! rg -q 'flags=.*runtime' "$SIGNATURE_PATH"; then
   exit 1
 fi
 codesign -d --entitlements :- "$APP_PATH" > "$ENTITLEMENTS_PATH" 2>/dev/null
-plutil -lint "$ENTITLEMENTS_PATH" >/dev/null
-if /usr/libexec/PlistBuddy -c 'Print :com.apple.security.get-task-allow' "$ENTITLEMENTS_PATH" >/dev/null 2>&1; then
-  echo "Release app must not contain com.apple.security.get-task-allow." >&2
-  exit 1
-fi
+bash "$ROOT_DIR/script/verify_entitlements.sh" "$ENTITLEMENTS_PATH"
 
 for architecture in $ARCHITECTURES; do
   lipo "$APP_PATH/Contents/MacOS/$PRODUCT_NAME" -verify_arch "$architecture"

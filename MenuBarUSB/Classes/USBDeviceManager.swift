@@ -6,7 +6,45 @@ import IOKit.usb
 import SwiftUI
 import SystemConfiguration
 
+struct DeviceRefreshCoordinator {
+    enum Completion: Equatable {
+        case publish
+        case refresh(Int)
+    }
+
+    private(set) var latestGeneration = 0
+    private(set) var isRefreshInFlight = false
+
+    mutating func requestRefresh() -> Int? {
+        latestGeneration &+= 1
+
+        guard !isRefreshInFlight else { return nil }
+        isRefreshInFlight = true
+        return latestGeneration
+    }
+
+    mutating func completeRefresh(_ generation: Int) -> Completion {
+        if generation == latestGeneration {
+            isRefreshInFlight = false
+            return .publish
+        }
+
+        return .refresh(latestGeneration)
+    }
+
+    func isCurrent(_ generation: Int) -> Bool {
+        generation == latestGeneration
+    }
+}
+
+private struct DeviceRefreshOptions {
+    let powerSourceInfoEnabled: Bool
+    let showEthernetEnabled: Bool
+}
+
 final class USBDeviceManager: ObservableObject {
+    static let usbDeviceClassNames = [kIOUSBHostDeviceClassName, kIOUSBDeviceClassName]
+
     @Published private(set) var devices: [USBDeviceWrapper] = []
     @Published var count: Int = 0
     @Published var chargeConnected: Bool = false
@@ -17,9 +55,21 @@ final class USBDeviceManager: ObservableObject {
     private var notifyPort: IONotificationPortRef?
     private var addedIterator: io_iterator_t = 0
     private var removedIterator: io_iterator_t = 0
+    private var hostAddedIterator: io_iterator_t = 0
+    private var hostRemovedIterator: io_iterator_t = 0
     private var thunderboltAddedIterator: io_iterator_t = 0
     private var thunderboltRemovedIterator: io_iterator_t = 0
     private var isInitialPowerState = true
+    private let refreshQueue = DispatchQueue(
+        label: "de.r3d.menubarusb.tb.device-refresh",
+        qos: .utility
+    )
+    private var refreshCoordinator = DeviceRefreshCoordinator()
+    private var latestRefreshOptions = DeviceRefreshOptions(
+        powerSourceInfoEnabled: false,
+        showEthernetEnabled: false
+    )
+    private var ethernetRetry: DispatchWorkItem?
 
     lazy var persistentEthernetStore: SCDynamicStore? = {
         var context = SCDynamicStoreContext(version: 0, info: nil, retain: nil, release: nil, copyDescription: nil)
@@ -62,54 +112,106 @@ final class USBDeviceManager: ObservableObject {
     }
 
     func refresh() {
-        let powerSourceInfoEnabled = powerSourceInfo
-        let showEthernetEnabled = showEthernet
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in
+                self?.refresh()
+            }
+            return
+        }
 
-        DispatchQueue.global(qos: .utility).async {
+        latestRefreshOptions = DeviceRefreshOptions(
+            powerSourceInfoEnabled: powerSourceInfo,
+            showEthernetEnabled: showEthernet
+        )
+        ethernetRetry?.cancel()
+        ethernetRetry = nil
+
+        guard let generation = refreshCoordinator.requestRefresh() else { return }
+        startRefresh(generation: generation, options: latestRefreshOptions)
+    }
+
+    private func startRefresh(generation: Int, options: DeviceRefreshOptions) {
+        refreshQueue.async { [weak self] in
+            guard let self else { return }
+
             let snapshot = self.fetchConnectedDevices()
-
             var seenIds = Set<String>()
-            var uniqueDevices: [USBDeviceWrapper] = []
-            for device in snapshot {
-                let id = device.item.uniqueId
-                if !seenIds.contains(id) {
-                    seenIds.insert(id)
-                    uniqueDevices.append(device)
+            let uniqueDevices = snapshot.filter { device in
+                seenIds.insert(device.item.uniqueId).inserted
+            }
+            let devices = uniqueDevices.sorted(by: {
+                ($0.item.vendor ?? "") < ($1.item.vendor ?? "") ||
+                    ($0.item.vendor == $1.item.vendor && $0.item.name < $1.item.name)
+            })
+            let chargePercentage = options.powerSourceInfoEnabled && self.isChargerConnected
+                ? self.getChargePercentage()
+                : nil
+            let ethernetStatus = options.showEthernetEnabled ? self.isEthernetConnected() : nil
+
+            DispatchQueue.main.async { [weak self] in
+                self?.completeRefresh(
+                    generation: generation,
+                    options: options,
+                    devices: devices,
+                    chargePercentage: chargePercentage,
+                    ethernetStatus: ethernetStatus
+                )
+            }
+        }
+    }
+
+    private func completeRefresh(
+        generation: Int,
+        options: DeviceRefreshOptions,
+        devices: [USBDeviceWrapper],
+        chargePercentage: Int?,
+        ethernetStatus: Bool?
+    ) {
+        switch refreshCoordinator.completeRefresh(generation) {
+        case .refresh(let nextGeneration):
+            startRefresh(generation: nextGeneration, options: latestRefreshOptions)
+        case .publish:
+            self.devices = devices
+            setCount()
+
+            if options.powerSourceInfoEnabled, powerSourceInfo {
+                self.chargePercentage = chargePercentage
+            }
+
+            guard options.showEthernetEnabled, showEthernet, let ethernetStatus else {
+                if !showEthernet {
+                    ethernetCableConnected = false
                 }
+                return
             }
 
-            DispatchQueue.main.async {
-                self.devices = uniqueDevices.sorted(by: {
-                    ($0.item.vendor ?? "") < ($1.item.vendor ?? "") ||
-                        ($0.item.vendor == $1.item.vendor && $0.item.name < $1.item.name)
-                })
-
-                self.setCount()
+            ethernetCableConnected = ethernetStatus
+            if !ethernetStatus {
+                scheduleEthernetRetry(for: generation)
             }
+        }
+    }
 
-            if powerSourceInfoEnabled, self.isChargerConnected {
-                let value = self.getChargePercentage()
+    private func scheduleEthernetRetry(for generation: Int) {
+        let retry = DispatchWorkItem { [weak self] in
+            guard let self,
+                  self.refreshCoordinator.isCurrent(generation),
+                  self.showEthernet
+            else { return }
+
+            self.refreshQueue.async { [weak self] in
+                guard let self else { return }
+                let retryStatus = self.isEthernetConnected()
+
                 DispatchQueue.main.async {
-                    self.chargePercentage = value
-                }
-            }
-
-            if showEthernetEnabled {
-                let ethernetStatus = self.isEthernetConnected()
-                DispatchQueue.main.async {
-                    self.ethernetCableConnected = ethernetStatus
-                }
-
-                if !ethernetStatus {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.3) {
-                        let retryStatus = self.isEthernetConnected()
-                        DispatchQueue.main.async {
-                            self.ethernetCableConnected = retryStatus
-                        }
-                    }
+                    guard self.refreshCoordinator.isCurrent(generation), self.showEthernet else { return }
+                    self.ethernetCableConnected = retryStatus
                 }
             }
         }
+
+        ethernetRetry = retry
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.3, execute: retry)
     }
 
     func addDummy(amount: Int) {
@@ -267,7 +369,10 @@ final class USBDeviceManager: ObservableObject {
                let current = description[kIOPSCurrentCapacityKey as String] as? Int,
                let max = description[kIOPSMaxCapacityKey as String] as? Int
             {
-                return Int((Double(current) / Double(max)) * 100)
+                return Utils.USB.chargePercentage(
+                    currentCapacity: current,
+                    maximumCapacity: max
+                )
             }
         }
 
@@ -289,8 +394,7 @@ final class USBDeviceManager: ObservableObject {
             }
         }
 
-        addUniqueDevices(from: "IOUSBHostDevice")
-        addUniqueDevices(from: kIOUSBDeviceClassName)
+        Self.usbDeviceClassNames.forEach(addUniqueDevices)
 
         return result
     }
@@ -403,10 +507,14 @@ final class USBDeviceManager: ObservableObject {
         let linkSpeedBpsCandidates = [
             "kUSBDevicePropertyLinkSpeed", "LinkSpeed", "DeviceLinkSpeed", "link-speed",
         ]
-        let linkSpeedBps: Double? = linkSpeedBpsCandidates
-            .compactMap { doubleValue($0) ?? intValue($0).map(Double.init) }
+        let linkSpeedMbpsFromDevice: Int? = linkSpeedBpsCandidates
+            .compactMap { key -> Int? in
+                guard let bitsPerSecond = doubleValue(key) ?? intValue(key).map(Double.init) else {
+                    return nil
+                }
+                return Utils.USB.megabitsPerSecond(fromBitsPerSecond: bitsPerSecond)
+            }
             .first
-        let linkSpeedMbpsFromDevice = linkSpeedBps.map { Int($0 / 1_000_000.0) }
 
         let speedCode = intValue(kUSBDevicePropertySpeed as String)
         let speedMbpsFromCode: Int? = speedCode.flatMap {
@@ -437,8 +545,13 @@ final class USBDeviceManager: ObservableObject {
                 "kUSBHostPortPropertyLinkSpeed", "PortLinkSpeed", "PortSpeed",
                 "LinkSpeed", "MaxLinkRate", "maxLinkSpeed",
             ]
-            if let bps = candidates.compactMap({ pdouble($0) ?? pint($0).map(Double.init) }).first {
-                return Int(bps / 1_000_000.0)
+            if let speed = candidates.compactMap({ key -> Int? in
+                guard let bitsPerSecond = pdouble(key) ?? pint(key).map(Double.init) else {
+                    return nil
+                }
+                return Utils.USB.megabitsPerSecond(fromBitsPerSecond: bitsPerSecond)
+            }).first {
+                return speed
             }
 
             if let portType = pdict["PortType"] as? String {
@@ -591,7 +704,7 @@ final class USBDeviceManager: ObservableObject {
         }
 
         // IOThunderboltPort reports Link Bandwidth in 100 Mbit/s units.
-        return linkBandwidth * 100
+        return Utils.USB.thunderboltMegabitsPerSecond(fromLinkBandwidth: linkBandwidth)
     }
 
     private func tryGetIORegistryName(_ entry: io_registry_entry_t) -> String? {
@@ -613,6 +726,8 @@ final class USBDeviceManager: ObservableObject {
 
         let matchAdded = IOServiceMatching(kIOUSBDeviceClassName)
         let matchRemoved = IOServiceMatching(kIOUSBDeviceClassName)
+        let hostMatchAdded = IOServiceMatching(kIOUSBHostDeviceClassName)
+        let hostMatchRemoved = IOServiceMatching(kIOUSBHostDeviceClassName)
         let thunderboltMatchAdded = IOServiceMatching("IOThunderboltSwitch")
         let thunderboltMatchRemoved = IOServiceMatching("IOThunderboltSwitch")
 
@@ -693,12 +808,44 @@ final class USBDeviceManager: ObservableObject {
         let kr3 = IOServiceAddMatchingNotification(
             notifyPort,
             kIOMatchedNotification,
+            hostMatchAdded,
+            addedCallback,
+            refcon,
+            &hostAddedIterator
+        )
+        if kr3 == KERN_SUCCESS {
+            var service = IOIteratorNext(hostAddedIterator)
+            while service != 0 {
+                IOObjectRelease(service)
+                service = IOIteratorNext(hostAddedIterator)
+            }
+        }
+
+        let kr4 = IOServiceAddMatchingNotification(
+            notifyPort,
+            kIOTerminatedNotification,
+            hostMatchRemoved,
+            removedCallback,
+            refcon,
+            &hostRemovedIterator
+        )
+        if kr4 == KERN_SUCCESS {
+            var service = IOIteratorNext(hostRemovedIterator)
+            while service != 0 {
+                IOObjectRelease(service)
+                service = IOIteratorNext(hostRemovedIterator)
+            }
+        }
+
+        let kr5 = IOServiceAddMatchingNotification(
+            notifyPort,
+            kIOMatchedNotification,
             thunderboltMatchAdded,
             thunderboltAddedCallback,
             refcon,
             &thunderboltAddedIterator
         )
-        if kr3 == KERN_SUCCESS {
+        if kr5 == KERN_SUCCESS {
             var service = IOIteratorNext(thunderboltAddedIterator)
             while service != 0 {
                 IOObjectRelease(service)
@@ -706,7 +853,7 @@ final class USBDeviceManager: ObservableObject {
             }
         }
 
-        let kr4 = IOServiceAddMatchingNotification(
+        let kr6 = IOServiceAddMatchingNotification(
             notifyPort,
             kIOTerminatedNotification,
             thunderboltMatchRemoved,
@@ -714,7 +861,7 @@ final class USBDeviceManager: ObservableObject {
             refcon,
             &thunderboltRemovedIterator
         )
-        if kr4 == KERN_SUCCESS {
+        if kr6 == KERN_SUCCESS {
             var service = IOIteratorNext(thunderboltRemovedIterator)
             while service != 0 {
                 IOObjectRelease(service)
@@ -728,6 +875,8 @@ final class USBDeviceManager: ObservableObject {
 
         if addedIterator != 0 { IOObjectRelease(addedIterator); addedIterator = 0 }
         if removedIterator != 0 { IOObjectRelease(removedIterator); removedIterator = 0 }
+        if hostAddedIterator != 0 { IOObjectRelease(hostAddedIterator); hostAddedIterator = 0 }
+        if hostRemovedIterator != 0 { IOObjectRelease(hostRemovedIterator); hostRemovedIterator = 0 }
         if thunderboltAddedIterator != 0 { IOObjectRelease(thunderboltAddedIterator); thunderboltAddedIterator = 0 }
         if thunderboltRemovedIterator != 0 { IOObjectRelease(thunderboltRemovedIterator); thunderboltRemovedIterator = 0 }
         if let notifyPort {

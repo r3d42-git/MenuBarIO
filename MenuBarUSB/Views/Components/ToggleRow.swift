@@ -75,13 +75,19 @@ struct ToggleRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Toggle(label.localized, isOn: $binding)
-                    .onChange(of: binding) { newValue in
-                        onToggle(newValue)
-                        if !newValue && activeRowID == id {
-                            activeRowID = nil
+                Toggle(
+                    label.localized,
+                    isOn: Binding(
+                        get: { binding },
+                        set: { newValue in
+                            binding = newValue
+                            onToggle(newValue)
+                            if !newValue && activeRowID == id {
+                                activeRowID = nil
+                            }
                         }
-                    }
+                    )
+                )
                     .toggleStyle(.checkbox)
                     .disabled(disabled)
 

@@ -26,6 +26,23 @@ final class Utils {
             NSPasteboard.general.setString(content, forType: .string)
         }
 
+        static func safeClipboardDeviceField(_ value: String) -> String {
+            value.unicodeScalars.map { scalar in
+                switch scalar.value {
+                case 0x0000 ... 0x001F,
+                     0x007F ... 0x009F,
+                     0x061C,
+                     0x200E ... 0x200F,
+                     0x202A ... 0x202E,
+                     0x2028 ... 0x2029,
+                     0x2066 ... 0x2069:
+                    return String(format: "\\u{%04X}", scalar.value)
+                default:
+                    return String(scalar)
+                }
+            }.joined()
+        }
+
         static func playSystemSound(named sound: String, limit: TimeInterval = 8) {
             guard let audio = NSSound(named: NSSound.Name(sound)) else { return }
 
@@ -137,6 +154,31 @@ final class Utils {
     }
 
     final class USB {
+        static func chargePercentage(currentCapacity: Int, maximumCapacity: Int) -> Int? {
+            guard currentCapacity >= 0, maximumCapacity > 0 else { return nil }
+
+            let percentage = (Double(currentCapacity) / Double(maximumCapacity)) * 100
+            guard percentage.isFinite else { return nil }
+
+            return Int(min(max(percentage, 0), 100))
+        }
+
+        static func megabitsPerSecond(fromBitsPerSecond bitsPerSecond: Double) -> Int? {
+            guard bitsPerSecond.isFinite, bitsPerSecond > 0 else { return nil }
+
+            let megabitsPerSecond = bitsPerSecond / 1_000_000
+            guard megabitsPerSecond >= 1, megabitsPerSecond < Double(Int.max) else { return nil }
+
+            return Int(megabitsPerSecond)
+        }
+
+        static func thunderboltMegabitsPerSecond(fromLinkBandwidth linkBandwidth: Int) -> Int? {
+            guard linkBandwidth > 0 else { return nil }
+
+            let (megabitsPerSecond, overflow) = linkBandwidth.multipliedReportingOverflow(by: 100)
+            return overflow ? nil : megabitsPerSecond
+        }
+
         static func usbVersionLabel(from bcd: Int?) -> String? {
             guard let bcd = bcd else { return nil }
 

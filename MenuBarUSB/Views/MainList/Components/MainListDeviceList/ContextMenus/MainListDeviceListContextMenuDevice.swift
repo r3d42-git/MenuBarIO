@@ -32,16 +32,16 @@ struct MainListDeviceListContextMenuDevice: View {
         var parts: [String] = []
 
         if !device.name.isEmpty {
-            parts.append(device.name)
+            parts.append(Utils.System.safeClipboardDeviceField(device.name))
         } else {
             parts.append("usb_device".localized)
         }
 
         if let vendor = device.vendor, !vendor.isEmpty {
-            parts.append(vendor)
+            parts.append(Utils.System.safeClipboardDeviceField(vendor))
         }
 
-        parts.append(device.uniqueId)
+        parts.append(Utils.System.safeClipboardDeviceField(device.uniqueId))
 
         parts.append(deviceId(device))
 
@@ -54,7 +54,7 @@ struct MainListDeviceListContextMenuDevice: View {
         }
 
         if let serial = device.serialNumber, !serial.isEmpty {
-            parts.append("\("serial_number".localized) \(serial)")
+            parts.append("\("serial_number".localized) \(Utils.System.safeClipboardDeviceField(serial))")
         }
 
         if let portMax = device.portMaxSpeedMbps {
