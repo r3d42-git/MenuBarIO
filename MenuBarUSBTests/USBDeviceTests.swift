@@ -2,6 +2,40 @@ import XCTest
 @testable import MenuBarUSB
 
 final class USBDeviceTests: XCTestCase {
+    private enum LaunchAtLoginTestError: LocalizedError {
+        case failed
+
+        var errorDescription: String? {
+            "Login item update failed"
+        }
+    }
+
+    func testLaunchAtLoginUpdatePersistsRequestedValueOnSuccess() {
+        let result = LaunchAtLoginUpdateResult.applying(
+            requestedValue: true,
+            currentValue: { false },
+            operation: {}
+        )
+
+        XCTAssertEqual(result, LaunchAtLoginUpdateResult(persistedValue: true, errorMessage: nil))
+    }
+
+    func testLaunchAtLoginUpdateRestoresActualValueOnFailure() {
+        let result = LaunchAtLoginUpdateResult.applying(
+            requestedValue: true,
+            currentValue: { false },
+            operation: { throw LaunchAtLoginTestError.failed }
+        )
+
+        XCTAssertEqual(
+            result,
+            LaunchAtLoginUpdateResult(
+                persistedValue: false,
+                errorMessage: "Login item update failed"
+            )
+        )
+    }
+
     func testSeriallessUSBDevicesRemainDistinctByLocation() {
         let first = USBDevice(
             name: "USB Device",
@@ -116,6 +150,54 @@ final class USBDeviceTests: XCTestCase {
         XCTAssertTrue(billboard.isThunderboltBillboard)
     }
 
+    func testClipboardDeviceFieldsEscapeControlAndBidiCharacters() {
+        let rawValue = "USB\n\u{001B}[2J\u{202E}device\u{2028}\u{2066}"
+
+        XCTAssertEqual(
+            Utils.System.safeClipboardDeviceField(rawValue),
+            "USB\\u{000A}\\u{001B}[2J\\u{202E}device\\u{2028}\\u{2066}"
+        )
+        XCTAssertEqual(Utils.System.safeClipboardDeviceField("USB Café 4"), "USB Café 4")
+    }
+
+    func testExternalNumericValuesAreValidated() {
+        XCTAssertEqual(Utils.USB.chargePercentage(currentCapacity: 50, maximumCapacity: 100), 50)
+        XCTAssertEqual(Utils.USB.chargePercentage(currentCapacity: 150, maximumCapacity: 100), 100)
+        XCTAssertNil(Utils.USB.chargePercentage(currentCapacity: -1, maximumCapacity: 100))
+        XCTAssertNil(Utils.USB.chargePercentage(currentCapacity: 50, maximumCapacity: 0))
+
+        XCTAssertEqual(Utils.USB.megabitsPerSecond(fromBitsPerSecond: 5_000_000_000), 5_000)
+        XCTAssertNil(Utils.USB.megabitsPerSecond(fromBitsPerSecond: .nan))
+        XCTAssertNil(Utils.USB.megabitsPerSecond(fromBitsPerSecond: .infinity))
+        XCTAssertNil(Utils.USB.megabitsPerSecond(fromBitsPerSecond: -1))
+        XCTAssertNil(Utils.USB.megabitsPerSecond(fromBitsPerSecond: .greatestFiniteMagnitude))
+
+        XCTAssertEqual(Utils.USB.thunderboltMegabitsPerSecond(fromLinkBandwidth: 800), 80_000)
+        XCTAssertNil(Utils.USB.thunderboltMegabitsPerSecond(fromLinkBandwidth: Int.max))
+    }
+
+    func testRefreshCoordinatorCoalescesBurstsAndPublishesOnlyTheLatestGeneration() throws {
+        var coordinator = DeviceRefreshCoordinator()
+
+        let firstGeneration = try XCTUnwrap(coordinator.requestRefresh())
+        XCTAssertNil(coordinator.requestRefresh())
+        XCTAssertFalse(coordinator.isCurrent(firstGeneration))
+
+        let secondGeneration = firstGeneration + 1
+        XCTAssertEqual(coordinator.completeRefresh(firstGeneration), .refresh(secondGeneration))
+        XCTAssertTrue(coordinator.isCurrent(secondGeneration))
+        XCTAssertEqual(coordinator.completeRefresh(secondGeneration), .publish)
+
+        XCTAssertEqual(coordinator.requestRefresh(), secondGeneration + 1)
+    }
+
+    func testUSBDiscoveryIncludesHostAndLegacyDeviceClasses() {
+        XCTAssertEqual(
+            Set(USBDeviceManager.usbDeviceClassNames),
+            Set(["IOUSBHostDevice", "IOUSBDevice"])
+        )
+    }
+
     func testLegacyHardwareSoundDataIsRemoved() throws {
         let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
         guard let defaults = UserDefaults(suiteName: suiteName) else {
@@ -204,10 +286,29 @@ final class USBDeviceTests: XCTestCase {
         XCTAssertFalse(defaults.bool(forKey: StorageKeys.showScrollBar))
         XCTAssertTrue(defaults.bool(forKey: StorageKeys.bigNames))
         XCTAssertTrue(defaults.bool(forKey: StorageKeys.showEthernet))
-        XCTAssertFalse(defaults.bool(forKey: StorageKeys.storeConnectionLogs))
 
         defaults.set(false, forKey: StorageKeys.longList)
         AppDefaults.register(in: defaults)
         XCTAssertFalse(defaults.bool(forKey: StorageKeys.longList))
+    }
+
+    func testRemovedFeatureDataIsCleared() {
+        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let removedKeys = [
+            "storedDevices", "inheritedDevices", "connectionLogs",
+            "showNotifications", "searchEngine", "storeConnectionLogs",
+            "listToolBar", "forceEnglish",
+            "renamedDevices", "camouflagedDevices", "pinnedDevices",
+        ]
+        removedKeys.forEach { defaults.set("legacy-value", forKey: $0) }
+
+        Utils.App.removeRemovedFeatureData(defaults: defaults)
+
+        removedKeys.forEach { XCTAssertNil(defaults.object(forKey: $0)) }
     }
 }

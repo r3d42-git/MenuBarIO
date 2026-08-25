@@ -27,7 +27,6 @@ struct LegacySettingsHorizontalBottomBar: View {
                     .foregroundColor(.primary)
                     .onHover { hovering in
                         hoveringInfo = hovering
-                        Utils.System.hapticFeedback()
                     }
                     .padding(4)
             }

@@ -8,7 +8,4 @@
 enum AppWindow {
     case devices
     case settings
-    case heritage
-    case inheritanceTree
-    case logs
 }

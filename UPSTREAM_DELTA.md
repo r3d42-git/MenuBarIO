@@ -18,9 +18,9 @@ for future upstream comparisons.
 - Donation, cryptocurrency and related hiding features have been removed.
 - The link and image assets for the upstream-only analysis tool have been
   removed because this fork has no compatible companion of its own.
-- Tested local initial values have been set as product-wide defaults. Telemetry
-  and automatic update checks are removed; the privacy audit limits network
-  access to explicitly triggered actions.
+- Tested local initial values have been set as product-wide defaults. Telemetry,
+  update checks and device web search are removed; the privacy audit permits no
+  network client code.
 - The experimental Ethernet traffic monitor – including byte counters, timer,
   pause/start controls and blinking icon – has been removed. The local
   indicator of a connected LAN cable remains.
@@ -54,8 +54,8 @@ Abweichungen für spätere Upstream-Vergleiche fest.
 - Die Verknüpfung und Bildressourcen für das reine Upstream-Analysewerkzeug
   wurden entfernt, weil diese Variante keinen eigenen kompatiblen Begleiter hat.
 - Die geprüften lokalen Startwerte wurden als produktweite Defaults festgelegt.
-  Telemetrie und automatische Update-Abfragen sind entfernt; der Datenschutz-
-  Audit begrenzt Netzwerkzugriffe auf ausdrücklich ausgelöste Aktionen.
+  Telemetrie, Update-Abfragen und Websuchen für Geräte sind entfernt; der
+  Datenschutz-Audit erlaubt keinen Netzwerk-Client-Code.
 - Die experimentelle Ethernet-Verkehrsüberwachung einschließlich Byte-Zähler,
   Timer, Pause/Start-Bedienung und Blink-Symbol wurde entfernt. Die lokale
   Anzeige eines verbundenen LAN-Kabels bleibt erhalten.

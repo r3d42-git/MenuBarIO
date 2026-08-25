@@ -5,8 +5,17 @@ MODE="${1:-run}"
 APP_NAME="MenuBarUSB-TB"
 BUNDLE_ID="de.r3d.menubarusb.tb"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TARGET_ARCHITECTURE="${MENUBARUSB_BUILD_ARCH:-$(uname -m)}"
 DERIVED_DATA_PATH="${MENUBARUSB_DERIVED_DATA_PATH:-${TMPDIR:-/tmp}/menubarusb-tb-derived-data}"
 APP_BUNDLE="$DERIVED_DATA_PATH/Build/Products/Debug/$APP_NAME.app"
+
+case "$TARGET_ARCHITECTURE" in
+  arm64|x86_64) ;;
+  *)
+    echo "Unsupported macOS build architecture: $TARGET_ARCHITECTURE" >&2
+    exit 2
+    ;;
+esac
 
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
@@ -15,7 +24,7 @@ xcodebuild build -quiet \
   -project MenuBarUSB.xcodeproj \
   -scheme MenuBarUSB \
   -configuration Debug \
-  -destination 'platform=macOS,arch=arm64' \
+  -destination "platform=macOS,arch=$TARGET_ARCHITECTURE" \
   -derivedDataPath "$DERIVED_DATA_PATH" \
   CODE_SIGN_IDENTITY=- \
   CODE_SIGN_STYLE=Manual \

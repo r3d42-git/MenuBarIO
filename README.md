@@ -11,16 +11,18 @@ It is an independent fork of [rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi
 - Thunderbolt and USB4 devices, including negotiated link speed and protocol
 - USB-C Billboard interfaces are identified as companion interfaces, so compatible Thunderbolt docks are not listed twice
 - Optional local Ethernet-link indicator; network traffic monitoring is not included
-- Local device names, hierarchy, connection logs and notifications
+- Compact device-first view without saved per-device customizations
 - No bundled audio, custom hardware sound or donation functionality
-- No telemetry, analytics, crash reporting or automatic network requests; see
-  [PRIVACY.md](PRIVACY.md) for the explicitly user-triggered browser and
-  update actions
+- No telemetry, analytics, crash reporting or network requests; see
+  [PRIVACY.md](PRIVACY.md)
 
 ## Compatibility
 
-**Version 0.1.1 supports Apple Silicon Macs (`arm64`) running macOS 13 or
-newer. Intel Macs are not supported by this release.**
+The current development branch builds a **Universal** app for Apple Silicon
+(`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. The released
+version 0.1.1 remains Apple-Silicon-only. Before the first Universal release,
+the device acceptance cases in [TESTING.md](TESTING.md) still need to be run on
+an Intel Mac (or that exception must be explicitly accepted for the release).
 
 ## Build and test
 
@@ -62,17 +64,20 @@ Ansicht.
   sodass kompatible Thunderbolt-Docks nicht doppelt erscheinen
 - Optionale lokale Ethernet-Link-Anzeige; eine Überwachung des Netzwerkverkehrs
   ist nicht enthalten
-- Lokale Gerätenamen, Hierarchie, Verbindungsprotokolle und Benachrichtigungen
+- Kompakte, geräteorientierte Ansicht ohne gespeicherte Anpassungen je Gerät
 - Keine eingebundenen Audiodateien, eigenen Hardware-Sounds oder
   Spendenfunktionen
-- Keine Telemetrie, Analyse, Crash-Berichte oder automatischen
-  Netzwerkanfragen; zu den ausdrücklich vom Nutzer ausgelösten Browser- und
-  Update-Aktionen siehe [PRIVACY.md](PRIVACY.md)
+- Keine Telemetrie, Analyse, Crash-Berichte oder Netzwerkanfragen; siehe
+  [PRIVACY.md](PRIVACY.md)
 
 ## Kompatibilität
 
-**Version 0.1.1 unterstützt Apple-Silicon-Macs (`arm64`) mit macOS 13 oder
-neuer. Intel-Macs werden von dieser Version nicht unterstützt.**
+Der aktuelle Entwicklungsstand baut eine **Universal-App** für Apple-Silicon-
+(`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die veröffentlichte
+Version 0.1.1 bleibt ausschließlich für Apple Silicon. Vor dem ersten
+Universal-Release müssen die Geräte-Abnahmefälle aus
+[TESTING.md](TESTING.md) noch auf einem Intel-Mac ausgeführt werden (oder diese
+Ausnahme muss für den Release ausdrücklich akzeptiert werden).
 
 ## Bauen und testen
 

@@ -19,7 +19,6 @@ struct LegacySettingsInterfaceCategory: View {
     @AS(Key.showScrollBar) private var showScrollBar = false
     @AS(Key.longList) private var longList = false
     @AS(Key.bigNames) private var bigNames = false
-    @AS(Key.storeDevices) private var storeDevices = false
     @AS(Key.windowWidth) private var windowWidth: WindowWidth = .normal
     
     private func setWindowWidth(increase: Bool) {
@@ -99,15 +98,6 @@ struct LegacySettingsInterfaceCategory: View {
             incompatibilities: nil,
             onToggle: { _ in }
         )
-        ToggleRow(
-            label: "show_previously_connected",
-            description: "show_previously_connected_description",
-            binding: $storeDevices,
-            activeRowID: $activeRowID,
-            incompatibilities: nil,
-            onToggle: { _ in }
-        )
-
         HStack {
             Text("list_width")
             Button {

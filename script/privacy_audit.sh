@@ -4,6 +4,13 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
+bash "$ROOT_DIR/script/verify_entitlements.sh" "$ROOT_DIR/MenuBarUSB/MenuBarUSB.entitlements"
+
+if rg -n 'ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;|ENABLE_USER_SELECTED_FILES = (readonly|readwrite);' MenuBarUSB.xcodeproj/project.pbxproj; then
+  echo "Privacy audit failed: Xcode still enables network or user-selected file access." >&2
+  exit 1
+fi
+
 forbidden_pattern='analytics|telemetry|sentry|firebase|mixpanel|amplitude|crashlytics|posthog|bugsnag|appcenter'
 if rg -n -i --glob '*.swift' "$forbidden_pattern" MenuBarUSB; then
   echo "Privacy audit failed: telemetry or analytics code was found." >&2
@@ -20,17 +27,14 @@ if rg -n --glob '*.swift' '@AS\(Key\.(internetMonitoring|trafficButton|disableTr
   exit 1
 fi
 
-expected_urlsession_files=$'MenuBarUSB/Views/LegacySettings/Components/LegacySettingsHorizontalTopBar.swift\nMenuBarUSB/Views/Settings/Components/SettingsHorizontalTopBar/SettingsHorizontalTopBar.swift'
-actual_urlsession_files="$(rg -l --glob '*.swift' 'URLSession' MenuBarUSB | LC_ALL=C sort || true)"
-if [[ "$actual_urlsession_files" != "$expected_urlsession_files" ]]; then
-  echo "Privacy audit failed: URLSession is only permitted for the manual update controls." >&2
+if rg -n --glob '*.swift' 'URLSession|URLRequest|NSURLSession|NSURLConnection|URLProtocol|NWConnection|NWListener|NWPathMonitor|CFSocket|CFNetwork|URL\(' MenuBarUSB; then
+  echo "Privacy audit failed: the minimal app must not contain network client code." >&2
   exit 1
 fi
 
-feed_url="$(plutil -extract MenuBarUSBUpdateFeedURL raw Info.plist)"
-if [[ "$feed_url" != 'https://api.github.com/repos/r3d42-git/MenuBarUSB-TB/releases/latest' ]]; then
-  echo "Privacy audit failed: the configured update feed is unexpected." >&2
+if plutil -extract MenuBarUSBUpdateFeedURL raw Info.plist >/dev/null 2>&1; then
+  echo "Privacy audit failed: the removed update feed is still configured." >&2
   exit 1
 fi
 
-echo "Privacy audit passed: no telemetry, no automatic network requests, no Ethernet traffic monitor, and only the manual GitHub update check uses URLSession."
+echo "Privacy audit passed: sandbox and USB-only entitlements; no telemetry, network client code, or Ethernet traffic monitor."

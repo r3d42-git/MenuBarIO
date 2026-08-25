@@ -40,17 +40,20 @@ under **Sign-In and Security → App-Specific Passwords**; do not put it in a
 shell history, file, patch, or repository. Apple documents this credential
 flow in its [notarization guide](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).
 
-Run the release with only values appropriate to this fork:
+Run the Universal release with only values appropriate to this fork:
 
 ```bash
 MENUBARUSB_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
-./script/release.sh 0.1.1
+./script/release.sh VERSION
 ```
 
-Version 0.1.1 is deliberately distributed for **Apple Silicon (`arm64`) only**
-and requires macOS 13 or newer. Intel Macs are not supported by this release.
-The release script verifies the requested executable slice. A future Universal
-release requires explicit additional hardware acceptance on both architectures.
+The release script always archives **both** executable slices: Apple Silicon
+(`arm64`) and Intel (`x86_64`). It verifies each slice before packaging, and
+the CI workflow runs the XCTest suite natively on both architectures. Version
+0.1.1 remains Apple-Silicon-only; the first Universal version must receive a
+new version number. Before that release, complete the device acceptance cases
+in [`TESTING.md`](TESTING.md) on an Intel Mac, or record an explicit release
+exception if this is not currently possible.
 
 The release script aborts when uncommitted or nonignored untracked files exist,
 runs the XCTest suite and static analysis, then verifies the signed app, the
@@ -61,11 +64,8 @@ tag, publish the DMG, its checksum and the versioned release notes. The script
 then independently re-checks the exact GitHub download with:
 
 ```bash
-./script/publish_release.sh 0.1.1
+./script/publish_release.sh VERSION
 ```
-
-The update feed is configured for this public repository. It will become
-usable after its first GitHub Release is published.
 
 ---
 
@@ -116,18 +116,21 @@ Sicherheit → App-spezifische Passwörter** erzeugen; es nicht in der
 Shell-Historie, Datei, einem Patch oder Repository ablegen. Apple dokumentiert
 diesen Ablauf in seinem [Notarisierungsleitfaden](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).
 
-Den Release nur mit für diesen Fork geeigneten Werten ausführen:
+Den Universal-Release nur mit für diesen Fork geeigneten Werten ausführen:
 
 ```bash
 MENUBARUSB_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
-./script/release.sh 0.1.1
+./script/release.sh VERSION
 ```
 
-Version 0.1.1 wird bewusst nur für **Apple Silicon (`arm64`)** ausgeliefert
-und benötigt macOS 13 oder neuer. Intel-Macs werden von dieser Version nicht
-unterstützt. Das Release-Skript prüft den angeforderten ausführbaren Slice. Ein
-künftiger Universal-Release erfordert ausdrücklich eine zusätzliche
-Hardware-Abnahme auf beiden Architekturen.
+Das Release-Skript archiviert immer **beide** ausführbaren Slices: Apple
+Silicon (`arm64`) und Intel (`x86_64`). Es prüft jeden Slice vor dem Paketbau;
+der CI-Ablauf führt die XCTest-Suite nativ auf beiden Architekturen aus.
+Version 0.1.1 bleibt ausschließlich für Apple Silicon; die erste Universal-
+Version benötigt eine neue Versionsnummer. Vor diesem Release die
+Geräte-Abnahmefälle in [`TESTING.md`](TESTING.md) auf einem Intel-Mac
+ausführen oder eine ausdrückliche Release-Ausnahme dokumentieren, falls das
+derzeit nicht möglich ist.
 
 Das Release-Skript bricht bei nicht übergebenen oder nicht ignorierten
 unversionierten Dateien ab, führt die XCTest-Suite und die statische Analyse
@@ -140,8 +143,5 @@ veröffentlichen. Das Skript prüft danach den exakten GitHub-Download
 unabhängig erneut mit:
 
 ```bash
-./script/publish_release.sh 0.1.1
+./script/publish_release.sh VERSION
 ```
-
-Der Update-Feed ist für dieses öffentliche Repository eingerichtet. Er wird
-nach Veröffentlichung des ersten GitHub Release nutzbar.

@@ -9,10 +9,5 @@ import SwiftUI
 
 final class AssetColors {
     static var info: Color { Color("Info") }
-    static var restartIcon: Color { Color("Restart") }
-    static var logConnect: Color { Color("LogConnect") }
-    static var logDisconnect: Color { Color("LogDisconnect") }
-    static var update: Color { Color("Update") }
     static var warning: Color { Color("Warning") }
-    static var toolbarButton: Color { Color("ToolbarButton") }
 }

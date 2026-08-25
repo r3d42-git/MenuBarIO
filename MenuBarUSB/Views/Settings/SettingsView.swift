@@ -5,114 +5,129 @@
 //  Created by Rafael Neuwirth on 28/08/25.
 //
 
-import AppKit
-import ServiceManagement
 import SwiftUI
 
 struct SettingsView: View {
-    
-    @Environment(\.openURL) var openURL
-    @Environment(\.openWindow) private var openWindow
     @Binding var currentWindow: AppWindow
-    
     @State private var activeRowID: UUID? = nil
-    
-    @State private var resetSettingsPress: Int = 0
-    
-    @AS(Key.settingsCategory) private var category: SettingsCategory = .system
+    @State private var expandedCategories: Set<SettingsCategory> = [.system]
+
     @AS(Key.reduceTransparency) private var reduceTransparency = false
-    
-    var body: some View {
-        
-        VStack(alignment: .leading, spacing: 20) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("MenuBarUSB-TB")
-                        .font(.title2)
-                        .bold()
-                    Text(
-                        String(
-                            format: NSLocalizedString("version", comment: "APP VERSION"),
-                            Utils.App.appVersion
-                        )
-                    )
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
+    @AS(Key.windowWidth) private var windowWidth: WindowWidth = .normal
+
+    private func expandedBinding(for category: SettingsCategory) -> Binding<Bool> {
+        Binding(
+            get: {
+                expandedCategories.contains(category)
+            },
+            set: { isExpanded in
+                if isExpanded {
+                    expandedCategories.insert(category)
+                } else {
+                    expandedCategories.remove(category)
                 }
-                
-                Spacer()
-                
-                SettingsHorizontalTopBar()
             }
-            
-            VStack(alignment: .leading, spacing: 3) {
-                HStack {
+        )
+    }
+
+    private func section<Content: View>(
+        _ category: SettingsCategory,
+        label: LocalizedStringKey,
+        image: String,
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        let isExpanded = expandedBinding(for: category)
+
+        return VStack(alignment: .leading, spacing: 0) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    isExpanded.wrappedValue.toggle()
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .rotationEffect(.degrees(isExpanded.wrappedValue ? 90 : 0))
+                        .frame(width: 12)
+
+                    Image(image)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 16, height: 16)
+
+                    Text(label)
+                        .font(.headline)
+
                     Spacer()
-                    CategoryButton(category: .system, label: "system_category", image: "settings_general", binding: $category)
-                    CategoryButton(category: .icon, label: "icon_category", image: "settings_icon", binding: $category)
-                    CategoryButton(category: .interface, label: "ui_category", image: "settings_interface", binding: $category)
-                    CategoryButton(category: .usb, label: "usb_category", image: "settings_info", binding: $category)
-                    CategoryButton(category: .contextMenu, label: "context_menu_category", image: "settings_contextmenu", binding: $category)
-                    CategoryButton(category: .ethernet, label: "ethernet_category", image: "settings_ethernet", binding: $category)
-                    CategoryButton(category: .heritage, label: "heritage_category", image: "settings_heritage", binding: $category)
-                    // CategoryButton(category: .automation, label: "automation_category", image: "settings_automation", binding: $category)
-                    CategoryButton(category: .others, label: "others_category", image: "settings_others", binding: $category) {
-                        resetSettingsPress = 0
-                    }
-                    CategoryButton(category: .storage, label: "storage_category", image: "settings_storage", binding: $category)
                 }
-                .padding(.horizontal, 4)
-                .padding(.vertical, 8)
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(5)
-                
-                Text(LocalizedStringKey(category.rawValue))
-                    .font(.title)
-                    .padding(.vertical, 10)
-                
-                if category == .system {
-                    SettingsSystemCategory(activeRowID: $activeRowID)
-                }
-                
-                if category == .icon {
-                    SettingsIconCategory(activeRowID: $activeRowID)
-                }
-                
-                if category == .interface {
-                    SettingsInterfaceCategory(activeRowID: $activeRowID)
-                }
-                
-                if category == .usb {
-                    SettingsUSBCategory(currentWindow: $currentWindow, activeRowID: $activeRowID)
-                }
-                
-                if category == .contextMenu {
-                    SettingsContextMenuCategory(activeRowID: $activeRowID)
-                }
-                
-                if category == .ethernet {
-                    SettingsEthernetCategory(activeRowID: $activeRowID)
-                }
-                
-                if category == .heritage {
-                    SettingsHeritageCategory(currentWindow: $currentWindow, activeRowID: $activeRowID)
-                }
-                
-                if category == .others {
-                    SettingsOthersCategory(activeRowID: $activeRowID)
-                }
-                
-                if category == .storage {
-                    SettingsStorageCategory()
-                }
+                .contentShape(Rectangle())
+                .padding(.horizontal, 12)
+                .frame(minHeight: 46)
             }
-            
-            Spacer()
-            
-            SettingsBottomBar(currentWindow: $currentWindow, resetSettingsPress: $resetSettingsPress)
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            if isExpanded.wrappedValue {
+                content()
+                    .padding(.top, 8)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 12)
+            }
+        }
+        .background(Color.gray.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("MenuBarUSB-TB")
+                    .font(.title2)
+                    .bold()
+                Text(
+                    String(
+                        format: NSLocalizedString("version", comment: "APP VERSION"),
+                        Utils.App.appVersion
+                    )
+                )
+                .font(.footnote)
+                .foregroundColor(.secondary)
+            }
+
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 8) {
+                    section(.system, label: "system_category", image: "settings_general") {
+                        SettingsSystemCategory(activeRowID: $activeRowID)
+                    }
+
+                    section(.icon, label: "icon_category", image: "settings_icon") {
+                        SettingsIconCategory(activeRowID: $activeRowID)
+                    }
+
+                    section(.interface, label: "ui_category", image: "settings_interface") {
+                        SettingsInterfaceCategory(activeRowID: $activeRowID)
+                    }
+
+                    section(.usb, label: "usb_category", image: "settings_info") {
+                        SettingsUSBCategory(activeRowID: $activeRowID)
+                    }
+
+                    section(.ethernet, label: "ethernet_category", image: "settings_ethernet") {
+                        SettingsEthernetCategory(activeRowID: $activeRowID)
+                    }
+
+                    section(.others, label: "others_category", image: "settings_others") {
+                        SettingsOthersCategory(activeRowID: $activeRowID)
+                    }
+
+                }
+                .padding(.horizontal, 1)
+            }
+
+            SettingsBottomBar(currentWindow: $currentWindow)
         }
         .padding(10)
-        .frame(minWidth: WindowWidth.value, minHeight: 600)
+        .frame(minWidth: CGFloat(windowWidth.rawValue), minHeight: 600)
         .appBackground(reduceTransparency)
     }
 }

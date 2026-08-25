@@ -12,7 +12,6 @@ struct MainListDeviceListContextMenuCharger: View {
     @EnvironmentObject var manager: USBDeviceManager
     
     @AS(Key.powerSupplyAsCharger) private var powerSupplyAsCharger = false
-    @AS(Key.powerSourceInfo) private var powerSourceInfo = false
     
     var body: some View {
         Button {
@@ -23,8 +22,7 @@ struct MainListDeviceListContextMenuCharger: View {
         }
         Divider()
         Button {
-            powerSourceInfo = false
-            manager.refresh()
+            manager.setPowerSourceInfoEnabled(false)
         } label: {
             Label("hide_charger_information", systemImage: "eye.slash")
         }
