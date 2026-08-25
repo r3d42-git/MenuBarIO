@@ -331,17 +331,6 @@ struct MainListDeviceList: View {
                 }
 
                 groupHeader(
-                    title: "usb_hubs".localized,
-                    icon: "circle.grid.2x2",
-                    count: hubGroupDevices.count,
-                    isExpanded: $hubGroupExpanded
-                )
-
-                if hubGroupExpanded {
-                    connectedDeviceRows(hubGroupDevices)
-                }
-
-                groupHeader(
                     title: "bluetooth_devices".localized,
                     icon: "bluetooth",
                     count: bluetoothManager.count,
@@ -350,6 +339,17 @@ struct MainListDeviceList: View {
 
                 if bluetoothGroupExpanded {
                     connectedBluetoothDeviceRows(bluetoothManager.devices)
+                }
+
+                groupHeader(
+                    title: "usb_hubs".localized,
+                    icon: "circle.grid.2x2",
+                    count: hubGroupDevices.count,
+                    isExpanded: $hubGroupExpanded
+                )
+
+                if hubGroupExpanded {
+                    connectedDeviceRows(hubGroupDevices)
                 }
             }
             .padding(.horizontal, 2)
