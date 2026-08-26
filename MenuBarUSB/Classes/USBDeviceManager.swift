@@ -79,7 +79,9 @@ final class USBDeviceManager: ObservableObject {
     @AS(Key.powerSourceInfo) private var powerSourceInfo: Bool = false
     @AS(Key.showEthernet) var showEthernet = false
 
-    init() {
+    init(monitoringEnabled: Bool = true) {
+        guard monitoringEnabled else { return }
+
         if powerSourceInfo {
             startPowerMonitoring()
         }

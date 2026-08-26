@@ -11,8 +11,8 @@ import SwiftUI
 
 @main
 struct MenuBarUSBApp: App {
-    @StateObject private var manager = USBDeviceManager()
-    @StateObject private var bluetoothManager = BluetoothDeviceManager()
+    @StateObject private var manager: USBDeviceManager
+    @StateObject private var bluetoothManager: BluetoothDeviceManager
     @State private var currentWindow: AppWindow = .devices
     
     @AS(Key.reduceTransparency) private var isReduceTransparencyOn = false
@@ -24,7 +24,13 @@ struct MenuBarUSBApp: App {
     @AS(Key.macBarIcon) private var macBarIcon: String = "cable.connector"
     @AS(Key.showEthernet) private var showEthernet = false
     @AS(Key.appLanguage) private var appLanguageIdentifier = AppLanguage.automatic.rawValue
+
     init() {
+        let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil ||
+            NSClassFromString("XCTestCase") != nil
+        _manager = StateObject(wrappedValue: USBDeviceManager(monitoringEnabled: !isRunningTests))
+        _bluetoothManager = StateObject(wrappedValue: BluetoothDeviceManager(monitoringEnabled: !isRunningTests))
+
         AppDefaults.register()
         Utils.App.removeLegacyHardwareSoundData()
         Utils.App.removeLegacyDonationData()

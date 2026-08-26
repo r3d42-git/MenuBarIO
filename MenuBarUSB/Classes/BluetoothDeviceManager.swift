@@ -16,8 +16,11 @@ final class BluetoothDeviceManager: NSObject, ObservableObject {
     private var connectNotification: IOBluetoothUserNotification?
     private var disconnectNotifications: [String: IOBluetoothUserNotification] = [:]
 
-    override init() {
+    init(monitoringEnabled: Bool = true) {
         super.init()
+
+        guard monitoringEnabled else { return }
+
         startMonitoring()
         refresh()
     }
