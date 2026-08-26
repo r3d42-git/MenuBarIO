@@ -32,6 +32,16 @@ uses the architecture of the current Mac; it can be selected explicitly with
 `MENUBARUSB_TEST_ARCH=arm64` or `MENUBARUSB_TEST_ARCH=x86_64` when that native
 architecture is available.
 
+## CI recovery
+
+Never bypass `main` protection when a pull request has no checks. If GitHub
+does not create them after a short wait, close and reopen the pull request to
+issue a regular `pull_request` event again. The workflow also supports a
+manual dispatch from the Actions page (or `gh workflow run ci.yml --ref
+BRANCH`) as a non-administrative fallback. In either case, merge only after
+both the `verify` and `verify-intel` checks have completed successfully for the
+pull request commit.
+
 ## Hardware acceptance before a release
 
 These cases require real hardware and cannot be meaningfully emulated in CI.
@@ -116,6 +126,17 @@ GitHub Actions führt dieselben Prüfungen bei Pull Requests und jedem Push auf
 XCTest-Tests verwenden die Architektur des aktuellen Macs; sie kann mit
 `MENUBARUSB_TEST_ARCH=arm64` beziehungsweise `MENUBARUSB_TEST_ARCH=x86_64`
 ausdrücklich gewählt werden, wenn diese Architektur nativ verfügbar ist.
+
+## CI-Wiederherstellung
+
+Den Schutz von `main` niemals umgehen, wenn für einen Pull Request keine
+Checks erscheinen. Falls GitHub sie nach kurzer Wartezeit nicht anlegt, den
+Pull Request schließen und wieder öffnen, damit erneut ein reguläres
+`pull_request`-Ereignis ausgelöst wird. Der Workflow unterstützt zusätzlich
+einen manuellen Start über die Actions-Seite (oder `gh workflow run ci.yml
+--ref BRANCH`) als nicht-administrativen Fallback. In beiden Fällen erst
+mergen, wenn die Checks `verify` und `verify-intel` für den Pull-Request-Commit
+erfolgreich abgeschlossen sind.
 
 ## Hardware-Abnahme vor einem Release
 
