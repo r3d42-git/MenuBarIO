@@ -56,6 +56,20 @@ After every change to IOKit discovery, check them once:
    Intel Mac is unavailable, record the approved exception in the release notes
    instead of claiming physical Intel-device acceptance.
 
+### Recorded Intel MacBook validation — 2026-08-26
+
+The following physical checks were successfully observed on an Intel MacBook:
+
+- Eight built-in USB peripherals appeared in **Internal Devices** and did not
+  affect the menu-bar device count.
+- One external USB 3 device and one connected Bluetooth mouse appeared in their
+  respective groups; the menu-bar count was correctly **2**.
+- Power supply through the Mac power adapter was detected and displayed
+  correctly.
+
+This record covers these observed cases only; it does not replace the remaining
+Thunderbolt/USB4 acceptance cases above when a change affects that discovery.
+
 For signed distribution, then follow the complete instructions in
 [`RELEASE.md`](RELEASE.md).
 
@@ -129,6 +143,22 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
    wiederholen. Falls kein Intel-Mac verfügbar ist, die genehmigte Ausnahme in
    den Release Notes dokumentieren, statt eine physische Intel-Geräteabnahme zu
    behaupten.
+
+### Dokumentierte Intel-MacBook-Abnahme — 26.08.2026
+
+Auf einem Intel-MacBook wurden folgende physische Prüfungen erfolgreich
+beobachtet:
+
+- Acht integrierte USB-Peripheriegeräte erschienen unter **Interne Geräte** und
+  beeinflussten nicht den Zähler in der Menüleiste.
+- Ein externes USB-3-Gerät und eine verbundene Bluetooth-Maus erschienen in
+  ihren jeweiligen Gruppen; der Zähler in der Menüleiste zeigte korrekt **2**.
+- Die Stromversorgung über das Mac-Netzteil wurde korrekt erkannt und
+  angezeigt.
+
+Dieser Eintrag hält nur diese beobachteten Fälle fest; bei Änderungen an der
+Thunderbolt-/USB4-Erkennung ersetzt er nicht die übrigen oben genannten
+Abnahmefälle.
 
 Für die signierte Auslieferung danach die vollständige Anleitung in
 [`RELEASE.md`](RELEASE.md) befolgen.
