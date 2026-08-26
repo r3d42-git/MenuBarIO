@@ -2,6 +2,7 @@ name: Verify macOS app
 
 on:
   pull_request:
+    types: [opened, reopened, synchronize]
   push:
     branches: [main]
   # Non-administrative recovery path if GitHub delays a pull-request event.
