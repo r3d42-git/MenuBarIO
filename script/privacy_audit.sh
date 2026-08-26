@@ -37,4 +37,4 @@ if plutil -extract MenuBarUSBUpdateFeedURL raw Info.plist >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "Privacy audit passed: sandbox and USB-only entitlements; no telemetry, network client code, or Ethernet traffic monitor."
+echo "Privacy audit passed: sandbox with USB and Bluetooth entitlements; no telemetry, network client code, or Ethernet traffic monitor."

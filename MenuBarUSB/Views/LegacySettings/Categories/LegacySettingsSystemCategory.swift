@@ -9,6 +9,9 @@ struct LegacySettingsSystemCategory: View {
     @Binding var activeRowID: UUID?
 
     var body: some View {
-        LaunchAtLoginToggle(activeRowID: $activeRowID)
+        VStack(alignment: .leading, spacing: 3) {
+            LaunchAtLoginToggle(activeRowID: $activeRowID)
+            AppLanguagePicker()
+        }
     }
 }

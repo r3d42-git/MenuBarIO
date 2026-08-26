@@ -10,6 +10,7 @@ import SwiftUI
 struct MainListView: View {
     
     @EnvironmentObject var manager: USBDeviceManager
+    @EnvironmentObject var bluetoothManager: BluetoothDeviceManager
     
     @Binding var currentWindow: AppWindow
     
@@ -18,19 +19,23 @@ struct MainListView: View {
     @AS(Key.windowWidth) private var windowWidth: WindowWidth = .normal
     @AS(Key.deviceGroupExpanded) private var deviceGroupExpanded = true
     @AS(Key.hubGroupExpanded) private var hubGroupExpanded = false
+    @AS(Key.internalGroupExpanded) private var internalGroupExpanded = false
+    @AS(Key.bluetoothGroupExpanded) private var bluetoothGroupExpanded = false
     
     private var windowHeight: CGFloat? {
         if isTrulyEmpty {
             return nil
         }
-        let baseValue: CGFloat = 120
+        let baseValue: CGFloat = 202
         let rowHeight: CGFloat = hideTechInfo ? 48 : 68
 
         // The header and bottom bar live outside this scrollable device area.
         // Device rows stay comfortably readable until scrolling becomes useful.
-        let total = manager.devices.count
-
-        let sum: CGFloat = baseValue + (CGFloat(total) * rowHeight)
+        let usbRows = (deviceGroupExpanded ? manager.devices.filter { $0.item.countsTowardUSBDeviceTotal }.count : 0) +
+            (internalGroupExpanded ? manager.devices.filter { $0.item.isInternal && !$0.item.isHub }.count : 0) +
+            (hubGroupExpanded ? manager.devices.filter { $0.item.isHub }.count : 0)
+        let bluetoothRows = bluetoothGroupExpanded ? bluetoothManager.count : 0
+        let sum: CGFloat = baseValue + (CGFloat(usbRows) * rowHeight) + (CGFloat(bluetoothRows) * 48)
         var max: CGFloat = 420
         if longList {
             max = 640
@@ -39,7 +44,7 @@ struct MainListView: View {
     }
     
     private var isTrulyEmpty: Bool {
-        manager.devices.isEmpty
+        manager.devices.isEmpty && bluetoothManager.devices.isEmpty
     }
 
     private var header: some View {
@@ -56,7 +61,7 @@ struct MainListView: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text("MenuBarUSB-TB")
                     .font(.headline)
-                Text("usb_devices")
+                Text("connected_devices")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -67,7 +72,7 @@ struct MainListView: View {
                 Circle()
                     .fill(.blue)
                     .frame(width: 6, height: 6)
-                Text("\(manager.devices.count)")
+                Text("\(manager.count + bluetoothManager.count)")
                     .font(.subheadline.weight(.semibold))
                     .monospacedDigit()
             }
@@ -75,7 +80,7 @@ struct MainListView: View {
             .padding(.horizontal, 9)
             .padding(.vertical, 5)
             .background(.primary.opacity(0.07), in: Capsule())
-            .accessibilityLabel(Text("\(manager.devices.count) \("usb_devices".localized)"))
+            .accessibilityLabel(Text("\(manager.count + bluetoothManager.count) \("connected_devices".localized)"))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 11)
@@ -92,7 +97,9 @@ struct MainListView: View {
                 } else {
                     MainListDeviceList(
                         deviceGroupExpanded: $deviceGroupExpanded,
-                        hubGroupExpanded: $hubGroupExpanded
+                        hubGroupExpanded: $hubGroupExpanded,
+                        internalGroupExpanded: $internalGroupExpanded,
+                        bluetoothGroupExpanded: $bluetoothGroupExpanded
                     )
                 }
             }

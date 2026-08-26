@@ -79,7 +79,9 @@ final class USBDeviceManager: ObservableObject {
     @AS(Key.powerSourceInfo) private var powerSourceInfo: Bool = false
     @AS(Key.showEthernet) var showEthernet = false
 
-    init() {
+    init(monitoringEnabled: Bool = true) {
+        guard monitoringEnabled else { return }
+
         if powerSourceInfo {
             startPowerMonitoring()
         }
@@ -106,9 +108,10 @@ final class USBDeviceManager: ObservableObject {
     }
 
     private func setCount() {
-        // The status-item count mirrors the visible "USB-Geräte" group. Standard
-        // USB hubs stay available in their own group, but are not user devices.
-        count = devices.filter { !$0.item.isHub }.count
+        // The status-item count mirrors the external "USB-Geräte" group.
+        // Hubs and IOKit-classified internal devices remain visible in their
+        // own groups, but are not user-connected devices.
+        count = devices.filter { $0.item.countsTowardUSBDeviceTotal }.count
     }
 
     func refresh() {
@@ -503,6 +506,7 @@ final class USBDeviceManager: ObservableObject {
         let serial = stringValue(kUSBSerialNumberString as String)
         let locationId = uint32Value(kUSBDevicePropertyLocationID as String)
         let deviceClass = intValue("bDeviceClass")
+        let usbPortType = intValue(kUSBHostMatchingPropertyPortType)
 
         let linkSpeedBpsCandidates = [
             "kUSBDevicePropertyLinkSpeed", "LinkSpeed", "DeviceLinkSpeed", "link-speed",
@@ -577,6 +581,7 @@ final class USBDeviceManager: ObservableObject {
             portMaxSpeedMbps: portMaxSpeedMbps,
             usbVersionBCD: usbVersionBCD,
             isExternalStorage: isExternalStorageDevice(entry),
+            usbPortType: usbPortType,
             deviceClass: deviceClass,
             isThunderboltBillboard: containsUSBInterfaceClass(entry, 0x11)
         ))

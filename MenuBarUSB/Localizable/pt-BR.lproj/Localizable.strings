@@ -4,6 +4,12 @@
 "usb_device" = "Dispositivo USB";
 "usb_devices" = "Dispositivos USB";
 "usb_hubs" = "Hubs USB";
+"internal_devices" = "Dispositivos internos";
+"app_language" = "Idioma do app";
+"app_language_description" = "Escolha um idioma para MenuBarUSB-TB. Automático segue o idioma do macOS.";
+"app_language_automatic" = "Automático";
+"bluetooth_devices" = "Dispositivos Bluetooth";
+"connected_devices" = "Dispositivos conectados";
 "protocol" = "Protocolo:";
 "no_devices_found" = "Nada encontrado";
 "about" = "Sobre";

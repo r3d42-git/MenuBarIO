@@ -1,4 +1,5 @@
 import XCTest
+import IOKit.usb
 @testable import MenuBarUSB
 
 final class USBDeviceTests: XCTestCase {
@@ -98,6 +99,40 @@ final class USBDeviceTests: XCTestCase {
         XCTAssertFalse(thunderboltDevice.isHub)
     }
 
+    func testInternalUSBClassificationUsesOnlyIOKitInternalPortType() {
+        let internalDevice = USBDevice(
+            name: "Internal Camera",
+            vendor: "Apple Inc.",
+            vendorId: 1452,
+            productId: 1,
+            serialNumber: nil,
+            locationId: nil,
+            speedMbps: 480,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: false,
+            usbPortType: Int(kIOUSBHostPortTypeInternal.rawValue)
+        )
+        let captiveDevice = USBDevice(
+            name: "Captive Accessory",
+            vendor: "Apple Inc.",
+            vendorId: 1452,
+            productId: 2,
+            serialNumber: nil,
+            locationId: nil,
+            speedMbps: 480,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: false,
+            usbPortType: Int(kIOUSBHostPortTypeCaptive.rawValue)
+        )
+
+        XCTAssertTrue(internalDevice.isInternal)
+        XCTAssertFalse(internalDevice.countsTowardUSBDeviceTotal)
+        XCTAssertFalse(captiveDevice.isInternal)
+        XCTAssertTrue(captiveDevice.countsTowardUSBDeviceTotal)
+    }
+
     func testThunderboltDescriptionUsesItsNegotiatedLinkSpeed() {
         let device = USBDevice(
             name: "SSD",
@@ -195,6 +230,99 @@ final class USBDeviceTests: XCTestCase {
         XCTAssertEqual(
             Set(USBDeviceManager.usbDeviceClassNames),
             Set(["IOUSBHostDevice", "IOUSBDevice"])
+        )
+    }
+
+    func testBluetoothDevicesFilterDisconnectedDevicesSortAndDeduplicate() {
+        let devices = BluetoothDevice.connectedDevices(from: [
+            .init(identifier: "AA:BB", name: "Zebra Mouse", isConnected: true),
+            .init(identifier: "CC:DD", name: "Alpha Keyboard", isConnected: true),
+            .init(identifier: "EE:FF", name: "Offline Headphones", isConnected: false),
+            .init(identifier: "AA:BB", name: "Zebra Mouse", isConnected: true),
+        ])
+
+        XCTAssertEqual(devices.map(\.name), ["Alpha Keyboard", "Zebra Mouse"])
+        XCTAssertEqual(devices.map(\.id), ["bluetooth-cc:dd", "bluetooth-aa:bb"])
+    }
+
+    func testBluetoothDeviceUsesAStableNameFallbackWhenNoAddressIsAvailable() throws {
+        let device = try XCTUnwrap(BluetoothDevice(snapshot: .init(
+            identifier: nil,
+            name: "Logi M650 L",
+            isConnected: true
+        )))
+
+        XCTAssertEqual(device.id, "bluetooth-name-logi m650 l")
+        XCTAssertEqual(device.name, "Logi M650 L")
+        XCTAssertEqual(device.icon, .system("computermouse"))
+    }
+
+    func testBluetoothDeviceUsesMatchingIconsForAirPodsAndDeviceClasses() throws {
+        let airPods = try XCTUnwrap(BluetoothDevice(snapshot: .init(
+            identifier: "AA:BB",
+            name: "AirPods",
+            isConnected: true,
+            deviceClassMajor: 0x04,
+            deviceClassMinor: 0x06
+        )))
+        let speaker = try XCTUnwrap(BluetoothDevice(snapshot: .init(
+            identifier: "CC:DD",
+            name: "JBL Soundgear Clips",
+            isConnected: true,
+            deviceClassMajor: 0x04,
+            deviceClassMinor: 0x05
+        )))
+        let unknown = try XCTUnwrap(BluetoothDevice(snapshot: .init(
+            identifier: "EE:FF",
+            name: "Unknown Device",
+            isConnected: true
+        )))
+
+        XCTAssertEqual(airPods.icon, .system("airpods"))
+        XCTAssertEqual(speaker.icon, .system("speaker.wave.2"))
+        XCTAssertEqual(unknown.icon, .bluetoothTemplate)
+    }
+
+    func testBluetoothGroupIsCollapsedByDefault() {
+        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        AppDefaults.register(in: defaults)
+
+        XCTAssertFalse(defaults.bool(forKey: StorageKeys.bluetoothGroupExpanded))
+    }
+
+    func testInternalGroupIsCollapsedByDefault() {
+        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        AppDefaults.register(in: defaults)
+
+        XCTAssertFalse(defaults.bool(forKey: StorageKeys.internalGroupExpanded))
+    }
+
+    func testAppLanguageDefaultsToAutomatic() {
+        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        AppDefaults.register(in: defaults)
+
+        XCTAssertEqual(AppLanguage.selected(in: defaults), .automatic)
+    }
+
+    func testAppLanguageAcceptsOnlyTheBundledManualLanguages() {
+        XCTAssertEqual(
+            Set(AppLanguage.allCases.map(\.rawValue)),
+            Set(["automatic", "en", "de", "es", "fr", "pt-BR", "zh-Hans", "ja"])
         )
     }
 

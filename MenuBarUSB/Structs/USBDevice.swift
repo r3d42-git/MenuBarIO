@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import IOKit.usb
 
 enum ConnectionTransport: String {
     case usb
@@ -33,6 +34,9 @@ struct USBDevice: ~Copyable {
     let portMaxSpeedMbps: Int?
     let usbVersionBCD: Int?
     let isExternalStorage: Bool?
+    /// USB port type as reported by IOKit. The internal type identifies a
+    /// device that is not physically disconnectable from this Mac.
+    let usbPortType: Int?
     /// USB device class 9 identifies a standards-compliant USB hub.
     let deviceClass: Int?
     /// USB-C Billboard interfaces expose alternate-mode status. A Thunderbolt
@@ -55,6 +59,7 @@ struct USBDevice: ~Copyable {
         portMaxSpeedMbps: Int?,
         usbVersionBCD: Int?,
         isExternalStorage: Bool?,
+        usbPortType: Int? = nil,
         deviceClass: Int? = nil,
         isThunderboltBillboard: Bool = false,
         transport: ConnectionTransport = .usb,
@@ -71,6 +76,7 @@ struct USBDevice: ~Copyable {
         self.portMaxSpeedMbps = portMaxSpeedMbps
         self.usbVersionBCD = usbVersionBCD
         self.isExternalStorage = isExternalStorage
+        self.usbPortType = usbPortType
         self.deviceClass = deviceClass
         self.isThunderboltBillboard = isThunderboltBillboard
         self.transport = transport
@@ -132,5 +138,17 @@ struct USBDevice: ~Copyable {
 
     var isHub: Bool {
         transport == .usb && deviceClass == 9
+    }
+
+    /// Uses IOKit's port classification, rather than a device name, vendor, or
+    /// location-ID heuristic. Captive ports intentionally remain separate.
+    var isInternal: Bool {
+        transport == .usb && usbPortType == Int(kIOUSBHostPortTypeInternal.rawValue)
+    }
+
+    /// Only external, non-hub USB and Thunderbolt devices contribute to the
+    /// user-facing USB count in the menu bar and list header.
+    var countsTowardUSBDeviceTotal: Bool {
+        !isHub && !isInternal
     }
 }
