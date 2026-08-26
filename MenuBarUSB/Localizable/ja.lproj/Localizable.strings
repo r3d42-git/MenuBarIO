@@ -4,6 +4,10 @@
 "usb_device" = "USBデバイス";
 "usb_devices" = "USBデバイス";
 "usb_hubs" = "USBハブ";
+"internal_devices" = "内蔵デバイス";
+"app_language" = "アプリの言語";
+"app_language_description" = "MenuBarUSB-TB の言語を選択します。「自動」は macOS の言語設定に従います。";
+"app_language_automatic" = "自動";
 "bluetooth_devices" = "Bluetoothデバイス";
 "connected_devices" = "接続中のデバイス";
 "protocol" = "プロトコル:";

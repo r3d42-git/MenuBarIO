@@ -4,6 +4,10 @@
 "usb_device" = "USB-Gerät";
 "usb_devices" = "USB-Geräte";
 "usb_hubs" = "USB-Hubs";
+"internal_devices" = "Interne Geräte";
+"app_language" = "App-Sprache";
+"app_language_description" = "Wähle die Sprache für MenuBarUSB-TB. „Automatisch“ folgt der macOS-Sprache.";
+"app_language_automatic" = "Automatisch";
 "bluetooth_devices" = "Bluetooth-Geräte";
 "connected_devices" = "Verbundene Geräte";
 "protocol" = "Protokoll:";

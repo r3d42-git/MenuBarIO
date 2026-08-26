@@ -19,18 +19,20 @@ struct MainListView: View {
     @AS(Key.windowWidth) private var windowWidth: WindowWidth = .normal
     @AS(Key.deviceGroupExpanded) private var deviceGroupExpanded = true
     @AS(Key.hubGroupExpanded) private var hubGroupExpanded = false
+    @AS(Key.internalGroupExpanded) private var internalGroupExpanded = false
     @AS(Key.bluetoothGroupExpanded) private var bluetoothGroupExpanded = false
     
     private var windowHeight: CGFloat? {
         if isTrulyEmpty {
             return nil
         }
-        let baseValue: CGFloat = 162
+        let baseValue: CGFloat = 202
         let rowHeight: CGFloat = hideTechInfo ? 48 : 68
 
         // The header and bottom bar live outside this scrollable device area.
         // Device rows stay comfortably readable until scrolling becomes useful.
-        let usbRows = (deviceGroupExpanded ? manager.devices.filter { !$0.item.isHub }.count : 0) +
+        let usbRows = (deviceGroupExpanded ? manager.devices.filter { $0.item.countsTowardUSBDeviceTotal }.count : 0) +
+            (internalGroupExpanded ? manager.devices.filter { $0.item.isInternal && !$0.item.isHub }.count : 0) +
             (hubGroupExpanded ? manager.devices.filter { $0.item.isHub }.count : 0)
         let bluetoothRows = bluetoothGroupExpanded ? bluetoothManager.count : 0
         let sum: CGFloat = baseValue + (CGFloat(usbRows) * rowHeight) + (CGFloat(bluetoothRows) * 48)
@@ -70,7 +72,7 @@ struct MainListView: View {
                 Circle()
                     .fill(.blue)
                     .frame(width: 6, height: 6)
-                Text("\(manager.devices.count + bluetoothManager.count)")
+                Text("\(manager.count + bluetoothManager.count)")
                     .font(.subheadline.weight(.semibold))
                     .monospacedDigit()
             }
@@ -78,7 +80,7 @@ struct MainListView: View {
             .padding(.horizontal, 9)
             .padding(.vertical, 5)
             .background(.primary.opacity(0.07), in: Capsule())
-            .accessibilityLabel(Text("\(manager.devices.count + bluetoothManager.count) \("connected_devices".localized)"))
+            .accessibilityLabel(Text("\(manager.count + bluetoothManager.count) \("connected_devices".localized)"))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 11)
@@ -96,6 +98,7 @@ struct MainListView: View {
                     MainListDeviceList(
                         deviceGroupExpanded: $deviceGroupExpanded,
                         hubGroupExpanded: $hubGroupExpanded,
+                        internalGroupExpanded: $internalGroupExpanded,
                         bluetoothGroupExpanded: $bluetoothGroupExpanded
                     )
                 }

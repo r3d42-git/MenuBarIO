@@ -86,7 +86,7 @@ struct SettingsView: View {
                     .bold()
                 Text(
                     String(
-                        format: NSLocalizedString("version", comment: "APP VERSION"),
+                        format: "version".localized,
                         Utils.App.appVersion
                     )
                 )

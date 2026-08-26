@@ -4,6 +4,10 @@
 "usb_device" = "USB设备";
 "usb_devices" = "USB设备";
 "usb_hubs" = "USB 集线器";
+"internal_devices" = "内部设备";
+"app_language" = "应用语言";
+"app_language_description" = "为 MenuBarUSB-TB 选择语言。“自动”会跟随 macOS 的语言设置。";
+"app_language_automatic" = "自动";
 "bluetooth_devices" = "蓝牙设备";
 "connected_devices" = "已连接的设备";
 "protocol" = "协议：";

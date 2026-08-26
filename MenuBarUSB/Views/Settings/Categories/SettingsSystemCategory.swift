@@ -15,6 +15,7 @@ struct SettingsSystemCategory: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             LaunchAtLoginToggle(activeRowID: $activeRowID)
+            AppLanguagePicker()
             ToggleRow(
                 label: "reduce_transparency",
                 description: "reduce_transparency_description",

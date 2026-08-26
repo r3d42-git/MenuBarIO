@@ -18,6 +18,7 @@ struct MainListDeviceList: View {
     
     @Binding var deviceGroupExpanded: Bool
     @Binding var hubGroupExpanded: Bool
+    @Binding var internalGroupExpanded: Bool
     @Binding var bluetoothGroupExpanded: Bool
     
     @AS(Key.powerSourceInfo) private var powerSourceInfo = false
@@ -30,7 +31,11 @@ struct MainListDeviceList: View {
     @AS(Key.bigNames) private var bigNames = false
     
     private var deviceGroupDevices: [USBDeviceWrapper] {
-        manager.devices.filter { !$0.item.isHub }
+        manager.devices.filter { $0.item.countsTowardUSBDeviceTotal }
+    }
+
+    private var internalGroupDevices: [USBDeviceWrapper] {
+        manager.devices.filter { $0.item.isInternal && !$0.item.isHub }
     }
 
     private var hubGroupDevices: [USBDeviceWrapper] {
@@ -339,6 +344,17 @@ struct MainListDeviceList: View {
 
                 if bluetoothGroupExpanded {
                     connectedBluetoothDeviceRows(bluetoothManager.devices)
+                }
+
+                groupHeader(
+                    title: "internal_devices".localized,
+                    icon: "laptopcomputer",
+                    count: internalGroupDevices.count,
+                    isExpanded: $internalGroupExpanded
+                )
+
+                if internalGroupExpanded {
+                    connectedDeviceRows(internalGroupDevices)
                 }
 
                 groupHeader(

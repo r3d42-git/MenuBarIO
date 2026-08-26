@@ -19,7 +19,7 @@ struct LegacySettingsHorizontalTopBar: View {
                     .bold()
                 Text(
                     String(
-                        format: NSLocalizedString("version", comment: "APP VERSION"),
+                        format: "version".localized,
                         "\(Utils.App.appVersion) - OS \(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
                     )
                 )

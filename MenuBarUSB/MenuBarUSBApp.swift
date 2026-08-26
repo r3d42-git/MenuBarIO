@@ -23,6 +23,7 @@ struct MenuBarUSBApp: App {
     @AS(Key.hideMenubarIcon) private var hideMenubarIcon = false
     @AS(Key.macBarIcon) private var macBarIcon: String = "cable.connector"
     @AS(Key.showEthernet) private var showEthernet = false
+    @AS(Key.appLanguage) private var appLanguageIdentifier = AppLanguage.automatic.rawValue
     init() {
         AppDefaults.register()
         Utils.App.removeLegacyHardwareSoundData()
@@ -106,8 +107,13 @@ struct MenuBarUSBApp: App {
             String(showEthernet),
             macBarIcon,
             String(hideMenubarIcon),
-            String(hideCount)
+            String(hideCount),
+            appLanguageIdentifier
         ].joined(separator: "-")
+    }
+
+    private var appLanguage: AppLanguage {
+        AppLanguage(rawValue: appLanguageIdentifier) ?? .automatic
     }
 
     private var menuLabel: some View {
@@ -120,8 +126,10 @@ struct MenuBarUSBApp: App {
         content()
             .appBackground(isReduceTransparencyOn)
             .colorSchemeForce(light: forceLightMode, dark: forceDarkMode)
+            .environment(\.locale, appLanguage.locale)
             .environmentObject(manager)
             .environmentObject(bluetoothManager)
+            .id(appLanguage.id)
     }
     
     // Auxiliary function for views in separate windows
@@ -134,8 +142,10 @@ struct MenuBarUSBApp: App {
         Window(title, id: id) {
             content()
                 .colorSchemeForce(light: false, dark: true)
+                .environment(\.locale, appLanguage.locale)
                 .environmentObject(manager)
                 .environmentObject(bluetoothManager)
+                .id(appLanguage.id)
         }
     }
     

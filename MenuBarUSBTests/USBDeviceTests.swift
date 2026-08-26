@@ -1,4 +1,5 @@
 import XCTest
+import IOKit.usb
 @testable import MenuBarUSB
 
 final class USBDeviceTests: XCTestCase {
@@ -96,6 +97,40 @@ final class USBDeviceTests: XCTestCase {
 
         XCTAssertTrue(usbHub.isHub)
         XCTAssertFalse(thunderboltDevice.isHub)
+    }
+
+    func testInternalUSBClassificationUsesOnlyIOKitInternalPortType() {
+        let internalDevice = USBDevice(
+            name: "Internal Camera",
+            vendor: "Apple Inc.",
+            vendorId: 1452,
+            productId: 1,
+            serialNumber: nil,
+            locationId: nil,
+            speedMbps: 480,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: false,
+            usbPortType: Int(kIOUSBHostPortTypeInternal.rawValue)
+        )
+        let captiveDevice = USBDevice(
+            name: "Captive Accessory",
+            vendor: "Apple Inc.",
+            vendorId: 1452,
+            productId: 2,
+            serialNumber: nil,
+            locationId: nil,
+            speedMbps: 480,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: false,
+            usbPortType: Int(kIOUSBHostPortTypeCaptive.rawValue)
+        )
+
+        XCTAssertTrue(internalDevice.isInternal)
+        XCTAssertFalse(internalDevice.countsTowardUSBDeviceTotal)
+        XCTAssertFalse(captiveDevice.isInternal)
+        XCTAssertTrue(captiveDevice.countsTowardUSBDeviceTotal)
     }
 
     func testThunderboltDescriptionUsesItsNegotiatedLinkSpeed() {
@@ -258,6 +293,37 @@ final class USBDeviceTests: XCTestCase {
         AppDefaults.register(in: defaults)
 
         XCTAssertFalse(defaults.bool(forKey: StorageKeys.bluetoothGroupExpanded))
+    }
+
+    func testInternalGroupIsCollapsedByDefault() {
+        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        AppDefaults.register(in: defaults)
+
+        XCTAssertFalse(defaults.bool(forKey: StorageKeys.internalGroupExpanded))
+    }
+
+    func testAppLanguageDefaultsToAutomatic() {
+        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            return XCTFail("Could not create isolated defaults suite")
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        AppDefaults.register(in: defaults)
+
+        XCTAssertEqual(AppLanguage.selected(in: defaults), .automatic)
+    }
+
+    func testAppLanguageAcceptsOnlyTheBundledManualLanguages() {
+        XCTAssertEqual(
+            Set(AppLanguage.allCases.map(\.rawValue)),
+            Set(["automatic", "en", "de", "es", "fr", "pt-BR", "zh-Hans", "ja"])
+        )
     }
 
     func testLegacyHardwareSoundDataIsRemoved() throws {
