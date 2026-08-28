@@ -94,7 +94,7 @@ ditto "$ROOT_DIR/LICENSE" "$STAGING_DIR/LICENSE"
   "$DMG_PATH" \
   "$VOLUME_NAME" \
   "$PRODUCT_NAME.app" \
-  "$APPLICATIONS_LINK_NAME"
+  "Programme"
 
 codesign --force --sign "$MENUBARUSB_SIGNING_IDENTITY" --timestamp "$DMG_PATH"
 codesign --verify --verbose=2 "$DMG_PATH"
