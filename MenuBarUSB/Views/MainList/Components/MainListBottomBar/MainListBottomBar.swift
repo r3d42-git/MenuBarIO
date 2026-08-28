@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct MainListBottomBar: View {
-    
+
     @EnvironmentObject var manager: USBDeviceManager
     @Environment(\.openWindow) private var openWindow
-    
+
     @Binding var currentWindow: AppWindow
-    
+
     @AS(Key.profilerButton) private var profilerButton = false
-    
+
     private func goToSettings() {
         if #available(macOS 15.0, *) {
             currentWindow = .settings
@@ -28,7 +28,7 @@ struct MainListBottomBar: View {
         HStack(spacing: 8) {
             if profilerButton {
                 Button {
-                    Utils.System.openSysInfo()
+                    SystemActions.openSystemInformation()
                 } label: {
                     Image(systemName: "info.circle")
                         .help("open_profiler")
@@ -50,12 +50,16 @@ struct MainListBottomBar: View {
             Spacer()
 
             ControlGroup {
-                Button { manager.refresh() } label: {
+                Button {
+                    manager.refresh()
+                } label: {
                     Image(systemName: "arrow.clockwise")
                 }
                 .help("refresh")
 
-                Button { Utils.App.exit() } label: {
+                Button {
+                    ApplicationActions.exit()
+                } label: {
                     Image(systemName: "power")
                 }
                 .help("exit")

@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct MainListBottomBarContextMenuProfiler: View {
-    
+
     @AS(Key.profilerButton) private var profilerButton = false
-    
+
     var body: some View {
         Button {
             profilerButton = false

@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct LegacySettingsHorizontalTopBar: View {
-    
+
     var body: some View {
         let version = ProcessInfo.processInfo.operatingSystemVersion
-        
+
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text("MenuBarUSB-TB")
@@ -20,7 +20,7 @@ struct LegacySettingsHorizontalTopBar: View {
                 Text(
                     String(
                         format: "version".localized,
-                        "\(Utils.App.appVersion) - OS \(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
+                        "\(ApplicationActions.version) - OS \(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
                     )
                 )
                 .font(.footnote)

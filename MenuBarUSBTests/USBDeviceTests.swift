@@ -1,85 +1,25 @@
-import XCTest
 import IOKit.usb
+import XCTest
+
 @testable import MenuBarUSB
 
 final class USBDeviceTests: XCTestCase {
-    private enum LaunchAtLoginTestError: LocalizedError {
-        case failed
+    func testSeriallessDevicesRemainDistinctByLocation() {
+        let first = makeDevice(locationID: 0x0010_0000)
+        let second = makeDevice(locationID: 0x0020_0000)
 
-        var errorDescription: String? {
-            "Login item update failed"
-        }
+        XCTAssertNotEqual(first.id, second.id)
     }
 
-    func testLaunchAtLoginUpdatePersistsRequestedValueOnSuccess() {
-        let result = LaunchAtLoginUpdateResult.applying(
-            requestedValue: true,
-            currentValue: { false },
-            operation: {}
-        )
+    func testStableIdentifierIsAlsoSwiftUIIdentity() {
+        let device = makeDevice(locationID: 0x0010_0000)
 
-        XCTAssertEqual(result, LaunchAtLoginUpdateResult(persistedValue: true, errorMessage: nil))
-    }
-
-    func testLaunchAtLoginUpdateRestoresActualValueOnFailure() {
-        let result = LaunchAtLoginUpdateResult.applying(
-            requestedValue: true,
-            currentValue: { false },
-            operation: { throw LaunchAtLoginTestError.failed }
-        )
-
-        XCTAssertEqual(
-            result,
-            LaunchAtLoginUpdateResult(
-                persistedValue: false,
-                errorMessage: "Login item update failed"
-            )
-        )
-    }
-
-    func testSeriallessUSBDevicesRemainDistinctByLocation() {
-        let first = USBDevice(
-            name: "USB Device",
-            vendor: "Example",
-            vendorId: 0x1234,
-            productId: 0x5678,
-            serialNumber: nil,
-            locationId: 0x0010_0000,
-            speedMbps: nil,
-            portMaxSpeedMbps: nil,
-            usbVersionBCD: nil,
-            isExternalStorage: nil
-        )
-        let second = USBDevice(
-            name: "USB Device",
-            vendor: "Example",
-            vendorId: 0x1234,
-            productId: 0x5678,
-            serialNumber: nil,
-            locationId: 0x0020_0000,
-            speedMbps: nil,
-            portMaxSpeedMbps: nil,
-            usbVersionBCD: nil,
-            isExternalStorage: nil
-        )
-
-        XCTAssertNotEqual(first.uniqueId, second.uniqueId)
+        XCTAssertEqual(device.id, device.uniqueId)
+        XCTAssertEqual(device.id, makeDevice(locationID: 0x0010_0000).id)
     }
 
     func testHubClassificationOnlyAppliesToUSBClassNine() {
-        let usbHub = USBDevice(
-            name: "Hub",
-            vendor: nil,
-            vendorId: 0,
-            productId: 0,
-            serialNumber: nil,
-            locationId: nil,
-            speedMbps: nil,
-            portMaxSpeedMbps: nil,
-            usbVersionBCD: nil,
-            isExternalStorage: nil,
-            deviceClass: 9
-        )
+        let usbHub = makeDevice(deviceClass: 9)
         let thunderboltDevice = USBDevice(
             name: "Dock",
             vendor: nil,
@@ -99,32 +39,14 @@ final class USBDeviceTests: XCTestCase {
         XCTAssertFalse(thunderboltDevice.isHub)
     }
 
-    func testInternalUSBClassificationUsesOnlyIOKitInternalPortType() {
-        let internalDevice = USBDevice(
-            name: "Internal Camera",
-            vendor: "Apple Inc.",
-            vendorId: 1452,
-            productId: 1,
-            serialNumber: nil,
-            locationId: nil,
-            speedMbps: 480,
-            portMaxSpeedMbps: nil,
-            usbVersionBCD: nil,
-            isExternalStorage: false,
-            usbPortType: Int(kIOUSBHostPortTypeInternal.rawValue)
+    func testInternalClassificationUsesOnlyIOKitInternalPortType() {
+        let internalDevice = makeDevice(
+            productID: 1,
+            portType: Int(kIOUSBHostPortTypeInternal.rawValue)
         )
-        let captiveDevice = USBDevice(
-            name: "Captive Accessory",
-            vendor: "Apple Inc.",
-            vendorId: 1452,
-            productId: 2,
-            serialNumber: nil,
-            locationId: nil,
-            speedMbps: 480,
-            portMaxSpeedMbps: nil,
-            usbVersionBCD: nil,
-            isExternalStorage: false,
-            usbPortType: Int(kIOUSBHostPortTypeCaptive.rawValue)
+        let captiveDevice = makeDevice(
+            productID: 2,
+            portType: Int(kIOUSBHostPortTypeCaptive.rawValue)
         )
 
         XCTAssertTrue(internalDevice.isInternal)
@@ -133,7 +55,22 @@ final class USBDeviceTests: XCTestCase {
         XCTAssertTrue(captiveDevice.countsTowardUSBDeviceTotal)
     }
 
-    func testThunderboltDescriptionUsesItsNegotiatedLinkSpeed() {
+    func testGroupsClassifyExternalInternalAndHubDevicesOnce() {
+        let externalDevice = makeDevice(productID: 1)
+        let internalDevice = makeDevice(
+            productID: 2,
+            portType: Int(kIOUSBHostPortTypeInternal.rawValue)
+        )
+        let hub = makeDevice(productID: 3, deviceClass: 9)
+
+        let groups = USBDeviceGroups(devices: [externalDevice, internalDevice, hub])
+
+        XCTAssertEqual(groups.externalDevices.map(\.id), [externalDevice.id])
+        XCTAssertEqual(groups.internalDevices.map(\.id), [internalDevice.id])
+        XCTAssertEqual(groups.hubs.map(\.id), [hub.id])
+    }
+
+    func testThunderboltDescriptionUsesNegotiatedLinkSpeed() {
         let device = USBDevice(
             name: "SSD",
             vendor: "Example",
@@ -151,22 +88,11 @@ final class USBDeviceTests: XCTestCase {
         )
 
         XCTAssertEqual(device.connectionDescription, "Thunderbolt/USB4 — 80.0 Gbps")
-        XCTAssertEqual(device.uniqueId, "thunderbolt-4369-8738-ABC")
+        XCTAssertEqual(device.id, "thunderbolt-4369-8738-ABC")
     }
 
     func testThunderboltBillboardIsExplicitOptIn() {
-        let regularUSBDevice = USBDevice(
-            name: "USB Device",
-            vendor: "Example",
-            vendorId: 1,
-            productId: 1,
-            serialNumber: nil,
-            locationId: nil,
-            speedMbps: nil,
-            portMaxSpeedMbps: nil,
-            usbVersionBCD: nil,
-            isExternalStorage: false
-        )
+        let regularDevice = makeDevice()
         let billboard = USBDevice(
             name: "Thunderbolt4 Mini Dock",
             vendor: "Anker",
@@ -181,262 +107,29 @@ final class USBDeviceTests: XCTestCase {
             isThunderboltBillboard: true
         )
 
-        XCTAssertFalse(regularUSBDevice.isThunderboltBillboard)
+        XCTAssertFalse(regularDevice.isThunderboltBillboard)
         XCTAssertTrue(billboard.isThunderboltBillboard)
     }
 
-    func testClipboardDeviceFieldsEscapeControlAndBidiCharacters() {
-        let rawValue = "USB\n\u{001B}[2J\u{202E}device\u{2028}\u{2066}"
-
-        XCTAssertEqual(
-            Utils.System.safeClipboardDeviceField(rawValue),
-            "USB\\u{000A}\\u{001B}[2J\\u{202E}device\\u{2028}\\u{2066}"
+    private func makeDevice(
+        productID: Int = 0x5678,
+        locationID: UInt32? = nil,
+        portType: Int? = nil,
+        deviceClass: Int? = nil
+    ) -> USBDevice {
+        USBDevice(
+            name: "USB Device",
+            vendor: "Example",
+            vendorId: 0x1234,
+            productId: productID,
+            serialNumber: nil,
+            locationId: locationID,
+            speedMbps: 480,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: false,
+            usbPortType: portType,
+            deviceClass: deviceClass
         )
-        XCTAssertEqual(Utils.System.safeClipboardDeviceField("USB Café 4"), "USB Café 4")
-    }
-
-    func testExternalNumericValuesAreValidated() {
-        XCTAssertEqual(Utils.USB.chargePercentage(currentCapacity: 50, maximumCapacity: 100), 50)
-        XCTAssertEqual(Utils.USB.chargePercentage(currentCapacity: 150, maximumCapacity: 100), 100)
-        XCTAssertNil(Utils.USB.chargePercentage(currentCapacity: -1, maximumCapacity: 100))
-        XCTAssertNil(Utils.USB.chargePercentage(currentCapacity: 50, maximumCapacity: 0))
-
-        XCTAssertEqual(Utils.USB.megabitsPerSecond(fromBitsPerSecond: 5_000_000_000), 5_000)
-        XCTAssertNil(Utils.USB.megabitsPerSecond(fromBitsPerSecond: .nan))
-        XCTAssertNil(Utils.USB.megabitsPerSecond(fromBitsPerSecond: .infinity))
-        XCTAssertNil(Utils.USB.megabitsPerSecond(fromBitsPerSecond: -1))
-        XCTAssertNil(Utils.USB.megabitsPerSecond(fromBitsPerSecond: .greatestFiniteMagnitude))
-
-        XCTAssertEqual(Utils.USB.thunderboltMegabitsPerSecond(fromLinkBandwidth: 800), 80_000)
-        XCTAssertNil(Utils.USB.thunderboltMegabitsPerSecond(fromLinkBandwidth: Int.max))
-    }
-
-    func testRefreshCoordinatorCoalescesBurstsAndPublishesOnlyTheLatestGeneration() throws {
-        var coordinator = DeviceRefreshCoordinator()
-
-        let firstGeneration = try XCTUnwrap(coordinator.requestRefresh())
-        XCTAssertNil(coordinator.requestRefresh())
-        XCTAssertFalse(coordinator.isCurrent(firstGeneration))
-
-        let secondGeneration = firstGeneration + 1
-        XCTAssertEqual(coordinator.completeRefresh(firstGeneration), .refresh(secondGeneration))
-        XCTAssertTrue(coordinator.isCurrent(secondGeneration))
-        XCTAssertEqual(coordinator.completeRefresh(secondGeneration), .publish)
-
-        XCTAssertEqual(coordinator.requestRefresh(), secondGeneration + 1)
-    }
-
-    func testUSBDiscoveryIncludesHostAndLegacyDeviceClasses() {
-        XCTAssertEqual(
-            Set(USBDeviceManager.usbDeviceClassNames),
-            Set(["IOUSBHostDevice", "IOUSBDevice"])
-        )
-    }
-
-    func testBluetoothDevicesFilterDisconnectedDevicesSortAndDeduplicate() {
-        let devices = BluetoothDevice.connectedDevices(from: [
-            .init(identifier: "AA:BB", name: "Zebra Mouse", isConnected: true),
-            .init(identifier: "CC:DD", name: "Alpha Keyboard", isConnected: true),
-            .init(identifier: "EE:FF", name: "Offline Headphones", isConnected: false),
-            .init(identifier: "AA:BB", name: "Zebra Mouse", isConnected: true),
-        ])
-
-        XCTAssertEqual(devices.map(\.name), ["Alpha Keyboard", "Zebra Mouse"])
-        XCTAssertEqual(devices.map(\.id), ["bluetooth-cc:dd", "bluetooth-aa:bb"])
-    }
-
-    func testBluetoothDeviceUsesAStableNameFallbackWhenNoAddressIsAvailable() throws {
-        let device = try XCTUnwrap(BluetoothDevice(snapshot: .init(
-            identifier: nil,
-            name: "Logi M650 L",
-            isConnected: true
-        )))
-
-        XCTAssertEqual(device.id, "bluetooth-name-logi m650 l")
-        XCTAssertEqual(device.name, "Logi M650 L")
-        XCTAssertEqual(device.icon, .system("computermouse"))
-    }
-
-    func testBluetoothDeviceUsesMatchingIconsForAirPodsAndDeviceClasses() throws {
-        let airPods = try XCTUnwrap(BluetoothDevice(snapshot: .init(
-            identifier: "AA:BB",
-            name: "AirPods",
-            isConnected: true,
-            deviceClassMajor: 0x04,
-            deviceClassMinor: 0x06
-        )))
-        let speaker = try XCTUnwrap(BluetoothDevice(snapshot: .init(
-            identifier: "CC:DD",
-            name: "JBL Soundgear Clips",
-            isConnected: true,
-            deviceClassMajor: 0x04,
-            deviceClassMinor: 0x05
-        )))
-        let unknown = try XCTUnwrap(BluetoothDevice(snapshot: .init(
-            identifier: "EE:FF",
-            name: "Unknown Device",
-            isConnected: true
-        )))
-
-        XCTAssertEqual(airPods.icon, .system("airpods"))
-        XCTAssertEqual(speaker.icon, .system("speaker.wave.2"))
-        XCTAssertEqual(unknown.icon, .bluetoothTemplate)
-    }
-
-    func testBluetoothGroupIsCollapsedByDefault() {
-        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suiteName) else {
-            return XCTFail("Could not create isolated defaults suite")
-        }
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-
-        AppDefaults.register(in: defaults)
-
-        XCTAssertFalse(defaults.bool(forKey: StorageKeys.bluetoothGroupExpanded))
-    }
-
-    func testInternalGroupIsCollapsedByDefault() {
-        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suiteName) else {
-            return XCTFail("Could not create isolated defaults suite")
-        }
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-
-        AppDefaults.register(in: defaults)
-
-        XCTAssertFalse(defaults.bool(forKey: StorageKeys.internalGroupExpanded))
-    }
-
-    func testAppLanguageDefaultsToAutomatic() {
-        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suiteName) else {
-            return XCTFail("Could not create isolated defaults suite")
-        }
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-
-        AppDefaults.register(in: defaults)
-
-        XCTAssertEqual(AppLanguage.selected(in: defaults), .automatic)
-    }
-
-    func testAppLanguageAcceptsOnlyTheBundledManualLanguages() {
-        XCTAssertEqual(
-            Set(AppLanguage.allCases.map(\.rawValue)),
-            Set(["automatic", "en", "de", "es", "fr", "pt-BR", "zh-Hans", "ja"])
-        )
-    }
-
-    func testLegacyHardwareSoundDataIsRemoved() throws {
-        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suiteName) else {
-            return XCTFail("Could not create isolated defaults suite")
-        }
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-
-        ["soundDevices", "customHardwareSounds", "hardwareSound", "playHardwareSound"].forEach {
-            defaults.set("legacy-value", forKey: $0)
-        }
-
-        let appSupport = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString, isDirectory: true)
-        let soundDirectory = appSupport
-            .appendingPathComponent("local.menubarusb.tests", isDirectory: true)
-            .appendingPathComponent("Sounds", isDirectory: true)
-        try FileManager.default.createDirectory(at: soundDirectory, withIntermediateDirectories: true)
-        try Data("legacy sound".utf8).write(to: soundDirectory.appendingPathComponent("sound.mp3"))
-        defer { try? FileManager.default.removeItem(at: appSupport) }
-
-        Utils.App.removeLegacyHardwareSoundData(
-            defaults: defaults,
-            bundleIdentifier: "local.menubarusb.tests",
-            applicationSupportDirectory: appSupport
-        )
-
-        XCTAssertFalse(FileManager.default.fileExists(atPath: soundDirectory.path))
-        ["soundDevices", "customHardwareSounds", "hardwareSound", "playHardwareSound"].forEach {
-            XCTAssertNil(defaults.object(forKey: $0))
-        }
-    }
-
-    func testLegacyDonationPreferenceIsRemoved() {
-        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suiteName) else {
-            return XCTFail("Could not create isolated defaults suite")
-        }
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-
-        defaults.set(true, forKey: "hideDonate")
-        Utils.App.removeLegacyDonationData(defaults: defaults)
-
-        XCTAssertNil(defaults.object(forKey: "hideDonate"))
-    }
-
-    func testLegacyAutomaticUpdatePreferenceIsRemoved() {
-        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suiteName) else {
-            return XCTFail("Could not create isolated defaults suite")
-        }
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-
-        defaults.set(true, forKey: "newVersionNotification")
-        Utils.App.removeLegacyAutomaticUpdateData(defaults: defaults)
-
-        XCTAssertNil(defaults.object(forKey: "newVersionNotification"))
-    }
-
-    func testLegacyEthernetTrafficPreferencesAreRemoved() {
-        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suiteName) else {
-            return XCTFail("Could not create isolated defaults suite")
-        }
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-
-        ["internetMonitoring", "trafficButton", "disableTrafficButtonLabel", "fastMonitor"].forEach {
-            defaults.set(true, forKey: $0)
-        }
-        Utils.App.removeLegacyEthernetTrafficData(defaults: defaults)
-
-        ["internetMonitoring", "trafficButton", "disableTrafficButtonLabel", "fastMonitor"].forEach {
-            XCTAssertNil(defaults.object(forKey: $0))
-        }
-    }
-
-    func testCuratedInitialDefaultsDoNotOverwriteExistingPreferences() {
-        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suiteName) else {
-            return XCTFail("Could not create isolated defaults suite")
-        }
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-
-        AppDefaults.register(in: defaults)
-        XCTAssertTrue(defaults.bool(forKey: StorageKeys.showPortMax))
-        XCTAssertTrue(defaults.bool(forKey: StorageKeys.longList))
-        XCTAssertFalse(defaults.bool(forKey: StorageKeys.showScrollBar))
-        XCTAssertTrue(defaults.bool(forKey: StorageKeys.bigNames))
-        XCTAssertTrue(defaults.bool(forKey: StorageKeys.showEthernet))
-
-        defaults.set(false, forKey: StorageKeys.longList)
-        AppDefaults.register(in: defaults)
-        XCTAssertFalse(defaults.bool(forKey: StorageKeys.longList))
-    }
-
-    func testRemovedFeatureDataIsCleared() {
-        let suiteName = "MenuBarUSBTests.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suiteName) else {
-            return XCTFail("Could not create isolated defaults suite")
-        }
-        defer { defaults.removePersistentDomain(forName: suiteName) }
-
-        let removedKeys = [
-            "storedDevices", "inheritedDevices", "connectionLogs",
-            "showNotifications", "searchEngine", "storeConnectionLogs",
-            "listToolBar", "forceEnglish",
-            "renamedDevices", "camouflagedDevices", "pinnedDevices",
-        ]
-        removedKeys.forEach { defaults.set("legacy-value", forKey: $0) }
-
-        Utils.App.removeRemovedFeatureData(defaults: defaults)
-
-        removedKeys.forEach { XCTAssertNil(defaults.object(forKey: $0)) }
     }
 }

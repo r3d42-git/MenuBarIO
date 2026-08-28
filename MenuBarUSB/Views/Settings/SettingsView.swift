@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Binding var currentWindow: AppWindow
-    @State private var activeRowID: UUID? = nil
+    @State private var activeRowID: String?
     @State private var expandedCategories: Set<SettingsCategory> = [.system]
 
     @AS(Key.reduceTransparency) private var reduceTransparency = false
@@ -30,54 +30,6 @@ struct SettingsView: View {
         )
     }
 
-    private func section<Content: View>(
-        _ category: SettingsCategory,
-        label: LocalizedStringKey,
-        image: String,
-        @ViewBuilder content: @escaping () -> Content
-    ) -> some View {
-        let isExpanded = expandedBinding(for: category)
-
-        return VStack(alignment: .leading, spacing: 0) {
-            Button {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    isExpanded.wrappedValue.toggle()
-                }
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "chevron.right")
-                        .font(.caption.weight(.semibold))
-                        .rotationEffect(.degrees(isExpanded.wrappedValue ? 90 : 0))
-                        .frame(width: 12)
-
-                    Image(image)
-                        .renderingMode(.template)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 16, height: 16)
-
-                    Text(label)
-                        .font(.headline)
-
-                    Spacer()
-                }
-                .contentShape(Rectangle())
-                .padding(.horizontal, 12)
-                .frame(minHeight: 46)
-            }
-            .buttonStyle(.plain)
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            if isExpanded.wrappedValue {
-                content()
-                    .padding(.top, 8)
-                    .padding(.horizontal, 12)
-                    .padding(.bottom, 12)
-            }
-        }
-        .background(Color.gray.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             VStack(alignment: .leading, spacing: 2) {
@@ -87,7 +39,7 @@ struct SettingsView: View {
                 Text(
                     String(
                         format: "version".localized,
-                        Utils.App.appVersion
+                        ApplicationActions.version
                     )
                 )
                 .font(.footnote)
@@ -96,27 +48,51 @@ struct SettingsView: View {
 
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 8) {
-                    section(.system, label: "system_category", image: "settings_general") {
+                    CollapsibleSettingsSection(
+                        label: "system_category",
+                        imageName: "settings_general",
+                        isExpanded: expandedBinding(for: .system)
+                    ) {
                         SettingsSystemCategory(activeRowID: $activeRowID)
                     }
 
-                    section(.icon, label: "icon_category", image: "settings_icon") {
+                    CollapsibleSettingsSection(
+                        label: "icon_category",
+                        imageName: "settings_icon",
+                        isExpanded: expandedBinding(for: .icon)
+                    ) {
                         SettingsIconCategory(activeRowID: $activeRowID)
                     }
 
-                    section(.interface, label: "ui_category", image: "settings_interface") {
+                    CollapsibleSettingsSection(
+                        label: "ui_category",
+                        imageName: "settings_interface",
+                        isExpanded: expandedBinding(for: .interface)
+                    ) {
                         SettingsInterfaceCategory(activeRowID: $activeRowID)
                     }
 
-                    section(.usb, label: "usb_category", image: "settings_info") {
+                    CollapsibleSettingsSection(
+                        label: "usb_category",
+                        imageName: "settings_info",
+                        isExpanded: expandedBinding(for: .usb)
+                    ) {
                         SettingsUSBCategory(activeRowID: $activeRowID)
                     }
 
-                    section(.ethernet, label: "ethernet_category", image: "settings_ethernet") {
+                    CollapsibleSettingsSection(
+                        label: "ethernet_category",
+                        imageName: "settings_ethernet",
+                        isExpanded: expandedBinding(for: .ethernet)
+                    ) {
                         SettingsEthernetCategory(activeRowID: $activeRowID)
                     }
 
-                    section(.others, label: "others_category", image: "settings_others") {
+                    CollapsibleSettingsSection(
+                        label: "others_category",
+                        imageName: "settings_others",
+                        isExpanded: expandedBinding(for: .others)
+                    ) {
                         SettingsOthersCategory(activeRowID: $activeRowID)
                     }
 

@@ -9,9 +9,12 @@
 The command uses an isolated DerivedData directory and runs:
 
 - the privacy audit: no telemetry, update checks or network client code;
-- the XCTest suite for device identity, hub classification, Thunderbolt link
-  speed, Billboard detection and removal of retired features;
-- the Xcode Static Analyzer for the Release configuration.
+- the localization audit for valid syntax, matching locale keys, duplicate keys
+  and unused literal keys;
+- the Swift formatter in lint mode for all app and test sources;
+- the XCTest suite for device identity, device grouping, formatting, refresh
+  coordination, migration and settings boundaries;
+- the Xcode Static Analyzer for the Release configuration;
 - a Release app containing both Apple-Silicon (`arm64`) and Intel (`x86_64`)
   slices; `lipo` verifies both slices in the resulting executable.
 
@@ -105,8 +108,12 @@ Der Befehl verwendet ein isoliertes DerivedData-Verzeichnis und führt aus:
 
 - die Datenschutzprüfung: keine Telemetrie, Update-Abfragen oder
   Netzwerk-Client-Code;
-- die XCTest-Tests für Geräteidentität, Hub-Klassifizierung, Thunderbolt-Link-Geschwindigkeit, Billboard-Erkennung sowie die Bereinigung entfernter Funktionen;
-- den Xcode Static Analyzer für die Release-Konfiguration.
+- die Lokalisierungsprüfung auf gültige Syntax, identische Schlüssel je
+  Sprache, Duplikate und ungenutzte literale Schlüssel;
+- den Swift-Formatter im Prüfmodus für alle App- und Testquellen;
+- die XCTest-Tests für Geräteidentität, Gerätegruppierung, Formatierung,
+  Aktualisierungskoordination, Migration und Einstellungsgrenzen;
+- den Xcode Static Analyzer für die Release-Konfiguration;
 - eine Release-App mit Apple-Silicon- (`arm64`) und Intel-Slice (`x86_64`);
   `lipo` prüft beide Slices in der erzeugten ausführbaren Datei.
 

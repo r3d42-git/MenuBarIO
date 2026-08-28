@@ -8,16 +8,16 @@
 import SwiftUI
 
 struct SettingsIconCategory: View {
-    
+
     @EnvironmentObject var manager: USBDeviceManager
-    
-    @Binding var activeRowID: UUID?
-    
+
+    @Binding var activeRowID: String?
+
     @AS(Key.hideMenubarIcon) private var hideMenubarIcon = false
     @AS(Key.hideCount) private var hideCount = false
     @AS(Key.macBarIcon) private var macBarIcon: String = "cable.connector"
     @AS(Key.numberRepresentation) private var numberRepresentation: NumberRepresentation = .base10
-    
+
     private let icons: [String] = [
         "cable.connector",
         "app.connected.to.app.below.fill",
@@ -39,28 +39,11 @@ struct SettingsIconCategory: View {
         "cat.fill",
         "dog.fill",
     ]
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ToggleRow(
-                label: "hide_menubar_icon",
-                description: "hide_menubar_icon_description",
-                binding: $hideMenubarIcon,
-                activeRowID: $activeRowID,
-                incompatibilities: nil,
-                disabled: hideCount,
-                onToggle: { _ in hideCount = false }
-            )
-            ToggleRow(
-                label: "hide_count",
-                description: "hide_count_description",
-                binding: $hideCount,
-                activeRowID: $activeRowID,
-                incompatibilities: nil,
-                disabled: hideMenubarIcon,
-                onToggle: { _ in hideMenubarIcon = false }
-            )
-            
+            MenuBarVisibilitySettings(activeRowID: $activeRowID)
+
             HStack(spacing: 12) {
                 if !hideMenubarIcon {
                     Text("icon")
@@ -68,12 +51,12 @@ struct SettingsIconCategory: View {
                 }
                 if !hideCount {
                     Text("numerical_representation")
-                    Text(NumberConverter(manager.count).converted)
+                    Text(DeviceCountFormatter.string(for: manager.count, representation: numberRepresentation))
                         .fontWeight(.bold)
                 }
                 Spacer()
             }
-            
+
             HStack {
                 Menu {
                     ForEach(icons, id: \.self) { item in
@@ -84,7 +67,10 @@ struct SettingsIconCategory: View {
                                 Image(systemName: item)
                                 if !hideCount {
                                     Text(
-                                        NumberConverter(manager.count).converted
+                                        DeviceCountFormatter.string(
+                                            for: manager.count,
+                                            representation: numberRepresentation
+                                        )
                                     )
                                 }
                             }
@@ -97,15 +83,11 @@ struct SettingsIconCategory: View {
                                 Color.gray.opacity(0.3)))
                 }
                 .disabled(hideMenubarIcon)
-                
+
                 Menu(LocalizedStringKey(numberRepresentation.rawValue)) {
-                    let nr: [NumberRepresentation] = [
-                        .base10, .egyptian, .greek, .roman,
-                    ]
-                    ForEach(nr, id: \.self) { item in
+                    ForEach(NumberRepresentation.allCases) { item in
                         Button {
                             numberRepresentation = item
-                            Utils.App.restart()
                         } label: {
                             Text(LocalizedStringKey(item.rawValue))
                         }
@@ -114,12 +96,7 @@ struct SettingsIconCategory: View {
                 .disabled(hideCount)
                 .help("numerical_representation")
             }
-            
-            Text("changes_restart_warning")
-                .font(.footnote)
-                .foregroundColor(.primary)
-                .opacity(0.7)
-                .padding(.bottom, 3)
+
         }
     }
 }

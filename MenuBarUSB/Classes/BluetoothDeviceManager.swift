@@ -81,10 +81,10 @@ final class BluetoothDeviceManager: NSObject, ObservableObject {
 
         for device in connectedDevices {
             guard let systemDevice = systemDevices[device.id],
-                  let notification = systemDevice.register(
-                      forDisconnectNotification: self,
-                      selector: #selector(deviceDisconnected(_:device:))
-                  )
+                let notification = systemDevice.register(
+                    forDisconnectNotification: self,
+                    selector: #selector(deviceDisconnected(_:device:))
+                )
             else {
                 continue
             }
@@ -94,7 +94,9 @@ final class BluetoothDeviceManager: NSObject, ObservableObject {
     }
 
     private func unregisterDisconnectNotifications() {
-        disconnectNotifications.values.forEach { $0.unregister() }
+        for notification in disconnectNotifications.values {
+            notification.unregister()
+        }
         disconnectNotifications.removeAll()
     }
 

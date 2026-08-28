@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct LaunchAtLoginToggle: View {
-    @Binding var activeRowID: UUID?
+    @Binding var activeRowID: String?
 
     @AS(Key.launchAtLogin) private var launchAtLogin = false
     @State private var errorMessage: String?
@@ -23,7 +23,6 @@ struct LaunchAtLoginToggle: View {
             description: "open_on_startup_description",
             binding: $launchAtLogin,
             activeRowID: $activeRowID,
-            incompatibilities: nil,
             onToggle: updateLoginItem
         )
         .alert(

@@ -30,13 +30,14 @@ enum LaunchAtLoginService {
     static func update(enabled: Bool) -> LaunchAtLoginUpdateResult {
         LaunchAtLoginUpdateResult.applying(
             requestedValue: enabled,
-            currentValue: { SMAppService.mainApp.status == .enabled }
-        ) {
-            if enabled {
-                try SMAppService.mainApp.register()
-            } else {
-                try SMAppService.mainApp.unregister()
+            currentValue: { SMAppService.mainApp.status == .enabled },
+            operation: {
+                if enabled {
+                    try SMAppService.mainApp.register()
+                } else {
+                    try SMAppService.mainApp.unregister()
+                }
             }
-        }
+        )
     }
 }

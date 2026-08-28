@@ -36,7 +36,8 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 
     static func selected(in defaults: UserDefaults = .standard) -> AppLanguage {
         guard let identifier = defaults.string(forKey: StorageKeys.appLanguage),
-              let language = AppLanguage(rawValue: identifier) else {
+            let language = AppLanguage(rawValue: identifier)
+        else {
             return .automatic
         }
         return language
@@ -51,7 +52,8 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         if self == .automatic {
             bundle = mainBundle
         } else if let path = mainBundle.path(forResource: rawValue, ofType: "lproj"),
-                  let languageBundle = Bundle(path: path) {
+            let languageBundle = Bundle(path: path)
+        {
             bundle = languageBundle
         } else {
             bundle = mainBundle
