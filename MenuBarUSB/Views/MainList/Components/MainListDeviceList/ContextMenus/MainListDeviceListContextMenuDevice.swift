@@ -8,45 +8,32 @@
 import SwiftUI
 
 struct MainListDeviceListContextMenuDevice: View {
-    
-    @Binding var devicesShowingMore: [USBDeviceWrapper]
-    
-    var device: USBDeviceWrapper
+
+    @Binding var expandedDeviceIDs: Set<String>
+
+    let device: USBDevice
     @AS(Key.mouseHoverInfo) private var mouseHoverInfo = false
     @AS(Key.hideTechInfo) private var hideTechInfo = false
-    
-    private func devicesShowingMoreDoesNotHave(_ device: borrowing USBDevice) -> Bool {
-        for dev in devicesShowingMore {
-            if dev.item.id == device.id {
-                return false
-            }
-        }
-        return true
-    }
-    
-    private func deviceId(_ device: borrowing USBDevice) -> String {
-        return device.hardwareIdentifier
-    }
-    
-    private func compactStringInformation(_ device: borrowing USBDevice) -> String {
+
+    private func compactStringInformation(_ device: USBDevice) -> String {
         var parts: [String] = []
 
         if !device.name.isEmpty {
-            parts.append(Utils.System.safeClipboardDeviceField(device.name))
+            parts.append(SystemActions.sanitizedDeviceField(device.name))
         } else {
             parts.append("usb_device".localized)
         }
 
         if let vendor = device.vendor, !vendor.isEmpty {
-            parts.append(Utils.System.safeClipboardDeviceField(vendor))
+            parts.append(SystemActions.sanitizedDeviceField(vendor))
         }
 
-        parts.append(Utils.System.safeClipboardDeviceField(device.uniqueId))
+        parts.append(SystemActions.sanitizedDeviceField(device.uniqueId))
 
-        parts.append(deviceId(device))
+        parts.append(device.hardwareIdentifier)
 
         if let usbVer = device.usbVersionBCD {
-            if let usbVersion = Utils.USB.usbVersionLabel(from: usbVer) {
+            if let usbVersion = USBFormatting.usbVersionLabel(from: usbVer) {
                 parts.append("\("usb_version".localized) \(usbVersion)")
             } else {
                 parts.append("\("usb_version".localized) 0x\(String(format: "%04X", usbVer))")
@@ -54,36 +41,33 @@ struct MainListDeviceListContextMenuDevice: View {
         }
 
         if let serial = device.serialNumber, !serial.isEmpty {
-            parts.append("\("serial_number".localized) \(Utils.System.safeClipboardDeviceField(serial))")
+            parts.append("\("serial_number".localized) \(SystemActions.sanitizedDeviceField(serial))")
         }
 
         if let portMax = device.portMaxSpeedMbps {
-            let portStr = portMax >= 1000
-                ? String(format: "%.1f Gbps", Double(portMax) / 1000.0)
-                : "\(portMax) Mbps"
-            parts.append("\("port_max".localized) \(portStr)")
+            parts.append("\("port_max".localized) \(USBFormatting.transferRate(portMax))")
         }
 
         return parts.joined(separator: "\n")
     }
-    
+
     var body: some View {
         Button {
-            Utils.System.copyToClipboard(compactStringInformation(device.item))
+            SystemActions.copyToClipboard(compactStringInformation(device))
         } label: {
             Label("copy", systemImage: "square.on.square")
         }
         if !mouseHoverInfo && hideTechInfo {
             Divider()
-            if devicesShowingMoreDoesNotHave(device.item) {
+            if !expandedDeviceIDs.contains(device.id) {
                 Button {
-                    devicesShowingMore.append(device)
+                    expandedDeviceIDs.insert(device.id)
                 } label: {
                     Label("show_more", systemImage: "line.3.horizontal")
                 }
             } else {
                 Button {
-                    devicesShowingMore.removeAll { $0 == device }
+                    expandedDeviceIDs.remove(device.id)
                 } label: {
                     Label("show_less", systemImage: "ellipsis")
                 }

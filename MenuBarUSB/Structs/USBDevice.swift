@@ -22,8 +22,7 @@ enum ConnectionTransport: String {
     }
 }
 
-struct USBDevice: ~Copyable {
-    let id = UUID()
+struct USBDevice: Identifiable, Equatable, Hashable {
     let name: String
     let vendor: String?
     let vendorId: Int
@@ -47,6 +46,8 @@ struct USBDevice: ~Copyable {
     let transportVersion: String?
     /// Stable bus-specific ID. Thunderbolt UIDs must not be shown as USB serial numbers.
     let transportIdentifier: String?
+
+    var id: String { uniqueId }
 
     init(
         name: String,
@@ -88,7 +89,8 @@ struct USBDevice: ~Copyable {
         if transport == .thunderbolt {
             let identifier = transportIdentifier?.trimmingCharacters(in: .whitespaces)
             let fallback = locationId.map(String.init) ?? "unknown"
-            return "thunderbolt-\(vendorId)-\(productId)-\(identifier?.isEmpty == false ? identifier! : fallback)"
+            let stableIdentifier = identifier.flatMap { $0.isEmpty ? nil : $0 } ?? fallback
+            return "thunderbolt-\(vendorId)-\(productId)-\(stableIdentifier)"
         }
 
         let serial = serialNumber?.trimmingCharacters(in: .whitespaces) ?? ""
@@ -110,13 +112,13 @@ struct USBDevice: ~Copyable {
         guard let devMbps = speedMbps else {
             return "unknown_speed".localized
         }
-        var parts: [String] = [Utils.USB.speedTierLabel(for: devMbps)]
+        var parts: [String] = [USBFormatting.speedTierLabel(for: devMbps)]
 
         if let port = portMaxSpeedMbps {
             if devMbps < port {
-                parts.append("— \("supports_up_to".localized) \(Utils.USB.prettyMbps(port))")
+                parts.append("— \("supports_up_to".localized) \(USBFormatting.transferRate(port))")
             } else {
-                parts.append("— \("supports".localized) \(Utils.USB.prettyMbps(port))")
+                parts.append("— \("supports".localized) \(USBFormatting.transferRate(port))")
             }
         }
         return parts.joined(separator: " ")
@@ -126,7 +128,7 @@ struct USBDevice: ~Copyable {
         guard transport == .thunderbolt else { return speedDescription }
 
         if let speedMbps {
-            return "\(transport.displayName) — \(Utils.USB.prettyMbps(speedMbps))"
+            return "\(transport.displayName) — \(USBFormatting.transferRate(speedMbps))"
         }
         return transport.displayName
     }

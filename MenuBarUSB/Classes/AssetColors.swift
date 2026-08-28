@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-final class AssetColors {
+enum AssetColors {
     static var info: Color { Color("Info") }
     static var warning: Color { Color("Warning") }
 }

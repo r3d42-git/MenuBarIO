@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct SettingsSystemCategory: View {
-    @Binding var activeRowID: UUID?
+    @Binding var activeRowID: String?
 
     @AS(Key.reduceTransparency) private var reduceTransparency = false
     @AS(Key.forceDarkMode) private var forceDarkMode = false
@@ -14,14 +14,12 @@ struct SettingsSystemCategory: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            LaunchAtLoginToggle(activeRowID: $activeRowID)
-            AppLanguagePicker()
+            SystemBasicsSettings(activeRowID: $activeRowID)
             ToggleRow(
                 label: "reduce_transparency",
                 description: "reduce_transparency_description",
                 binding: $reduceTransparency,
                 activeRowID: $activeRowID,
-                incompatibilities: nil,
                 disabled: forceDarkMode || forceLightMode,
                 onToggle: { _ in }
             )
@@ -30,7 +28,7 @@ struct SettingsSystemCategory: View {
                 description: "force_dark_mode_description",
                 binding: $forceDarkMode,
                 activeRowID: $activeRowID,
-                incompatibilities: [forceLightMode],
+                hasIncompatibility: forceLightMode,
                 onToggle: { if $0 { forceLightMode = false } }
             )
             ToggleRow(
@@ -38,7 +36,7 @@ struct SettingsSystemCategory: View {
                 description: "force_light_mode_description",
                 binding: $forceLightMode,
                 activeRowID: $activeRowID,
-                incompatibilities: [forceDarkMode],
+                hasIncompatibility: forceDarkMode,
                 onToggle: { if $0 { forceDarkMode = false } }
             )
         }

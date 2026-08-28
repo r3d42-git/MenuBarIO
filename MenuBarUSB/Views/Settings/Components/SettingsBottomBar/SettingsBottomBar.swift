@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct SettingsBottomBar: View {
-    
+
     @Binding var currentWindow: AppWindow
-    
+
     var body: some View {
         HStack {
             Spacer()
-            
+
             Button(action: {
                 currentWindow = .devices
             }) {

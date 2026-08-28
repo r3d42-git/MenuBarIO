@@ -10,7 +10,7 @@ import SwiftUI
 struct MainListBottomBarContextMenuExit: View {
     var body: some View {
         Button {
-            Utils.App.restart()
+            ApplicationActions.restart()
         } label: {
             Label("restart", systemImage: "arrow.2.squarepath")
         }

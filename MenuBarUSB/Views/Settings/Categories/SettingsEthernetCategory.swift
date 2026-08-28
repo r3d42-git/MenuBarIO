@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct SettingsEthernetCategory: View {
-    
+
     @EnvironmentObject var manager: USBDeviceManager
-    
-    @Binding var activeRowID: UUID?
-    
+
+    @Binding var activeRowID: String?
+
     @AS(Key.showEthernet) private var showEthernet = false
     @AS(Key.hideMenubarIcon) private var hideMenubarIcon = false
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             ToggleRow(
@@ -23,13 +23,12 @@ struct SettingsEthernetCategory: View {
                 description: "ethernet_connected_icon_description",
                 binding: $showEthernet,
                 activeRowID: $activeRowID,
-                incompatibilities: nil,
                 disabled: hideMenubarIcon,
                 onToggle: { _ in
                     manager.refresh()
                 }
             )
-            
+
             if #available(macOS 27, *) {
                 HStack(spacing: 5) {
                     Image(systemName: "info.circle")
@@ -38,7 +37,7 @@ struct SettingsEthernetCategory: View {
                 .foregroundStyle(.gray)
                 .font(.footnote)
             }
-            
+
         }
     }
 }

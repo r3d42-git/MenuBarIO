@@ -8,27 +8,29 @@
 import SwiftUI
 
 struct LegacySettingsHorizontalBottomBar: View {
-    
-    @State private var hoveringInfo: Bool = false
-    
+
+    @State private var showDescription = false
+
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         HStack {
             ZStack(alignment: .bottomLeading) {
-                if hoveringInfo {
+                if showDescription {
                     Text("legacy_settings_description")
                         .font(.caption)
                         .offset(y: -40)
                 }
 
-                Image(systemName: "info.circle")
-                    .font(.title2)
-                    .foregroundColor(.primary)
-                    .onHover { hovering in
-                        hoveringInfo = hovering
-                    }
-                    .padding(4)
+                Button {
+                    showDescription.toggle()
+                } label: {
+                    Image(systemName: "info.circle")
+                        .font(.title2)
+                        .foregroundColor(.primary)
+                        .padding(4)
+                }
+                .buttonStyle(.plain)
             }
             Spacer()
             Button("close") {

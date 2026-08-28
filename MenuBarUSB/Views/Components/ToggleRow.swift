@@ -8,14 +8,13 @@
 import SwiftUI
 
 struct ToggleRow: View {
-    let id: UUID = .init()
     let label: String
     let description: String
     @Binding var binding: Bool
-    @Binding var activeRowID: UUID?
-    let incompatibilities: [Bool]?
+    @Binding var activeRowID: String?
+    var hasIncompatibility = false
     var disabled: Bool = false
-    var onToggle: (Bool) -> Void
+    var onToggle: (Bool) -> Void = { _ in }
 
     @State private var showIncompatibilityMessage = false
     @State private var showDescription = false
@@ -23,10 +22,8 @@ struct ToggleRow: View {
     @State private var warningHoverProgress: Double = 0
     @State private var warningTimer: Timer?
 
-    func hasIncompatibility() -> Bool {
-        return incompatibilities?.contains(true) ?? false
-    }
-    
+    private var id: String { label }
+
     private func startWarningHoverProgress() {
         let duration: TimeInterval = 1.5
         let step: TimeInterval = 0.05
@@ -88,23 +85,32 @@ struct ToggleRow: View {
                         }
                     )
                 )
-                    .toggleStyle(.checkbox)
-                    .disabled(disabled)
+                .toggleStyle(.checkbox)
+                .disabled(disabled)
 
-                Image(systemName: "info.circle")
-                    .foregroundStyle(AssetColors.info)
-                    .onTapGesture(perform: toggleDescription)
-                .frame(width: 20, height: 20)
+                Button(action: toggleDescription) {
+                    Image(systemName: "info.circle")
+                        .foregroundStyle(AssetColors.info)
+                        .frame(width: 20, height: 20)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text(description.localized))
 
-                if hasIncompatibility() {
+                if hasIncompatibility {
                     ZStack {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(AssetColors.warning)
-                            .onTapGesture(perform: toggleWarningMessage)
-                            .onHover { inside in
-                                if inside && !showIncompatibilityMessage { startWarningHoverProgress() }
-                                else { cancelWarningHover() }
+                        Button(action: toggleWarningMessage) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(AssetColors.warning)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(Text("warning_incompatible_options"))
+                        .onHover { inside in
+                            if inside && !showIncompatibilityMessage {
+                                startWarningHoverProgress()
+                            } else {
+                                cancelWarningHover()
                             }
+                        }
 
                         if warningHoverProgress > 0 && warningHoverProgress < 1 {
                             Circle()

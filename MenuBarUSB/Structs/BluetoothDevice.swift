@@ -100,8 +100,9 @@ struct BluetoothDevice: Identifiable, Equatable, Hashable {
         if normalizedName.contains("trackpad") {
             return .system("rectangle.and.hand.point.up.left")
         }
-        if normalizedName.contains("mouse") || normalizedName.contains("maus") ||
-            ["m650", "mx master", "mx anywhere", "trackball"].contains(where: { normalizedName.contains($0) }) {
+        if normalizedName.contains("mouse") || normalizedName.contains("maus")
+            || ["m650", "mx master", "mx anywhere", "trackball"].contains(where: { normalizedName.contains($0) })
+        {
             return .system("computermouse")
         }
         if normalizedName.contains("keyboard") || normalizedName.contains("neo") {

@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct MainListDeviceListContextMenuCharger: View {
-    
+
     @EnvironmentObject var manager: USBDeviceManager
-    
+
     @AS(Key.powerSupplyAsCharger) private var powerSupplyAsCharger = false
-    
+
     var body: some View {
         Button {
             powerSupplyAsCharger.toggle()
