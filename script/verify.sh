@@ -30,6 +30,7 @@ bash -n \
   script/localization_audit.sh \
   script/release.sh \
   script/publish_release.sh \
+  script/verify_release.sh \
   script/verify_entitlements.sh
 
 xcodebuild test -quiet \

@@ -14,14 +14,9 @@ TAG="v$VERSION"
 DMG_PATH="$ROOT_DIR/.release/$VERSION/$PRODUCT_NAME-$VERSION-mac.dmg"
 CHECKSUM_PATH="$DMG_PATH.sha256"
 RELEASE_NOTES_PATH="$ROOT_DIR/RELEASE_NOTES/$VERSION.md"
-MOUNT_DIR=""
 DOWNLOAD_DIR=""
 
 cleanup() {
-  if [[ -n "$MOUNT_DIR" && -d "$MOUNT_DIR" ]]; then
-    hdiutil detach "$MOUNT_DIR" -quiet >/dev/null 2>&1 || true
-    rmdir "$MOUNT_DIR" >/dev/null 2>&1 || true
-  fi
   if [[ -n "$DOWNLOAD_DIR" && -d "$DOWNLOAD_DIR" ]]; then
     rm -rf "$DOWNLOAD_DIR"
   fi
@@ -68,6 +63,7 @@ if [[ "$CHECKSUM_SHA256" != "$LOCAL_SHA256" ]]; then
   echo "The recorded checksum does not match the local DMG." >&2
   exit 1
 fi
+"$ROOT_DIR/script/verify_release.sh" "$VERSION" "$DMG_PATH"
 
 gh release create "$TAG" "$DMG_PATH" "$CHECKSUM_PATH" \
   --repo "$REPOSITORY" \
@@ -94,12 +90,6 @@ fi
   shasum -a 256 -c "$(basename "$DOWNLOADED_CHECKSUM")"
 )
 
-hdiutil verify "$DOWNLOADED_DMG"
-xcrun stapler validate "$DOWNLOADED_DMG"
-spctl --assess --type open --context context:primary-signature --verbose=4 "$DOWNLOADED_DMG"
-
-MOUNT_DIR="$(mktemp -d /private/tmp/menubarusb-release-mount.XXXXXX)"
-hdiutil attach -readonly -nobrowse -mountpoint "$MOUNT_DIR" "$DOWNLOADED_DMG" >/dev/null
-codesign --verify --deep --strict --verbose=2 "$MOUNT_DIR/$PRODUCT_NAME.app"
+"$ROOT_DIR/script/verify_release.sh" "$VERSION" "$DOWNLOADED_DMG"
 
 echo "Published and independently verified: $REPOSITORY $TAG"

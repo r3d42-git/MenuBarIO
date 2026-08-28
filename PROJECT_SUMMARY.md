@@ -42,7 +42,8 @@ It audits privacy and localization, lints Swift formatting, runs XCTest and
 the Xcode Static Analyzer, builds both `arm64` and `x86_64`, and verifies the
 resulting Universal app. Use `./script/build_and_run.sh --verify` for a local
 launch smoke test. Hardware-dependent USB/Thunderbolt cases remain documented
-in `TESTING.md`.
+in `TESTING.md`. `./script/verify_release.sh VERSION DMG_PATH` validates the
+final DMG plus the separately notarized and stapled enclosed app.
 
 Release, signing, notarization, GitHub upload and publication are separate
 steps governed by `RELEASE.md`; do not infer them from a code change.
@@ -97,7 +98,9 @@ Sie prüft Datenschutz und Lokalisierung, kontrolliert die Swift-Formatierung,
 führt XCTest und den Xcode Static Analyzer aus, baut `arm64` und `x86_64` und
 verifiziert die erzeugte Universal-App. Für einen lokalen Starttest dient
 `./script/build_and_run.sh --verify`. Hardwareabhängige USB-/Thunderbolt-Fälle
-sind weiterhin in `TESTING.md` dokumentiert.
+sind weiterhin in `TESTING.md` dokumentiert. Mit
+`./script/verify_release.sh VERSION DMG_PATH` werden das finale DMG und die
+getrennt notarisierte und gestapelte enthaltene App geprüft.
 
 Release, Signierung, Notarisierung, GitHub-Upload und Veröffentlichung sind
 getrennte Schritte nach `RELEASE.md`; sie sind nicht automatisch Teil einer

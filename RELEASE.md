@@ -1,9 +1,10 @@
 # Release
 
 `script/release.sh` produces a Developer-ID-signed, notarized and stapled DMG
-and its matching `.dmg.sha256` checksum. It verifies the app before packaging,
-validates the notarized DMG, then mounts that exact DMG read-only and verifies
-the enclosed app again. The delivered image opens as a small installer window:
+and its matching `.dmg.sha256` checksum. It notarizes and staples the app before
+packaging, independently notarizes the DMG, then mounts that exact DMG read-only
+and verifies both tickets with `script/verify_release.sh`. The delivered image
+opens as a small installer window:
 the app can be dragged onto the visible **Programme** alias, which points to
 `/Applications`. `LICENSE` and the installer background stay included in the
 image and are verified during the release.
@@ -56,8 +57,9 @@ in [`TESTING.md`](TESTING.md) on an Intel Mac, or record an explicit release
 exception if this is not currently possible.
 
 The release script aborts when uncommitted or nonignored untracked files exist,
-runs the XCTest suite and static analysis, then verifies the signed app, the
-notarized DMG, and the app inside that exact DMG. It does not upload anything.
+runs the XCTest suite and static analysis, then verifies the separately stapled
+app, the notarized DMG, and the app inside that exact DMG. It does not upload
+anything.
 
 After reviewing and pushing the release commit and its annotated `vVERSION`
 tag, publish the DMG, its checksum and the versioned release notes. The script
@@ -72,10 +74,11 @@ then independently re-checks the exact GitHub download with:
 # Release – Deutsch
 
 `script/release.sh` erzeugt ein mit Developer ID signiertes, notarisiertes und
-gestapeltes DMG sowie die zugehörige Prüfsumme `.dmg.sha256`. Es prüft die App
-vor dem Paketbau, validiert das notarisierte DMG, bindet dann genau dieses DMG
-schreibgeschützt ein und prüft die enthaltene App erneut. Das ausgelieferte
-Image öffnet sich als kleines Installationsfenster: Die App kann auf den
+gestapeltes DMG sowie die zugehörige Prüfsumme `.dmg.sha256`. Es notarisiert und
+stapelt die App vor dem Paketbau, notarisiert das DMG unabhängig davon und
+bindet anschließend genau dieses DMG schreibgeschützt ein. Dabei prüft
+`script/verify_release.sh` beide Tickets. Das ausgelieferte Image öffnet sich
+als kleines Installationsfenster: Die App kann auf den
 sichtbaren Alias **Programme** gezogen werden, der auf `/Applications` zeigt.
 `LICENSE` und der Installationshintergrund bleiben im Image enthalten und
 werden während des Release geprüft.
@@ -134,8 +137,8 @@ derzeit nicht möglich ist.
 
 Das Release-Skript bricht bei nicht übergebenen oder nicht ignorierten
 unversionierten Dateien ab, führt die XCTest-Suite und die statische Analyse
-aus und prüft anschließend die signierte App, das notarisierte DMG und die App
-in genau diesem DMG. Es lädt nichts hoch.
+aus und prüft anschließend die getrennt gestapelte App, das notarisierte DMG
+und die App in genau diesem DMG. Es lädt nichts hoch.
 
 Nach Prüfung und Push des Release-Commits und seines annotierten Tags
 `vVERSION` das DMG, seine Prüfsumme und die versionsbezogenen Release Notes
