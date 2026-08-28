@@ -18,24 +18,15 @@ BUNDLE_IDENTIFIER="de.r3d.menubarusb.tb"
 # release must contain both supported Mac architectures.
 ARCHITECTURES="arm64 x86_64"
 VOLUME_NAME="$PRODUCT_NAME installieren"
-APPLICATIONS_LINK_NAME="Programme"
 RELEASE_DIR="${MENUBARUSB_RELEASE_DIR:-$ROOT_DIR/.release/$VERSION}"
 ARCHIVE_PATH="$RELEASE_DIR/$PRODUCT_NAME.xcarchive"
 APP_PATH="$ARCHIVE_PATH/Products/Applications/$PRODUCT_NAME.app"
+APP_NOTARY_PATH="$RELEASE_DIR/$PRODUCT_NAME-notary.zip"
 STAGING_DIR="$RELEASE_DIR/staging"
 DMG_PATH="$RELEASE_DIR/$PRODUCT_NAME-$VERSION-mac.dmg"
 CHECKSUM_PATH="$DMG_PATH.sha256"
 ENTITLEMENTS_PATH="$RELEASE_DIR/effective-entitlements.plist"
 SIGNATURE_PATH="$RELEASE_DIR/signature-details.txt"
-MOUNT_DIR=""
-
-cleanup() {
-  if [[ -n "$MOUNT_DIR" && -d "$MOUNT_DIR" ]]; then
-    hdiutil detach "$MOUNT_DIR" -quiet >/dev/null 2>&1 || true
-    rmdir "$MOUNT_DIR" >/dev/null 2>&1 || true
-  fi
-}
-trap cleanup EXIT
 
 cd "$ROOT_DIR"
 if [[ -n "$(git status --porcelain=v1 --untracked-files=all)" ]]; then
@@ -87,6 +78,14 @@ for architecture in $ARCHITECTURES; do
   lipo "$APP_PATH/Contents/MacOS/$PRODUCT_NAME" -verify_arch "$architecture"
 done
 
+# Notarize and staple the app before it is copied into the installer. The DMG
+# receives its own independent ticket after packaging.
+ditto -c -k --keepParent "$APP_PATH" "$APP_NOTARY_PATH"
+xcrun notarytool submit "$APP_NOTARY_PATH" --keychain-profile "$MENUBARUSB_NOTARY_PROFILE" --wait
+xcrun stapler staple "$APP_PATH"
+xcrun stapler validate "$APP_PATH"
+spctl --assess --type execute --verbose=4 "$APP_PATH"
+
 mkdir -p "$STAGING_DIR"
 ditto "$APP_PATH" "$STAGING_DIR/$PRODUCT_NAME.app"
 ditto "$ROOT_DIR/LICENSE" "$STAGING_DIR/LICENSE"
@@ -101,21 +100,7 @@ codesign --force --sign "$MENUBARUSB_SIGNING_IDENTITY" --timestamp "$DMG_PATH"
 codesign --verify --verbose=2 "$DMG_PATH"
 xcrun notarytool submit "$DMG_PATH" --keychain-profile "$MENUBARUSB_NOTARY_PROFILE" --wait
 xcrun stapler staple "$DMG_PATH"
-xcrun stapler validate "$DMG_PATH"
-hdiutil verify "$DMG_PATH"
-spctl --assess --type open --context context:primary-signature --verbose=4 "$DMG_PATH"
-
-MOUNT_DIR="$(mktemp -d /private/tmp/menubarusb-release-mount.XXXXXX)"
-hdiutil attach -readonly -nobrowse -mountpoint "$MOUNT_DIR" "$DMG_PATH" >/dev/null
-codesign --verify --deep --strict --verbose=2 "$MOUNT_DIR/$PRODUCT_NAME.app"
-if [[ ! -L "$MOUNT_DIR/$APPLICATIONS_LINK_NAME" || "$(readlink "$MOUNT_DIR/$APPLICATIONS_LINK_NAME")" != "/Applications" ]]; then
-  echo "Installer DMG is missing the $APPLICATIONS_LINK_NAME link to /Applications." >&2
-  exit 1
-fi
-if [[ ! -f "$MOUNT_DIR/.background/installer-background.png" || ! -f "$MOUNT_DIR/LICENSE" ]]; then
-  echo "Installer DMG is missing its required background or license." >&2
-  exit 1
-fi
+"$ROOT_DIR/script/verify_release.sh" "$VERSION" "$DMG_PATH"
 
 (
   cd "$RELEASE_DIR"
