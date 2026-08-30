@@ -3,7 +3,12 @@
 PortGlance is based on the publicly available
 [`rafaelSwi/MenuBarUSB`](https://github.com/rafaelSwi/MenuBarUSB) project under
 the MIT License. This document records deliberate, product-relevant changes
-for future upstream comparisons.
+for future upstream comparisons. The original idea and source authorship remain
+credited, but PortGlance is not an official successor to MenuBarUSB, an official
+continuation of it or a version endorsed by its original author. The original
+author is not involved in PortGlance development, maintenance, support or
+releases. GitHub contributor entries for upstream author accounts reflect only
+the preserved source history, not a current collaboration or affiliation.
 
 - Product name and release channel are independent. The legacy bundle
   identifier `de.r3d.menubarusb.tb` is retained only so existing installations
@@ -42,7 +47,14 @@ The complete technical difference remains traceable through Git against the
 PortGlance basiert auf dem öffentlich verfügbaren Projekt
 [`rafaelSwi/MenuBarUSB`](https://github.com/rafaelSwi/MenuBarUSB) unter der
 MIT-Lizenz. Dieses Dokument hält bewusst eingebrachte, produktrelevante
-Abweichungen für spätere Upstream-Vergleiche fest.
+Abweichungen für spätere Upstream-Vergleiche fest. Die ursprüngliche Idee und
+Urheberschaft am Ausgangscode werden ausdrücklich genannt; PortGlance ist
+jedoch weder offizieller Nachfolger noch offizielle Fortführung von MenuBarUSB
+und auch keine vom ursprünglichen Autor bestätigte Variante. Der ursprüngliche
+Autor ist an Entwicklung, Pflege, Support und Releases von PortGlance nicht
+beteiligt. Seine GitHub-Contributor-Einträge bilden ausschließlich die
+erhaltene Quellcodehistorie ab, nicht eine aktuelle Zusammenarbeit oder
+Zugehörigkeit.
 
 - Produktname und Release-Kanal sind unabhängig. Der bisherige
   Bundle-Identifier `de.r3d.menubarusb.tb` bleibt ausschließlich erhalten,

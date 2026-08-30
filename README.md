@@ -5,7 +5,19 @@
 PortGlance is a native macOS menu-bar utility for inspecting connected USB,
 Thunderbolt and USB4 hardware.
 
-It is an independent fork of [rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi/MenuBarUSB), retained under its MIT license. The fork focuses on reliable Thunderbolt/USB4 discovery and a compact device-first view.
+PortGlance began with the MIT-licensed source of
+[rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi/MenuBarUSB). That original
+idea and source authorship remain explicitly credited, and the original
+copyright notice remains in the license. PortGlance itself is developed and
+maintained independently.
+
+> [!IMPORTANT]
+> PortGlance is not an official successor to MenuBarUSB, an official
+> continuation of it or a version endorsed by its original author. There is no
+> collaboration or affiliation with the original author, who is not involved
+> in PortGlance development, maintenance, support or releases. GitHub lists
+> upstream author accounts under **Contributors** only because this repository
+> preserves the earlier source history.
 
 ## Highlights
 
@@ -44,8 +56,9 @@ Hardware acceptance cases and the release workflow are documented in
 ## License and origin
 
 PortGlance is distributed under the [MIT License](LICENSE). The original
-copyright notice and license terms are preserved. This fork has no affiliation
-with the original developer beyond its licensed source-code origin.
+copyright notice and license terms are preserved. This credits the licensed
+source origin and does not imply collaboration, endorsement or successor
+status.
 
 ---
 
@@ -56,11 +69,19 @@ with the original developer beyond its licensed source-code origin.
 PortGlance ist ein natives macOS-Menüleistenprogramm zur Anzeige
 angeschlossener USB-, Thunderbolt- und USB4-Hardware.
 
-Es ist ein unabhängiger Fork von
-[rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi/MenuBarUSB), der unter
-seiner MIT-Lizenz weitergeführt wird. Der Fork konzentriert sich auf eine
-zuverlässige Thunderbolt-/USB4-Erkennung und eine kompakte, geräteorientierte
-Ansicht.
+PortGlance entstand auf Grundlage des MIT-lizenzierten Quellcodes von
+[rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi/MenuBarUSB). Die
+ursprüngliche Idee und Urheberschaft am Ausgangscode werden ausdrücklich
+genannt; der ursprüngliche Copyright-Hinweis bleibt in der Lizenz erhalten.
+PortGlance selbst wird unabhängig entwickelt und gepflegt.
+
+> [!IMPORTANT]
+> PortGlance ist weder ein offizieller Nachfolger noch eine offizielle
+> Fortführung von MenuBarUSB und auch keine vom ursprünglichen Autor bestätigte
+> Variante. Es bestehen weder Zusammenarbeit noch Zugehörigkeit; der
+> ursprüngliche Autor ist an Entwicklung, Pflege, Support und Releases von
+> PortGlance nicht beteiligt. GitHub führt dessen Konten ausschließlich wegen
+> der erhaltenen früheren Quellcodehistorie unter **Contributors** auf.
 
 ## Wichtige Funktionen
 
@@ -105,6 +126,6 @@ Hardware-Abnahmefälle und der Release-Ablauf sind in
 ## Lizenz und Herkunft
 
 PortGlance wird unter der [MIT-Lizenz](LICENSE) vertrieben. Der ursprüngliche
-Copyright-Hinweis und die Lizenzbedingungen bleiben erhalten. Dieser Fork ist
-über die lizenzierte Herkunft des Quellcodes hinaus nicht mit dem ursprünglichen
-Entwickler verbunden.
+Copyright-Hinweis und die Lizenzbedingungen bleiben erhalten. Damit wird die
+lizenzierte Herkunft des Ausgangscodes gewürdigt; eine Zusammenarbeit,
+Bestätigung oder Nachfolgestellung ist damit nicht verbunden.

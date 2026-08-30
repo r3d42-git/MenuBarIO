@@ -13,6 +13,14 @@ The product, executable, target, project and test target are named
 unchanged so existing preferences and the login-item identity survive the
 rebrand; the test bundle uses `de.r3d.portglance.tests`.
 
+Public product language must credit the original MenuBarUSB idea and
+MIT-licensed source without presenting PortGlance as an official successor to
+MenuBarUSB, an official continuation of it or a version endorsed by its
+original author. There is no collaboration or affiliation with the original
+author, who is not involved in PortGlance development, maintenance, support or
+releases. GitHub contributor entries for upstream author accounts reflect only
+the preserved source history.
+
 The PortGlance rebrand was completed on 2026-08-30 and passed the complete
 local verification plus launch smoke test. The canonical repository is
 `r3d42-git/PortGlance`; `upstream` remains the read-only source reference to
@@ -83,6 +91,14 @@ Produkt, Programmdatei, Target, Projekt und Test-Target heißen `PortGlance`.
 Die bisherige App-Bundle-ID `de.r3d.menubarusb.tb` bleibt erhalten, damit
 Einstellungen und Anmeldeobjekt-Identität die Umbenennung überstehen; das
 Test-Bundle verwendet `de.r3d.portglance.tests`.
+
+Die öffentliche Produktkommunikation muss die ursprüngliche MenuBarUSB-Idee
+und den MIT-lizenzierten Ausgangscode nennen, ohne PortGlance als offiziellen
+Nachfolger, offizielle Fortführung oder vom ursprünglichen Autor bestätigte
+Variante darzustellen. Es bestehen weder Zusammenarbeit noch Zugehörigkeit zum
+ursprünglichen Autor, der an Entwicklung, Pflege, Support und Releases von
+PortGlance nicht beteiligt ist. GitHub-Contributor-Einträge der Upstream-Autoren
+bilden ausschließlich die erhaltene Quellcodehistorie ab.
 
 Das PortGlance-Rebranding wurde am 30.08.2026 abgeschlossen und hat die
 vollständige lokale Prüfkette sowie den Starttest bestanden. Das kanonische
