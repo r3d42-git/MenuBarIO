@@ -16,8 +16,12 @@ rebrand; the test bundle uses `de.r3d.portglance.tests`.
 The PortGlance rebrand was completed on 2026-08-30 and passed the complete
 local verification plus launch smoke test. The canonical repository is
 `r3d42-git/PortGlance`; `upstream` remains the read-only source reference to
-`rafaelSwi/MenuBarUSB`. The rebrand did not create a version bump, tag or
-release.
+`rafaelSwi/MenuBarUSB`. The rebrand was published as the signed, notarized and
+stapled Universal release
+[`v0.2.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.2.0). Its
+release asset is `PortGlance-0.2.0-mac.dmg` with SHA-256
+`c79e5a61dca6e6a160df23a8a2361f29121ce71ae402e4ecae9a131a55847709`; the
+publicly downloaded artifact passed the independent release verification.
 
 ## Code structure
 
@@ -83,8 +87,12 @@ Test-Bundle verwendet `de.r3d.portglance.tests`.
 Das PortGlance-Rebranding wurde am 30.08.2026 abgeschlossen und hat die
 vollständige lokale Prüfkette sowie den Starttest bestanden. Das kanonische
 Repository ist `r3d42-git/PortGlance`; `upstream` bleibt die schreibgeschützte
-Quellreferenz auf `rafaelSwi/MenuBarUSB`. Durch das Rebranding wurden weder
-Versionssprung noch Tag oder Release erstellt.
+Quellreferenz auf `rafaelSwi/MenuBarUSB`. Das Rebranding wurde als signierter,
+notarisierter und gestapelter Universal-Release
+[`v0.2.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.2.0)
+veröffentlicht. Das Release-Artefakt `PortGlance-0.2.0-mac.dmg` hat den SHA-256
+`c79e5a61dca6e6a160df23a8a2361f29121ce71ae402e4ecae9a131a55847709`; der
+öffentlich heruntergeladene Stand bestand die unabhängige Release-Prüfung.
 
 ## Codestruktur
 

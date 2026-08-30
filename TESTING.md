@@ -65,9 +65,10 @@ After every change to IOKit discovery, check them once:
 6. If the Ethernet indicator is enabled, turn its setting off and on twice. The
    cable icon may appear only when a wired link is active and must not initiate
    a network connection from the app.
-7. Before the first Universal release, repeat cases 1–6 on an Intel Mac. If an
-   Intel Mac is unavailable, record the approved exception in the release notes
-   instead of claiming physical Intel-device acceptance.
+7. For a release that changes device discovery, repeat the applicable cases
+   1–6 on an Intel Mac. If the required Intel Mac or device is unavailable,
+   record the approved exception in the release notes instead of claiming
+   physical acceptance that was not performed.
 
 ### Recorded Intel MacBook validation — 2026-08-26
 
@@ -167,9 +168,10 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
 6. Falls die Ethernet-Anzeige aktiviert ist: Einstellung zweimal ein- und
    ausschalten. Das Kabelsymbol darf nur bei aktivem kabelgebundenem Link
    erscheinen und darf keine Netzwerkverbindung der App auslösen.
-7. Vor dem ersten Universal-Release die Fälle 1–6 auf einem Intel-Mac
-   wiederholen. Falls kein Intel-Mac verfügbar ist, die genehmigte Ausnahme in
-   den Release Notes dokumentieren, statt eine physische Intel-Geräteabnahme zu
+7. Bei einem Release mit Änderungen an der Geräteerkennung die zutreffenden
+   Fälle 1–6 auf einem Intel-Mac wiederholen. Falls der benötigte Intel-Mac oder
+   ein Gerät nicht verfügbar ist, die genehmigte Ausnahme in den Release Notes
+   dokumentieren, statt eine nicht durchgeführte physische Abnahme zu
    behaupten.
 
 ### Dokumentierte Intel-MacBook-Abnahme — 26.08.2026

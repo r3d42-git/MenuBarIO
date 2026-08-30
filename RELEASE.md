@@ -28,9 +28,9 @@ that CI workflow deliberately has no signing or notary credentials.
 The product identity is fixed as `PortGlance`. The legacy bundle identifier
 `de.r3d.menubarusb.tb` is deliberately retained for upgrade continuity. The
 project uses Developer Team `G6JH37W285` and the
-existing local `notarytool` keychain profile `MenuBarUSB-TB-notary` by default. Before
-the first release, ensure the corresponding Developer ID Application
-certificate is available and create that profile interactively:
+existing local `notarytool` keychain profile `MenuBarUSB-TB-notary` by default.
+When configuring another Mac for releases, ensure the corresponding Developer
+ID Application certificate is available and create that profile interactively:
 
 ```bash
 ./script/store_notary_credentials.sh 'YOUR-APPLE-ID'
@@ -52,10 +52,11 @@ PORTGLANCE_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
 The release script always archives **both** executable slices: Apple Silicon
 (`arm64`) and Intel (`x86_64`). It verifies each slice before packaging, and
 the CI workflow runs the XCTest suite natively on both architectures. Version
-0.1.1 remains Apple-Silicon-only; the first Universal version must receive a
-new version number. Before that release, complete the device acceptance cases
-in [`TESTING.md`](TESTING.md) on an Intel Mac, or record an explicit release
-exception if this is not currently possible.
+0.1.1 was Apple-Silicon-only; releases from 0.1.2 onward, including the current
+0.2.0 release, are Universal. When a release changes device discovery, complete
+the applicable hardware acceptance cases in [`TESTING.md`](TESTING.md),
+including the Intel-Mac cases, or record an explicit release exception if a
+required device is not available.
 
 The release script aborts when uncommitted or nonignored untracked files exist,
 runs the XCTest suite and static analysis, then verifies the separately stapled
@@ -104,12 +105,11 @@ Notarisierungszugangsdaten.
 
 Die Produktidentität ist auf `PortGlance` festgelegt. Die bisherige Bundle-ID
 `de.r3d.menubarusb.tb` bleibt für nahtlose Aktualisierungen absichtlich
-erhalten. Das Projekt verwendet standardmäßig das
-Entwicklerteam `G6JH37W285` und das lokale `notarytool`-Schlüsselbundprofil
-bereits vorhandene `notarytool`-Schlüsselbundprofil `MenuBarUSB-TB-notary`.
-Vor dem ersten Release sicherstellen, dass das
-entsprechende Developer-ID-Application-Zertifikat verfügbar ist, und dieses
-Profil interaktiv anlegen:
+erhalten. Das Projekt verwendet standardmäßig das Entwicklerteam `G6JH37W285`
+und das vorhandene lokale `notarytool`-Schlüsselbundprofil
+`MenuBarUSB-TB-notary`. Beim Einrichten eines weiteren Macs für Releases
+sicherstellen, dass das entsprechende Developer-ID-Application-Zertifikat
+verfügbar ist, und dieses Profil interaktiv anlegen:
 
 ```bash
 ./script/store_notary_credentials.sh 'YOUR-APPLE-ID'
@@ -132,13 +132,14 @@ PORTGLANCE_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
 Das Release-Skript archiviert immer **beide** ausführbaren Slices: Apple
 Silicon (`arm64`) und Intel (`x86_64`). Es prüft jeden Slice vor dem Paketbau;
 der CI-Ablauf führt die XCTest-Suite nativ auf beiden Architekturen aus.
-Version 0.1.1 bleibt ausschließlich für Apple Silicon; die erste Universal-
-Version benötigt eine neue Versionsnummer. Vor diesem Release die
-Geräte-Abnahmefälle in [`TESTING.md`](TESTING.md) auf einem Intel-Mac
-ausführen oder eine ausdrückliche Release-Ausnahme dokumentieren, falls das
-derzeit nicht möglich ist.
+Version 0.1.1 war ausschließlich für Apple Silicon bestimmt; die Releases ab
+0.1.2 einschließlich des aktuellen Releases 0.2.0 sind Universal-Versionen.
+Wenn ein Release die Geräteerkennung ändert, die zutreffenden
+Hardware-Abnahmefälle in [`TESTING.md`](TESTING.md) einschließlich der
+Intel-Mac-Fälle ausführen oder eine ausdrückliche Release-Ausnahme
+dokumentieren, falls ein benötigtes Gerät nicht verfügbar ist.
 
-Das Release-Skript bricht bei nicht übergebenen oder nicht ignorierten
+Das Release-Skript bricht bei nicht committeten oder nicht ignorierten
 unversionierten Dateien ab, führt die XCTest-Suite und die statische Analyse
 aus und prüft anschließend die getrennt gestapelte App, das notarisierte DMG
 und die App in genau diesem DMG. Es lädt nichts hoch.

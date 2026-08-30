@@ -20,11 +20,11 @@ It is an independent fork of [rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi
 
 ## Compatibility
 
-The current development branch builds a **Universal** app for Apple Silicon
-(`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. The released
-version 0.1.1 remains Apple-Silicon-only. Before the first Universal release,
-the device acceptance cases in [TESTING.md](TESTING.md) still need to be run on
-an Intel Mac (or that exception must be explicitly accepted for the release).
+The current release, **PortGlance 0.2.0**, is a **Universal** app for Apple
+Silicon (`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. Automated
+checks run natively on both architectures. The physical Intel-Mac observations
+and the hardware cases that still apply after discovery changes are documented
+in [TESTING.md](TESTING.md).
 
 The legacy bundle identifier `de.r3d.menubarusb.tb` is intentionally retained
 so existing installations keep their preferences and login-item identity.
@@ -79,12 +79,12 @@ Ansicht.
 
 ## Kompatibilität
 
-Der aktuelle Entwicklungsstand baut eine **Universal-App** für Apple-Silicon-
-(`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die veröffentlichte
-Version 0.1.1 bleibt ausschließlich für Apple Silicon. Vor dem ersten
-Universal-Release müssen die Geräte-Abnahmefälle aus
-[TESTING.md](TESTING.md) noch auf einem Intel-Mac ausgeführt werden (oder diese
-Ausnahme muss für den Release ausdrücklich akzeptiert werden).
+Der aktuelle Release **PortGlance 0.2.0** ist eine **Universal-App** für
+Apple-Silicon- (`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die
+automatischen Prüfungen laufen nativ auf beiden Architekturen. Die physischen
+Beobachtungen auf einem Intel-Mac und die nach Änderungen an der
+Geräteerkennung weiterhin erforderlichen Hardware-Abnahmen sind in
+[TESTING.md](TESTING.md) dokumentiert.
 
 Die bisherige Bundle-ID `de.r3d.menubarusb.tb` bleibt absichtlich erhalten,
 damit vorhandene Installationen ihre Einstellungen und die Identität des
