@@ -1,12 +1,16 @@
 # Differences from MenuBarUSB
 
-MenuBarUSB-TB is based on the publicly available
+PortGlance is based on the publicly available
 [`rafaelSwi/MenuBarUSB`](https://github.com/rafaelSwi/MenuBarUSB) project under
 the MIT License. This document records deliberate, product-relevant changes
 for future upstream comparisons.
 
-- Product identity, bundle identifier and release channel are independent:
-  `MenuBarUSB-TB` / `de.r3d.menubarusb.tb`.
+- Product name and release channel are independent. The legacy bundle
+  identifier `de.r3d.menubarusb.tb` is retained only so existing installations
+  keep their preferences and login-item identity.
+- The original custom app icon and seven custom in-app icon sets were removed.
+  PortGlance has its own app icon; in-app category and Ethernet indicators use
+  native SF Symbols.
 - Thunderbolt and USB4 devices are discovered alongside USB through IOKit;
   link speed, transport and USB4 version are displayed.
 - The list separates devices from pure USB hubs and permits both groups to be
@@ -35,13 +39,18 @@ The complete technical difference remains traceable through Git against the
 
 # Abweichungen zu MenuBarUSB
 
-MenuBarUSB-TB basiert auf dem öffentlich verfügbaren Projekt
+PortGlance basiert auf dem öffentlich verfügbaren Projekt
 [`rafaelSwi/MenuBarUSB`](https://github.com/rafaelSwi/MenuBarUSB) unter der
 MIT-Lizenz. Dieses Dokument hält bewusst eingebrachte, produktrelevante
 Abweichungen für spätere Upstream-Vergleiche fest.
 
-- Produktidentität, Bundle-Identifier und Release-Kanal sind unabhängig:
-  `MenuBarUSB-TB` / `de.r3d.menubarusb.tb`.
+- Produktname und Release-Kanal sind unabhängig. Der bisherige
+  Bundle-Identifier `de.r3d.menubarusb.tb` bleibt ausschließlich erhalten,
+  damit bestehende Installationen ihre Einstellungen und die Identität des
+  Anmeldeobjekts behalten.
+- Das ursprüngliche eigene App-Icon und sieben eigene Icon-Sets innerhalb der
+  App wurden entfernt. PortGlance besitzt ein neues App-Icon; Kategorien und
+  Ethernet-Anzeige verwenden native SF Symbols.
 - Thunderbolt- und USB4-Geräte werden neben USB per IOKit erfasst; Link-Speed,
   Transport und USB4-Version werden angezeigt.
 - Die Liste trennt Geräte von reinen USB-Hubs und erlaubt das Ein- und

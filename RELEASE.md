@@ -25,9 +25,10 @@ the XCTest suite and the Xcode static analyzer in isolated DerivedData. The
 same two checks run in GitHub Actions for pushes to `main` and pull requests;
 that CI workflow deliberately has no signing or notary credentials.
 
-The product identity is fixed as `MenuBarUSB-TB` with bundle identifier
-`de.r3d.menubarusb.tb`. The project uses Developer Team `G6JH37W285` and the
-local `notarytool` keychain profile `MenuBarUSB-TB-notary` by default. Before
+The product identity is fixed as `PortGlance`. The legacy bundle identifier
+`de.r3d.menubarusb.tb` is deliberately retained for upgrade continuity. The
+project uses Developer Team `G6JH37W285` and the
+existing local `notarytool` keychain profile `MenuBarUSB-TB-notary` by default. Before
 the first release, ensure the corresponding Developer ID Application
 certificate is available and create that profile interactively:
 
@@ -44,7 +45,7 @@ flow in its [notarization guide](https://developer.apple.com/documentation/secur
 Run the Universal release with only values appropriate to this fork:
 
 ```bash
-MENUBARUSB_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
+PORTGLANCE_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
 ./script/release.sh VERSION
 ```
 
@@ -101,10 +102,12 @@ Prüfungen laufen in GitHub Actions bei Pushes auf `main` und Pull Requests;
 dieser CI-Ablauf enthält bewusst keine Signierungs- oder
 Notarisierungszugangsdaten.
 
-Die Produktidentität ist auf `MenuBarUSB-TB` mit der Bundle-ID
-`de.r3d.menubarusb.tb` festgelegt. Das Projekt verwendet standardmäßig das
+Die Produktidentität ist auf `PortGlance` festgelegt. Die bisherige Bundle-ID
+`de.r3d.menubarusb.tb` bleibt für nahtlose Aktualisierungen absichtlich
+erhalten. Das Projekt verwendet standardmäßig das
 Entwicklerteam `G6JH37W285` und das lokale `notarytool`-Schlüsselbundprofil
-`MenuBarUSB-TB-notary`. Vor dem ersten Release sicherstellen, dass das
+bereits vorhandene `notarytool`-Schlüsselbundprofil `MenuBarUSB-TB-notary`.
+Vor dem ersten Release sicherstellen, dass das
 entsprechende Developer-ID-Application-Zertifikat verfügbar ist, und dieses
 Profil interaktiv anlegen:
 
@@ -122,7 +125,7 @@ diesen Ablauf in seinem [Notarisierungsleitfaden](https://developer.apple.com/do
 Den Universal-Release nur mit für diesen Fork geeigneten Werten ausführen:
 
 ```bash
-MENUBARUSB_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
+PORTGLANCE_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
 ./script/release.sh VERSION
 ```
 

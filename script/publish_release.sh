@@ -8,8 +8,8 @@ fi
 
 VERSION="$1"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-REPOSITORY="r3d42-git/MenuBarUSB-TB"
-PRODUCT_NAME="MenuBarUSB-TB"
+REPOSITORY="r3d42-git/PortGlance"
+PRODUCT_NAME="PortGlance"
 TAG="v$VERSION"
 DMG_PATH="$ROOT_DIR/.release/$VERSION/$PRODUCT_NAME-$VERSION-mac.dmg"
 CHECKSUM_PATH="$DMG_PATH.sha256"
@@ -71,7 +71,7 @@ gh release create "$TAG" "$DMG_PATH" "$CHECKSUM_PATH" \
   --notes-file "$RELEASE_NOTES_PATH" \
   --verify-tag
 
-DOWNLOAD_DIR="$(mktemp -d /private/tmp/menubarusb-release-download.XXXXXX)"
+DOWNLOAD_DIR="$(mktemp -d /private/tmp/portglance-release-download.XXXXXX)"
 gh release download "$TAG" \
   --repo "$REPOSITORY" \
   --pattern "$(basename "$DMG_PATH")" \
