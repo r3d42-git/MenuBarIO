@@ -32,7 +32,7 @@ For an app-launch smoke test only:
 GitHub Actions runs the same checks natively on an Apple-Silicon runner and an
 Intel runner for pull requests and every push to `main`. The local XCTest run
 uses the architecture of the current Mac; it can be selected explicitly with
-`MENUBARUSB_TEST_ARCH=arm64` or `MENUBARUSB_TEST_ARCH=x86_64` when that native
+`PORTGLANCE_TEST_ARCH=arm64` or `PORTGLANCE_TEST_ARCH=x86_64` when that native
 architecture is available.
 
 ## CI recovery
@@ -131,7 +131,7 @@ Zum reinen Starttest der App:
 GitHub Actions führt dieselben Prüfungen bei Pull Requests und jedem Push auf
 `main` nativ auf einem Apple-Silicon- und einem Intel-Runner aus. Die lokalen
 XCTest-Tests verwenden die Architektur des aktuellen Macs; sie kann mit
-`MENUBARUSB_TEST_ARCH=arm64` beziehungsweise `MENUBARUSB_TEST_ARCH=x86_64`
+`PORTGLANCE_TEST_ARCH=arm64` beziehungsweise `PORTGLANCE_TEST_ARCH=x86_64`
 ausdrücklich gewählt werden, wenn diese Architektur nativ verfügbar ist.
 
 ## CI-Wiederherstellung

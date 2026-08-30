@@ -1,6 +1,8 @@
-# MenuBarUSB-TB
+# PortGlance
 
-MenuBarUSB-TB is a native macOS menu-bar utility for inspecting connected USB,
+<img src="branding/PortGlance-AppIcon-master.png" alt="PortGlance app icon" width="128">
+
+PortGlance is a native macOS menu-bar utility for inspecting connected USB,
 Thunderbolt and USB4 hardware.
 
 It is an independent fork of [rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi/MenuBarUSB), retained under its MIT license. The fork focuses on reliable Thunderbolt/USB4 discovery and a compact device-first view.
@@ -24,9 +26,12 @@ version 0.1.1 remains Apple-Silicon-only. Before the first Universal release,
 the device acceptance cases in [TESTING.md](TESTING.md) still need to be run on
 an Intel Mac (or that exception must be explicitly accepted for the release).
 
+The legacy bundle identifier `de.r3d.menubarusb.tb` is intentionally retained
+so existing installations keep their preferences and login-item identity.
+
 ## Build and test
 
-Open `MenuBarUSB.xcodeproj` in Xcode, or use the local checks:
+Open `PortGlance.xcodeproj` in Xcode, or use the local checks:
 
 ```bash
 ./script/verify.sh
@@ -38,15 +43,17 @@ Hardware acceptance cases and the release workflow are documented in
 
 ## License and origin
 
-MenuBarUSB-TB is distributed under the [MIT License](LICENSE). The original
+PortGlance is distributed under the [MIT License](LICENSE). The original
 copyright notice and license terms are preserved. This fork has no affiliation
 with the original developer beyond its licensed source-code origin.
 
 ---
 
-# MenuBarUSB-TB – Deutsch
+# PortGlance – Deutsch
 
-MenuBarUSB-TB ist ein natives macOS-Menüleistenprogramm zur Anzeige
+<img src="branding/PortGlance-AppIcon-master.png" alt="PortGlance App-Icon" width="128">
+
+PortGlance ist ein natives macOS-Menüleistenprogramm zur Anzeige
 angeschlossener USB-, Thunderbolt- und USB4-Hardware.
 
 Es ist ein unabhängiger Fork von
@@ -79,9 +86,13 @@ Universal-Release müssen die Geräte-Abnahmefälle aus
 [TESTING.md](TESTING.md) noch auf einem Intel-Mac ausgeführt werden (oder diese
 Ausnahme muss für den Release ausdrücklich akzeptiert werden).
 
+Die bisherige Bundle-ID `de.r3d.menubarusb.tb` bleibt absichtlich erhalten,
+damit vorhandene Installationen ihre Einstellungen und die Identität des
+Anmeldeobjekts behalten.
+
 ## Bauen und testen
 
-`MenuBarUSB.xcodeproj` in Xcode öffnen oder die lokalen Prüfungen ausführen:
+`PortGlance.xcodeproj` in Xcode öffnen oder die lokalen Prüfungen ausführen:
 
 ```bash
 ./script/verify.sh
@@ -93,7 +104,7 @@ Hardware-Abnahmefälle und der Release-Ablauf sind in
 
 ## Lizenz und Herkunft
 
-MenuBarUSB-TB wird unter der [MIT-Lizenz](LICENSE) vertrieben. Der ursprüngliche
+PortGlance wird unter der [MIT-Lizenz](LICENSE) vertrieben. Der ursprüngliche
 Copyright-Hinweis und die Lizenzbedingungen bleiben erhalten. Dieser Fork ist
 über die lizenzierte Herkunft des Quellcodes hinaus nicht mit dem ursprünglichen
 Entwickler verbunden.

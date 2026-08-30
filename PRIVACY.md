@@ -1,6 +1,6 @@
 # Privacy and network access
 
-MenuBarUSB-TB has no telemetry, analytics SDKs, crash reporters, accounts,
+PortGlance has no telemetry, analytics SDKs, crash reporters, accounts,
 server API or background network access. It does not transmit device, usage or
 settings data.
 
@@ -20,7 +20,7 @@ script enforces this boundary in local verification and GitHub Actions.
 
 # Datenschutz und Netzwerkzugriffe
 
-MenuBarUSB-TB hat keine Telemetrie, Analyse-SDKs, Crash-Reporter, Konten,
+PortGlance hat keine Telemetrie, Analyse-SDKs, Crash-Reporter, Konten,
 Server-API oder Hintergrundnetzwerkzugriffe. Es übermittelt keine Geräte-,
 Nutzungs- oder Einstellungsdaten.
 

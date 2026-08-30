@@ -2,28 +2,41 @@
 
 ## Purpose and scope
 
-MenuBarUSB-TB is a local-only macOS menu-bar app for showing connected USB,
+PortGlance is a local-only macOS menu-bar app for showing connected USB,
 Thunderbolt/USB4 and Bluetooth devices. It targets macOS 13 or newer and does
 not contain telemetry, analytics, update checks or network client code.
 
-The current product version is `0.1.4` (build 4). Releases are prepared from a
+The current product version is `0.2.0` (build 5). Releases are prepared from a
 reviewed branch and integrated into protected `main` before tagging.
+The product, executable, target, project and test target are named
+`PortGlance`. The legacy app bundle identifier `de.r3d.menubarusb.tb` remains
+unchanged so existing preferences and the login-item identity survive the
+rebrand; the test bundle uses `de.r3d.portglance.tests`.
+
+The PortGlance rebrand was completed on 2026-08-30 and passed the complete
+local verification plus launch smoke test. The canonical repository is
+`r3d42-git/PortGlance`; `upstream` remains the read-only source reference to
+`rafaelSwi/MenuBarUSB`. The rebrand did not create a version bump, tag or
+release.
 
 ## Code structure
 
-- `MenuBarUSB/MenuBarUSBApp.swift` registers defaults, runs the one-time legacy
+- `PortGlance/PortGlanceApp.swift` registers defaults, runs the one-time legacy
   migration and composes the app scenes.
-- `MenuBarUSB/Services/` contains system adapters and lifecycle code for IOKit
+- `PortGlance/Services/` contains system adapters and lifecycle code for IOKit
   discovery, connection notifications, power sources, Ethernet state,
   login-item state and legacy-data migration.
-- `MenuBarUSB/Structs/` and `MenuBarUSB/Enums/` contain stable device models,
+- `PortGlance/Structs/` and `PortGlance/Enums/` contain stable device models,
   grouping rules and preference types.
-- `MenuBarUSB/Support/` contains stateless formatting and system-action
+- `PortGlance/Support/` contains stateless formatting and system-action
   helpers.
-- `MenuBarUSB/Views/` contains small menu-bar, list, row and settings
+- `PortGlance/Views/` contains small menu-bar, list, row and settings
   components. Current and legacy settings reuse the same controls.
-- `MenuBarUSBTests/` mirrors the model, service and migration boundaries with
+- `PortGlanceTests/` mirrors the model, service and migration boundaries with
   focused test files.
+- `branding/PortGlance-AppIcon-master.png` is the generated high-resolution
+  icon master. `PortGlance/Assets.xcassets/AppIcon.appiconset/` contains the
+  derived macOS icon sizes. In-app category and status icons use SF Symbols.
 
 USB and Thunderbolt identities must remain stable across refreshes. Internal
 devices and USB hubs do not count toward the external USB-device total.
@@ -54,31 +67,45 @@ steps governed by `RELEASE.md`; do not infer them from a code change.
 
 ## Zweck und Umfang
 
-MenuBarUSB-TB ist eine rein lokal arbeitende macOS-Menüleisten-App zur Anzeige
+PortGlance ist eine rein lokal arbeitende macOS-Menüleisten-App zur Anzeige
 angeschlossener USB-, Thunderbolt-/USB4- und Bluetooth-Geräte. Sie unterstützt
 macOS 13 oder neuer und enthält weder Telemetrie noch Analysen,
 Update-Abfragen oder Netzwerk-Client-Code.
 
-Die aktuelle Produktversion ist `0.1.4` (Build 4). Releases werden auf einem
+Die aktuelle Produktversion ist `0.2.0` (Build 5). Releases werden auf einem
 geprüften Branch vorbereitet und vor dem Tagging in den geschützten Branch
 `main` integriert.
+Produkt, Programmdatei, Target, Projekt und Test-Target heißen `PortGlance`.
+Die bisherige App-Bundle-ID `de.r3d.menubarusb.tb` bleibt erhalten, damit
+Einstellungen und Anmeldeobjekt-Identität die Umbenennung überstehen; das
+Test-Bundle verwendet `de.r3d.portglance.tests`.
+
+Das PortGlance-Rebranding wurde am 30.08.2026 abgeschlossen und hat die
+vollständige lokale Prüfkette sowie den Starttest bestanden. Das kanonische
+Repository ist `r3d42-git/PortGlance`; `upstream` bleibt die schreibgeschützte
+Quellreferenz auf `rafaelSwi/MenuBarUSB`. Durch das Rebranding wurden weder
+Versionssprung noch Tag oder Release erstellt.
 
 ## Codestruktur
 
-- `MenuBarUSB/MenuBarUSBApp.swift` registriert Standardwerte, führt die
+- `PortGlance/PortGlanceApp.swift` registriert Standardwerte, führt die
   einmalige Altdatenmigration aus und setzt die App-Szenen zusammen.
-- `MenuBarUSB/Services/` enthält Systemadapter und Lebenszykluscode für
+- `PortGlance/Services/` enthält Systemadapter und Lebenszykluscode für
   IOKit-Erkennung, Anschlussmeldungen, Stromquellen, Ethernet-Status,
   Anmeldeobjekt-Status und Altdatenmigration.
-- `MenuBarUSB/Structs/` und `MenuBarUSB/Enums/` enthalten stabile
+- `PortGlance/Structs/` und `PortGlance/Enums/` enthalten stabile
   Gerätemodelle, Gruppierungsregeln und Einstellungstypen.
-- `MenuBarUSB/Support/` enthält zustandslose Formatierungs- und
+- `PortGlance/Support/` enthält zustandslose Formatierungs- und
   Systemaktions-Helfer.
-- `MenuBarUSB/Views/` enthält kleine Menüleisten-, Listen-, Zeilen- und
+- `PortGlance/Views/` enthält kleine Menüleisten-, Listen-, Zeilen- und
   Einstellungskomponenten. Aktuelle und klassische Einstellungen verwenden
   dieselben Bedienelemente.
-- `MenuBarUSBTests/` bildet die Modell-, Service- und Migrationsgrenzen in
+- `PortGlanceTests/` bildet die Modell-, Service- und Migrationsgrenzen in
   gezielten Testdateien ab.
+- `branding/PortGlance-AppIcon-master.png` ist die hochauflösende generierte
+  Icon-Vorlage. Die abgeleiteten macOS-Größen liegen in
+  `PortGlance/Assets.xcassets/AppIcon.appiconset/`. Kategorien und Status in
+  der App verwenden SF Symbols.
 
 USB- und Thunderbolt-Identitäten müssen über Aktualisierungen hinweg stabil
 bleiben. Interne Geräte und USB-Hubs zählen nicht zum Zähler externer

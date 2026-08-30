@@ -2,11 +2,11 @@
 set -euo pipefail
 
 MODE="${1:-run}"
-APP_NAME="MenuBarUSB-TB"
+APP_NAME="PortGlance"
 BUNDLE_ID="de.r3d.menubarusb.tb"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TARGET_ARCHITECTURE="${MENUBARUSB_BUILD_ARCH:-$(uname -m)}"
-DERIVED_DATA_PATH="${MENUBARUSB_DERIVED_DATA_PATH:-${TMPDIR:-/tmp}/menubarusb-tb-derived-data}"
+TARGET_ARCHITECTURE="${PORTGLANCE_BUILD_ARCH:-$(uname -m)}"
+DERIVED_DATA_PATH="${PORTGLANCE_DERIVED_DATA_PATH:-${TMPDIR:-/tmp}/portglance-derived-data}"
 APP_BUNDLE="$DERIVED_DATA_PATH/Build/Products/Debug/$APP_NAME.app"
 
 case "$TARGET_ARCHITECTURE" in
@@ -21,8 +21,8 @@ pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
 cd "$ROOT_DIR"
 xcodebuild build -quiet \
-  -project MenuBarUSB.xcodeproj \
-  -scheme MenuBarUSB \
+  -project PortGlance.xcodeproj \
+  -scheme PortGlance \
   -configuration Debug \
   -destination "platform=macOS,arch=$TARGET_ARCHITECTURE" \
   -derivedDataPath "$DERIVED_DATA_PATH" \

@@ -2,9 +2,9 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-LOCALIZATION_DIR="$ROOT_DIR/MenuBarUSB/Localizable"
+LOCALIZATION_DIR="$ROOT_DIR/PortGlance/Localizable"
 BASE_FILE="$LOCALIZATION_DIR/en.lproj/Localizable.strings"
-AUDIT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/menubarusb-localization-audit.XXXXXX")"
+AUDIT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/portglance-localization-audit.XXXXXX")"
 
 cleanup() {
   rm -rf "$AUDIT_DIR"
@@ -41,7 +41,7 @@ for file in "$LOCALIZATION_DIR"/*.lproj/Localizable.strings; do
 done
 
 while IFS= read -r key; do
-  if ! rg -F -q --glob '*.swift' "\"$key\"" "$ROOT_DIR/MenuBarUSB"; then
+  if ! rg -F -q --glob '*.swift' "\"$key\"" "$ROOT_DIR/PortGlance"; then
     echo "Localization audit failed: unreferenced key: $key" >&2
     exit 1
   fi

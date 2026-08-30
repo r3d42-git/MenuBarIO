@@ -9,7 +9,7 @@ fi
 VERSION="$1"
 DMG_PATH="$2"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PRODUCT_NAME="MenuBarUSB-TB"
+PRODUCT_NAME="PortGlance"
 BUNDLE_IDENTIFIER="de.r3d.menubarusb.tb"
 TEAM_IDENTIFIER="G6JH37W285"
 APPLICATIONS_LINK_NAME="Programme"
@@ -42,7 +42,7 @@ hdiutil verify "$DMG_PATH"
 xcrun stapler validate "$DMG_PATH"
 spctl --assess --type open --context context:primary-signature --verbose=4 "$DMG_PATH"
 
-MOUNT_DIR="$(mktemp -d /private/tmp/menubarusb-release-verify.XXXXXX)"
+MOUNT_DIR="$(mktemp -d /private/tmp/portglance-release-verify.XXXXXX)"
 hdiutil attach -readonly -nobrowse -mountpoint "$MOUNT_DIR" "$DMG_PATH" >/dev/null
 APP_PATH="$MOUNT_DIR/$PRODUCT_NAME.app"
 if [[ ! -d "$APP_PATH" ]]; then
@@ -65,7 +65,7 @@ if ! rg -q '^CodeDirectory .*flags=.*\(runtime\)' <<<"$SIGNATURE_DETAILS"; then
   exit 1
 fi
 
-ENTITLEMENTS_PATH="$(mktemp /private/tmp/menubarusb-release-entitlements.XXXXXX)"
+ENTITLEMENTS_PATH="$(mktemp /private/tmp/portglance-release-entitlements.XXXXXX)"
 codesign -d --entitlements :- "$APP_PATH" > "$ENTITLEMENTS_PATH" 2>/dev/null
 bash "$ROOT_DIR/script/verify_entitlements.sh" "$ENTITLEMENTS_PATH"
 
