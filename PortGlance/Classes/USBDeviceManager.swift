@@ -37,16 +37,22 @@ private struct DeviceRefreshOptions {
 
 final class USBDeviceManager: ObservableObject {
     @Published private(set) var devices: [USBDevice] = []
+    @Published private(set) var thunderboltPorts: [ThunderboltPort] = []
+    @Published private(set) var externalThunderboltPortGroups: [ExternalThunderboltPortGroup] = []
     @Published private(set) var chargeConnected = false
     @Published private(set) var chargePercentage: Int?
     @Published private(set) var ethernetCableConnected = false
 
     var deviceGroups: USBDeviceGroups {
-        USBDeviceGroups(devices: devices)
+        USBDeviceGroups(devices: devices, thunderboltPorts: thunderboltPorts)
     }
 
     var count: Int {
-        deviceGroups.externalDevices.count
+        deviceGroups.countedExternalDeviceCount
+    }
+
+    var externalThunderboltPortCount: Int {
+        externalThunderboltPortGroups.reduce(0) { $0 + $1.ports.count }
     }
 
     private let defaults: UserDefaults
@@ -139,9 +145,14 @@ final class USBDeviceManager: ObservableObject {
             guard let self else { return }
 
             var seenDeviceIDs = Set<String>()
-            let devices = self.discovery.connectedDevices()
+            let topology = self.discovery.connectedTopology()
+            let devices = topology.devices
                 .filter { seenDeviceIDs.insert($0.id).inserted }
                 .sorted(by: Self.sortDevices)
+            let thunderboltPorts = topology.thunderboltPorts.sorted {
+                $0.connectorNumber < $1.connectorNumber
+            }
+            let externalThunderboltPortGroups = topology.externalThunderboltPortGroups
             let ethernetConnected =
                 options.showEthernet
                 ? self.ethernetReader.isConnected()
@@ -152,6 +163,8 @@ final class USBDeviceManager: ObservableObject {
                     generation: generation,
                     options: options,
                     devices: devices,
+                    thunderboltPorts: thunderboltPorts,
+                    externalThunderboltPortGroups: externalThunderboltPortGroups,
                     ethernetConnected: ethernetConnected
                 )
             }
@@ -168,6 +181,8 @@ final class USBDeviceManager: ObservableObject {
         generation: Int,
         options: DeviceRefreshOptions,
         devices: [USBDevice],
+        thunderboltPorts: [ThunderboltPort],
+        externalThunderboltPortGroups: [ExternalThunderboltPortGroup],
         ethernetConnected: Bool?
     ) {
         switch refreshCoordinator.completeRefresh(generation) {
@@ -175,6 +190,8 @@ final class USBDeviceManager: ObservableObject {
             startRefresh(generation: nextGeneration, options: latestRefreshOptions)
         case .publish:
             self.devices = devices
+            self.thunderboltPorts = thunderboltPorts
+            self.externalThunderboltPortGroups = externalThunderboltPortGroups
             publishEthernetStatus(
                 ethernetConnected,
                 generation: generation,

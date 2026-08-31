@@ -4,6 +4,13 @@
 "usb_device" = "USBデバイス";
 "usb_devices" = "USBデバイス";
 "usb_hubs" = "USBハブ";
+"thunderbolt_ports" = "Thunderbolt/USB4ポート";
+"external_thunderbolt_ports" = "外部TB/USB4ポート";
+"thunderbolt_port" = "ポート";
+"this_mac" = "このMac";
+"direct_usb_hubs" = "直接接続されたUSBハブ";
+"port_free" = "空き";
+"up_to" = "最大";
 "internal_devices" = "内蔵デバイス";
 "app_language" = "アプリの言語";
 "app_language_automatic" = "自動";

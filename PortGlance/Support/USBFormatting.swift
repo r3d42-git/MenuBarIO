@@ -24,6 +24,17 @@ enum USBFormatting {
         return overflow ? nil : megabitsPerSecond
     }
 
+    static func thunderboltProtocolLabel(for rawVersion: Int?) -> String {
+        switch rawVersion {
+        case 64:
+            return "Thunderbolt 5 / USB4 v2"
+        case 32:
+            return "Thunderbolt 3/4 / USB4"
+        default:
+            return "Thunderbolt/USB4"
+        }
+    }
+
     static func usbVersionLabel(from binaryCodedDecimal: Int?) -> String? {
         guard let binaryCodedDecimal else { return nil }
 
@@ -63,19 +74,22 @@ enum USBFormatting {
 
     static func speedTierLabel(for megabitsPerSecond: Int) -> String {
         switch megabitsPerSecond {
-        case 1, 2: "USB 1.0 \("low_speed".localized) (1.5 Mbps)"
-        case 12: "USB 1.1 \("full_speed".localized) (12 Mbps)"
-        case 480: "USB 2.0 \("high_speed".localized) (480 Mbps)"
-        case 5_000: "USB 3.0 / 3.1 Gen1 / 3.2 Gen1x1 (5 Gbps)"
-        case 10_000: "USB 3.1 Gen2 / 3.2 Gen2x1 (10 Gbps)"
-        case 20_000: "USB 3.2 Gen2x2 / USB4 Gen2x2 (20 Gbps)"
-        case 40_000: "USB4 Gen3x2 / Thunderbolt 3/4 (40 Gbps)"
-        case 80_000: "USB4 v2 Gen4x2 / Thunderbolt 5 (80 Gbps)"
-        default: transferRate(megabitsPerSecond)
+        case 1, 2: "USB 1.0 \("low_speed".localized)"
+        case 12: "USB 1.1 \("full_speed".localized)"
+        case 480: "USB 2.0 \("high_speed".localized)"
+        case 5_000: "USB 3.0 / 3.1 Gen1 / 3.2 Gen1x1"
+        case 10_000: "USB 3.1 Gen2 / 3.2 Gen2x1"
+        case 20_000: "USB 3.2 Gen2x2 / USB4 Gen2x2"
+        case 40_000: "USB4 Gen3x2 / Thunderbolt 3/4"
+        case 80_000: "USB4 v2 Gen4x2 / Thunderbolt 5"
+        default: "USB"
         }
     }
 
     static func transferRate(_ megabitsPerSecond: Int) -> String {
+        if megabitsPerSecond == 1 || megabitsPerSecond == 2 {
+            return "1.5 Mbps"
+        }
         if megabitsPerSecond >= 1_000 {
             return String(format: "%.1f Gbps", Double(megabitsPerSecond) / 1_000)
         }

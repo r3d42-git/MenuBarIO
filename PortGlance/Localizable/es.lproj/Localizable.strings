@@ -4,6 +4,13 @@
 "usb_device" = "Dispositivo USB";
 "usb_devices" = "Dispositivos USB";
 "usb_hubs" = "Concentradores USB";
+"thunderbolt_ports" = "Puertos Thunderbolt/USB4";
+"external_thunderbolt_ports" = "Puertos TB/USB4 externos";
+"thunderbolt_port" = "Puerto";
+"this_mac" = "Este Mac";
+"direct_usb_hubs" = "Concentradores USB conectados directamente";
+"port_free" = "Libre";
+"up_to" = "hasta";
 "internal_devices" = "Dispositivos internos";
 "app_language" = "Idioma de la app";
 "app_language_automatic" = "Automático";

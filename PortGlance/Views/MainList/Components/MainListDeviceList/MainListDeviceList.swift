@@ -10,6 +10,8 @@ struct MainListDeviceList: View {
     @Binding var hubGroupExpanded: Bool
     @Binding var internalGroupExpanded: Bool
     @Binding var bluetoothGroupExpanded: Bool
+    @Binding var thunderboltPortGroupExpanded: Bool
+    @Binding var externalThunderboltPortGroupExpanded: Bool
 
     var body: some View {
         let groups = manager.deviceGroups
@@ -18,10 +20,14 @@ struct MainListDeviceList: View {
 
         ContentFittingScrollView {
             VStack(alignment: .leading, spacing: 4) {
+                thunderboltPortGroup
+
+                externalThunderboltPortGroup
+
                 usbGroup(
                     title: "usb_devices",
                     icon: .system("desktopcomputer"),
-                    devices: groups.externalDevices,
+                    devices: groups.usbDevices,
                     isExpanded: $deviceGroupExpanded
                 )
 
@@ -34,14 +40,71 @@ struct MainListDeviceList: View {
                     isExpanded: $internalGroupExpanded
                 )
 
-                usbGroup(
-                    title: "usb_hubs",
-                    icon: .system("circle.grid.2x2"),
-                    devices: groups.hubs,
-                    isExpanded: $hubGroupExpanded
-                )
+                hubGroup(groups: groups)
             }
             .padding(.horizontal, 2)
+        }
+    }
+
+    @ViewBuilder
+    private var externalThunderboltPortGroup: some View {
+        DeviceGroupHeader(
+            title: "external_thunderbolt_ports",
+            icon: .system("bolt.horizontal.circle.fill"),
+            count: manager.externalThunderboltPortCount,
+            isExpanded: $externalThunderboltPortGroupExpanded
+        )
+
+        if externalThunderboltPortGroupExpanded {
+            ForEach(manager.externalThunderboltPortGroups) { group in
+                ThunderboltPortOwnerHeader(group: group)
+
+                ForEach(group.ports) { port in
+                    ThunderboltPortRow(port: port)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var thunderboltPortGroup: some View {
+        DeviceGroupHeader(
+            title: "thunderbolt_ports",
+            icon: .system("bolt.horizontal.circle"),
+            count: manager.thunderboltPorts.count,
+            isExpanded: $thunderboltPortGroupExpanded
+        )
+
+        if thunderboltPortGroupExpanded {
+            ForEach(manager.thunderboltPorts) { port in
+                ThunderboltPortRow(port: port)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func hubGroup(groups: USBDeviceGroups) -> some View {
+        DeviceGroupHeader(
+            title: "usb_hubs",
+            icon: .system("circle.grid.2x2"),
+            count: groups.hubs.count,
+            isExpanded: $hubGroupExpanded
+        )
+
+        if hubGroupExpanded {
+            ForEach(groups.hubGroups) { group in
+                USBHubOwnerHeader(group: group)
+
+                ForEach(group.devices) { device in
+                    let isHovered = hoveredDeviceID == device.id
+
+                    USBDeviceRow(
+                        device: device,
+                        isHovered: isHovered,
+                        onHover: { updateHoveredDevice(device.id, isHovering: $0) }
+                    )
+                }
+            }
         }
     }
 

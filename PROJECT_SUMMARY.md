@@ -6,7 +6,7 @@ PortGlance is a local-only macOS menu-bar app for showing connected USB,
 Thunderbolt/USB4 and Bluetooth devices. It targets macOS 13 or newer and does
 not contain telemetry, analytics, update checks or network client code.
 
-The current product version is `0.2.1` (build 6). Releases are prepared from a
+The current product version is `0.3.0` (build 7). Releases are prepared from a
 reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target, project and test target are named
 `PortGlance`. The legacy app bundle identifier `de.r3d.menubarusb.tb` remains
@@ -38,6 +38,36 @@ expanded or collapsed. It uses the available screen height before falling back
 to scrolling without a forced indicator. The six obsolete list preferences and
 the separate speed preference, including their context-menu paths, defaults,
 tests and localization strings, were removed.
+
+Device-row metadata was refined on 2026-08-31 so the subtitle identifies the
+USB tier or Thunderbolt/USB4 transport while the aligned trailing value alone
+shows the negotiated link rate. A different USB port maximum remains explicitly
+labelled in the subtitle, and a port maximum no longer substitutes for an
+unknown negotiated rate in the trailing position. USB Low-Speed is rendered as
+the exact `1.5 Mbps` there. The complete local verification, launch smoke test
+and visual inspection of the running menu passed; no new version or release was
+created.
+
+USB topology presentation was refined on 2026-08-31 as well. USB hubs are no
+longer shown as one flat chip-vendor list: built-in hubs appear below This Mac,
+while tunneled hubs appear below their owning Thunderbolt/USB4 device. A new
+collapsed Thunderbolt/USB4 Ports group shows every physical host receptacle,
+its attached device or free state, the active protocol and negotiated speed,
+or the host maximum for a free port. Physical validation on the M4 Pro Mac mini
+covered all three rear ports, the TerraMaster TDAS and D1 SSD Pro, the Anker
+Thunderbolt 4 Mini Dock, all six hub functions and a live connection change.
+Thunderbolt/USB4 devices now appear only below their physical ports rather than
+also being duplicated in USB Devices. They remain included in the overall
+connected-device and menu-bar count. The two Thunderbolt sections now precede
+USB Devices: the first contains only the Mac host ports, while a separate
+External TB/USB4 Ports section discovers downstream protocol connectors from
+attached-device IOKit topology and groups them by owner. The connected Anker
+Thunderbolt 4 Mini Dock exposed three such ports, all shown free at up to
+40 Gbps during validation. A USB device attached through a Thunderbolt-capable
+USB-C connector remains exclusively in USB Devices; only native Thunderbolt
+transport can populate a Thunderbolt port row. The complete local verification,
+Universal build, launch smoke test and visual inspection passed; no new version
+or release was created.
 
 The System Information button is now always available in the device-list
 footer, so its setting, stored preference, hide action and localization strings
@@ -96,6 +126,16 @@ description arguments and the now-unused Info color asset and localization keys
 were deleted. The complete local verification and launch smoke test passed; no
 new version or release was created.
 
+Version 0.3.0 packages the device-row metadata and USB/Thunderbolt topology
+work into a feature release. The complete automated gate, static analysis,
+Universal build, local launch smoke test and user visual inspection passed.
+Physical validation on the M4 Pro Mac mini covered the documented host ports,
+attached devices, hub ownership and live connection change. GitHub CI must pass
+natively on both Apple Silicon and Intel before merge. The physical Intel check
+of the new topology will be performed later with the published v0.3.0 GitHub
+artifact; the initial release therefore does not claim physical Intel hardware
+acceptance for the new topology.
+
 Version 0.2.1 collects these minimal-settings, appearance and cleanup changes
 into one maintenance release. The device-discovery services, hardware
 classification and privacy model are unchanged. The complete automated gate,
@@ -140,8 +180,10 @@ publicly downloaded artifact passed the independent release verification.
   derived macOS icon sizes. In-app category and status icons use SF Symbols.
 
 USB and Thunderbolt identities must remain stable across refreshes. Internal
-devices and USB hubs do not count toward the external USB-device total.
-Bluetooth devices count separately. The visible group order is USB devices,
+devices and USB hubs do not count toward the external-device total. Thunderbolt
+devices remain in that total but are rendered only in the physical port group,
+not in USB Devices. Bluetooth devices count separately. The visible group order
+is Thunderbolt/USB4 host ports, external Thunderbolt/USB4 ports, USB devices,
 Bluetooth devices, internal devices, then USB hubs.
 
 ## Verification
@@ -173,7 +215,7 @@ angeschlossener USB-, Thunderbolt-/USB4- und Bluetooth-Geräte. Sie unterstützt
 macOS 13 oder neuer und enthält weder Telemetrie noch Analysen,
 Update-Abfragen oder Netzwerk-Client-Code.
 
-Die aktuelle Produktversion ist `0.2.1` (Build 6). Releases werden auf einem
+Die aktuelle Produktversion ist `0.3.0` (Build 7). Releases werden auf einem
 geprüften Branch vorbereitet und vor dem Tagging in den geschützten Branch
 `main` integriert.
 Produkt, Programmdatei, Target, Projekt und Test-Target heißen `PortGlance`.
@@ -208,6 +250,16 @@ Sie nutzt zunächst die verfügbare Bildschirmhöhe und wird erst danach ohne
 erzwungene Bildlaufleiste scrollbar. Die sechs überholten Listeneinstellungen
 und die eigenständige Geschwindigkeitsoption samt Kontextmenüpfaden,
 Standardwerten, Tests und Übersetzungen wurden entfernt.
+
+Die Metadaten der Gerätezeilen wurden am 31.08.2026 weiter präzisiert: Der
+Untertext benennt jetzt die USB-Klasse beziehungsweise den
+Thunderbolt-/USB4-Transport, während ausschließlich der rechts ausgerichtete
+Wert die ausgehandelte Verbindungsgeschwindigkeit zeigt. Eine abweichende
+maximale USB-Portgeschwindigkeit bleibt im Untertext ausdrücklich bezeichnet
+und ersetzt rechts keine unbekannte Verbindungsgeschwindigkeit mehr. USB
+Low-Speed wird dort exakt als `1.5 Mbps` dargestellt. Die vollständige lokale
+Prüfkette, der Starttest und die Sichtprüfung des laufenden Menüs waren
+erfolgreich; es wurde keine neue Version und kein Release erstellt.
 
 Die Schaltfläche für die Systeminformationen ist jetzt immer in der Fußzeile
 der Geräteliste verfügbar. Deshalb wurden auch ihre Einstellung, der
@@ -264,6 +316,30 @@ weiterhin aktive Kompatibilitätslogik. Die vollständige lokale Prüfung und de
 Starttest waren erfolgreich; es wurde keine neue Version und kein Release
 erstellt.
 
+Am 31.08.2026 wurde außerdem die Darstellung der USB-Topologie präzisiert.
+USB-Hubs erscheinen nicht mehr als flache Liste ihrer Chip-Hersteller:
+integrierte Hubs stehen unter Dieser Mac, getunnelte Hubs unter ihrem
+zugehörigen Thunderbolt-/USB4-Gerät. Eine neue, standardmäßig eingeklappte
+Gruppe Thunderbolt-/USB4-Ports zeigt jeden physischen Host-Anschluss, das
+angeschlossene Gerät oder den freien Zustand, das aktive Protokoll und die
+ausgehandelte Geschwindigkeit beziehungsweise bei einem freien Port das
+Host-Maximum. Die physische Abnahme am M4-Pro-Mac-mini umfasste alle drei
+rückseitigen Ports, TerraMaster TDAS und D1 SSD Pro, das Anker Thunderbolt 4
+Mini Dock, alle sechs Hub-Funktionen und eine laufende Anschlussänderung. Die
+Thunderbolt-/USB4-Geräte erscheinen jetzt nur noch unter ihren physischen Ports
+und nicht zusätzlich unter USB-Geräte. Im Gesamt- und Menüleistenzähler werden
+sie weiterhin mitgezählt. Die beiden Thunderbolt-Bereiche stehen jetzt vor
+USB-Geräte: Der erste enthält nur die Hostanschlüsse des Mac, während eine
+eigene Gruppe Externe TB-/USB4-Ports nachgelagerte Protokollanschlüsse aus der
+IOKit-Topologie angeschlossener Geräte erkennt und nach Besitzer gruppiert. Das
+angeschlossene Anker Thunderbolt 4 Mini Dock stellte drei solche Ports bereit,
+die bei der Abnahme jeweils frei mit bis zu 40 Gbit/s erschienen. Ein über eine
+Thunderbolt-fähige USB-C-Buchse angeschlossenes USB-Gerät bleibt ausschließlich
+unter USB-Geräte; nur nativer Thunderbolt-Transport kann eine
+Thunderbolt-Portzeile belegen. Die vollständige lokale Prüfung, der
+Universal-Build, der Starttest und die Sichtprüfung waren erfolgreich; es wurde
+keine neue Version und kein Release erstellt.
+
 Die drei verbliebenen Schalterzeilen wurden nach dem Audit weiter vereinfacht.
 Ihre bisherigen blauen Info-Schaltflächen und aufklappbaren Beschreibungen
 wurden durch vollständige, handlungsorientierte Bezeichnungen ersetzt: „Beim
@@ -275,6 +351,17 @@ Beschreibungsparameter sowie das nun ungenutzte Info-Farbasset und die
 zugehörigen Übersetzungsschlüssel wurden gelöscht. Die vollständige lokale
 Prüfung und der Starttest waren erfolgreich; es wurde keine neue Version und
 kein Release erstellt.
+
+Version 0.3.0 bündelt die Metadaten der Gerätezeilen und die neue
+USB-/Thunderbolt-Topologie in einem Funktionsrelease. Die vollständige
+automatische Prüfkette, die statische Analyse, der Universal-Build, der lokale
+Starttest und die Sichtprüfung des Benutzers waren erfolgreich. Die physische
+Abnahme am M4-Pro-Mac-mini umfasste die dokumentierten Hostanschlüsse,
+angeschlossenen Geräte, Hub-Zuordnung und eine laufende Anschlussänderung. Vor
+dem Merge muss die GitHub-CI nativ auf Apple Silicon und Intel bestehen. Die
+physische Intel-Prüfung der neuen Topologie wird später mit dem veröffentlichten
+GitHub-Artefakt von v0.3.0 nachgeholt; der erste Release beansprucht daher keine
+physische Intel-Hardwareabnahme für die neue Topologie.
 
 Version 0.2.1 fasst diese Minimalisierung der Einstellungen, die neue
 Darstellungswahl und die Bereinigung in einem Wartungsrelease zusammen. Die
@@ -326,10 +413,12 @@ veröffentlicht. Das Release-Artefakt `PortGlance-0.2.0-mac.dmg` hat den SHA-256
   der App verwenden SF Symbols.
 
 USB- und Thunderbolt-Identitäten müssen über Aktualisierungen hinweg stabil
-bleiben. Interne Geräte und USB-Hubs zählen nicht zum Zähler externer
-USB-Geräte. Bluetooth-Geräte werden getrennt gezählt. Die sichtbare
-Gruppenreihenfolge lautet USB-Geräte, Bluetooth-Geräte, interne Geräte und
-USB-Hubs.
+bleiben. Interne Geräte und USB-Hubs zählen nicht zum Zähler externer Geräte.
+Thunderbolt-Geräte bleiben Teil dieses Zählers, werden aber nur in der Gruppe
+der physischen Ports und nicht unter USB-Geräte dargestellt. Bluetooth-Geräte
+werden getrennt gezählt. Die sichtbare Gruppenreihenfolge lautet
+Thunderbolt-/USB4-Hostports, externe Thunderbolt-/USB4-Ports, USB-Geräte,
+Bluetooth-Geräte, interne Geräte und USB-Hubs.
 
 ## Prüfung
 

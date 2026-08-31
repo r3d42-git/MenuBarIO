@@ -4,6 +4,13 @@
 "usb_device" = "USB设备";
 "usb_devices" = "USB设备";
 "usb_hubs" = "USB 集线器";
+"thunderbolt_ports" = "雷雳/USB4 端口";
+"external_thunderbolt_ports" = "外部雷雳/USB4 端口";
+"thunderbolt_port" = "端口";
+"this_mac" = "此 Mac";
+"direct_usb_hubs" = "直接连接的 USB 集线器";
+"port_free" = "空闲";
+"up_to" = "最高";
 "internal_devices" = "内部设备";
 "app_language" = "应用语言";
 "app_language_automatic" = "自动";

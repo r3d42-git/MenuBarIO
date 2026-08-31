@@ -19,9 +19,13 @@ struct MainListView: View {
     @AS(Key.hubGroupExpanded) private var hubGroupExpanded = false
     @AS(Key.internalGroupExpanded) private var internalGroupExpanded = false
     @AS(Key.bluetoothGroupExpanded) private var bluetoothGroupExpanded = false
+    @AS(Key.thunderboltPortGroupExpanded) private var thunderboltPortGroupExpanded = false
+    @AS(Key.externalThunderboltPortGroupExpanded) private var externalThunderboltPortGroupExpanded = false
 
     private var isTrulyEmpty: Bool {
-        manager.devices.isEmpty && bluetoothManager.devices.isEmpty
+        manager.devices.isEmpty
+            && bluetoothManager.devices.isEmpty
+            && manager.thunderboltPorts.isEmpty
     }
 
     private var header: some View {
@@ -76,7 +80,9 @@ struct MainListView: View {
                         deviceGroupExpanded: $deviceGroupExpanded,
                         hubGroupExpanded: $hubGroupExpanded,
                         internalGroupExpanded: $internalGroupExpanded,
-                        bluetoothGroupExpanded: $bluetoothGroupExpanded
+                        bluetoothGroupExpanded: $bluetoothGroupExpanded,
+                        thunderboltPortGroupExpanded: $thunderboltPortGroupExpanded,
+                        externalThunderboltPortGroupExpanded: $externalThunderboltPortGroupExpanded
                     )
                 }
             }
