@@ -100,6 +100,15 @@ Version 0.2.1 collects these minimal-settings, appearance and cleanup changes
 into one maintenance release. The device-discovery services, hardware
 classification and privacy model are unchanged. The complete automated gate,
 Universal build, local launch smoke test and user visual inspection passed.
+It was published on 2026-08-31 as the signed, notarized and stapled Universal
+release [`v0.2.1`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.2.1)
+from merge commit `22e7b542409fc024e5610ec4cc042d0315f939b8`. Apple accepted the
+separately submitted app (`bbce9e54-529e-4de9-aa3c-1a80e01bd42e`) and DMG
+(`5ce8ed88-2b8f-4f54-9c12-256ffa74dcbb`). The public asset
+`PortGlance-0.2.1-mac.dmg` has SHA-256
+`e52f4b0c47faf266af1f24e1627ada397e8b07f92ff283f90a7df6f0690659c0`; a
+fresh GitHub download passed the independent release verification, including
+the physically stapled app inside the mounted DMG.
 
 The PortGlance rebrand was completed on 2026-08-30 and passed the complete
 local verification plus launch smoke test. The canonical repository is
@@ -273,6 +282,17 @@ Dienste zur Geräteerkennung, die Hardwareklassifizierung und das
 Datenschutzmodell bleiben unverändert. Die vollständige automatische
 Prüfkette, der Universal-Build, der lokale Starttest und die Sichtprüfung des
 Benutzers waren erfolgreich.
+Der signierte, notarisierte und gestapelte Universal-Release wurde am
+31.08.2026 als
+[`v0.2.1`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.2.1) aus
+dem Merge-Commit `22e7b542409fc024e5610ec4cc042d0315f939b8` veröffentlicht. Apple
+akzeptierte die getrennt eingereichte App
+(`bbce9e54-529e-4de9-aa3c-1a80e01bd42e`) und das DMG
+(`5ce8ed88-2b8f-4f54-9c12-256ffa74dcbb`). Das öffentliche Artefakt
+`PortGlance-0.2.1-mac.dmg` hat den SHA-256
+`e52f4b0c47faf266af1f24e1627ada397e8b07f92ff283f90a7df6f0690659c0`; ein
+frischer GitHub-Download bestand die unabhängige Release-Prüfung einschließlich
+der physisch gestapelten App im eingebundenen DMG.
 
 Das PortGlance-Rebranding wurde am 30.08.2026 abgeschlossen und hat die
 vollständige lokale Prüfkette sowie den Starttest bestanden. Das kanonische
