@@ -284,12 +284,22 @@ Version 0.4.0 packages the Intel/T2 MacBook work, conservative USB ownership
 and downstream-port attachment, power-only USB-C port occupancy and live
 battery charging power into one feature release. It preserves native
 Thunderbolt and USB device-count semantics, declines ambiguous assignments and
-keeps all hardware inspection local. The release candidate passed all 64
-tests, static analysis, the Universal build and launch smoke test. Physical
-acceptance covered the M4 Pro Mac mini topology plus the Intel/T2 MacBook's
-internal components, CalDigit hub ownership, unknown-hub fallback, all four
-power-only host ports, TS3 Plus and TDAS data-priority cases, and dynamic 10 W
-to 41 W charging measurements with a 100 W adapter.
+keeps all hardware inspection local. It was published on 2026-08-31 as the
+signed, notarized and stapled Universal release
+[`v0.4.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.4.0) from
+merge commit `89c9d18546f27c197a796676a5487dbc9fb35c22`. Apple accepted the
+separately submitted app (`628f94de-7781-47ca-8a48-fdb49f47748b`) and DMG
+(`cc9d6127-78e6-4c9a-bc54-259f4eda8c62`). The public asset
+`PortGlance-0.4.0-mac.dmg` has SHA-256
+`5bdd2287ce002c9ac1a825ae987bd2a16cdaf9e8aa5daf350e7adc34c2678196`, matching
+GitHub's reported digest; a fresh GitHub download passed the independent
+release verification, including the physically stapled app inside the mounted
+DMG. All 64 tests, static analysis, the Universal build, local launch smoke
+test and both native pull-request CI jobs passed. Physical acceptance covered
+the M4 Pro Mac mini topology plus the Intel/T2 MacBook's internal components,
+CalDigit hub ownership, unknown-hub fallback, all four power-only host ports,
+TS3 Plus and TDAS data-priority cases, and dynamic 10 W to 41 W charging
+measurements with a 100 W adapter.
 
 Version 0.3.0 packages the device-row metadata and USB/Thunderbolt topology
 work into a feature release. It was published on 2026-08-31 as the signed,
@@ -696,9 +706,20 @@ USB-Zuordnung zu Besitzern und nachgelagerten Ports, die Belegung eines
 USB-C-Ports allein durch Stromversorgung und die aktuelle Batterieladeleistung
 in einem Funktionsrelease. Native Thunderbolt-Belegungen und die Semantik der
 Gerätezähler bleiben erhalten; mehrdeutige Zuordnungen werden nicht behauptet
-und alle Hardwaredaten bleiben lokal. Der Release-Kandidat bestand alle 64
-Tests, die statische Analyse, den Universal-Build und den Starttest. Die
-physische Abnahme umfasste die Topologie am M4-Pro-Mac-mini sowie auf dem
+und alle Hardwaredaten bleiben lokal. Er wurde am 31.08.2026 als signierter,
+notarisierter und gestapelter Universal-Release
+[`v0.4.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.4.0) aus dem
+Merge-Commit `89c9d18546f27c197a796676a5487dbc9fb35c22` veröffentlicht. Apple
+akzeptierte die getrennt eingereichte App
+(`628f94de-7781-47ca-8a48-fdb49f47748b`) und das DMG
+(`cc9d6127-78e6-4c9a-bc54-259f4eda8c62`). Das öffentliche Artefakt
+`PortGlance-0.4.0-mac.dmg` hat den SHA-256
+`5bdd2287ce002c9ac1a825ae987bd2a16cdaf9e8aa5daf350e7adc34c2678196`, passend
+zum von GitHub gemeldeten Digest. Ein frischer GitHub-Download bestand die
+unabhängige Release-Prüfung einschließlich der physisch gestapelten App im
+eingebundenen DMG. Alle 64 Tests, die statische Analyse, der Universal-Build,
+der lokale Starttest und beide nativen Pull-Request-CI-Jobs waren erfolgreich.
+Die physische Abnahme umfasste die Topologie am M4-Pro-Mac-mini sowie auf dem
 Intel-/T2-MacBook die internen Komponenten, die CalDigit-Hub-Zuordnung, den
 Fallback für unbekannte Hubs, alle vier rein zur Stromversorgung belegten
 Host-Ports, den Vorrang der Datenbelegung bei TS3 Plus und TDAS und die
