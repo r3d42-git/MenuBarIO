@@ -33,9 +33,24 @@ PortGlance release names, tags and artifacts remain unchanged facts. The
 canonical GitHub repository is now `r3d42-git/MenuBarIO`; historical release
 links use that repository path while retaining their original tags and asset
 names. Version 0.5.0 packages this identity change as the first MenuBarIO
-release. The full local gate, Universal build and
-launch verification passed. A direct UI check confirmed the localized subtitle
-fits in the German settings view and the main device view shows the new name.
+release. It was published on 2026-08-31 as the signed, notarized and stapled
+Universal release
+[`v0.5.0`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.5.0) from
+merged pull request
+[`#18`](https://github.com/r3d42-git/MenuBarIO/pull/18) and release commit
+`ee63ead636460ff7bfad3f2ad1649355a087af9c`. The public asset
+`MenuBarIO-0.5.0-mac.dmg` is 2,901,103 bytes and has SHA-256
+`d0f1738c83bf20577744dd7cff3e47408a2d3a605679a20ee2a717cc425ecead`.
+Apple accepted the separately submitted app under
+`e989bccd-b350-4140-8027-a7c2d86baf52` and the DMG under
+`49e9ce14-ad88-44d4-a0d3-6199d80ccf4f`. Both pull-request CI jobs and both
+jobs for the merged `main` commit in run
+[`33409923818`](https://github.com/r3d42-git/MenuBarIO/actions/runs/33409923818)
+passed. The full local gate, Universal build and launch verification also
+passed. A direct UI check confirmed the localized subtitle fits in the German
+settings view and the main device view shows the new name. The final GitHub
+asset was freshly downloaded and passed checksum, DMG, Gatekeeper, staple and
+enclosed-app ticket verification.
 
 On 2026-08-31, the configurable menu-bar symbol section was removed as a
 deliberate minimal-product change. The menu bar now always shows the fixed USB
@@ -446,11 +461,25 @@ unverändert. Das kanonische GitHub-Repository heißt jetzt
 `r3d42-git/MenuBarIO`; Links auf historische Releases verwenden diesen
 Repository-Pfad und behalten ihre ursprünglichen Tags und Artefaktnamen.
 Version 0.5.0 bündelt diese Identitätsänderung als ersten
-MenuBarIO-Release.
-Die vollständige lokale Prüfkette, der Universal-Build und der Starttest waren
-erfolgreich. Eine direkte UI-Prüfung bestätigte, dass der lokalisierte Untertitel
-in der deutschen Einstellungsansicht vollständig sichtbar ist und die
-Geräteansicht den neuen Namen zeigt.
+MenuBarIO-Release. Er wurde am 31.08.2026 als signierter, notarisierter und
+gestapelter Universal-Release
+[`v0.5.0`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.5.0) aus dem
+gemergten Pull Request
+[`#18`](https://github.com/r3d42-git/MenuBarIO/pull/18) und dem Release-Commit
+`ee63ead636460ff7bfad3f2ad1649355a087af9c` veröffentlicht. Das öffentliche
+Artefakt `MenuBarIO-0.5.0-mac.dmg` ist 2.901.103 Bytes groß und hat den SHA-256
+`d0f1738c83bf20577744dd7cff3e47408a2d3a605679a20ee2a717cc425ecead`.
+Apple akzeptierte die separat eingereichte App unter
+`e989bccd-b350-4140-8027-a7c2d86baf52` und das DMG unter
+`49e9ce14-ad88-44d4-a0d3-6199d80ccf4f`. Beide Pull-Request-CI-Jobs sowie beide
+Jobs für den gemergten `main`-Commit im Lauf
+[`33409923818`](https://github.com/r3d42-git/MenuBarIO/actions/runs/33409923818)
+waren erfolgreich. Auch die vollständige lokale Prüfkette, der Universal-Build
+und der Starttest waren erfolgreich. Eine direkte UI-Prüfung bestätigte, dass
+der lokalisierte Untertitel in der deutschen Einstellungsansicht vollständig
+sichtbar ist und die Geräteansicht den neuen Namen zeigt. Das finale
+GitHub-Artefakt wurde frisch heruntergeladen und bestand die Prüfung von
+Prüfsumme, DMG, Gatekeeper, Staple und dem Ticket der enthaltenen App.
 
 Am 31.08.2026 wurde der konfigurierbare Menüleisten-Symbolblock als bewusste
 Minimalisierung vollständig entfernt. Die Menüleiste zeigt jetzt immer das
