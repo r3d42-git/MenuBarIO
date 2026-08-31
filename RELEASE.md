@@ -25,7 +25,7 @@ the XCTest suite and the Xcode static analyzer in isolated DerivedData. The
 same two checks run in GitHub Actions for pushes to `main` and pull requests;
 that CI workflow deliberately has no signing or notary credentials.
 
-The product identity is fixed as `PortGlance`. The legacy bundle identifier
+The product identity is fixed as `MenuBarIO`. The legacy bundle identifier
 `de.r3d.menubarusb.tb` is deliberately retained for upgrade continuity. The
 project uses Developer Team `G6JH37W285` and the
 existing local `notarytool` keychain profile `MenuBarUSB-TB-notary` by default.
@@ -45,7 +45,7 @@ flow in its [notarization guide](https://developer.apple.com/documentation/secur
 Run the Universal release with only values appropriate to this fork:
 
 ```bash
-PORTGLANCE_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
+MENUBARIO_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
 ./script/release.sh VERSION
 ```
 
@@ -53,7 +53,8 @@ The release script always archives **both** executable slices: Apple Silicon
 (`arm64`) and Intel (`x86_64`). It verifies each slice before packaging, and
 the CI workflow runs the XCTest suite natively on both architectures. Version
 0.1.1 was Apple-Silicon-only; releases from 0.1.2 onward, including the current
-0.4.0 release, are Universal. When a release changes device discovery, complete
+MenuBarIO 0.5.0 release, are Universal. When a release changes device discovery,
+complete
 the applicable hardware acceptance cases in [`TESTING.md`](TESTING.md),
 including the Intel-Mac cases, or record an explicit release exception if a
 required device is not available.
@@ -103,7 +104,7 @@ Prüfungen laufen in GitHub Actions bei Pushes auf `main` und Pull Requests;
 dieser CI-Ablauf enthält bewusst keine Signierungs- oder
 Notarisierungszugangsdaten.
 
-Die Produktidentität ist auf `PortGlance` festgelegt. Die bisherige Bundle-ID
+Die Produktidentität ist auf `MenuBarIO` festgelegt. Die bisherige Bundle-ID
 `de.r3d.menubarusb.tb` bleibt für nahtlose Aktualisierungen absichtlich
 erhalten. Das Projekt verwendet standardmäßig das Entwicklerteam `G6JH37W285`
 und das vorhandene lokale `notarytool`-Schlüsselbundprofil
@@ -125,7 +126,7 @@ diesen Ablauf in seinem [Notarisierungsleitfaden](https://developer.apple.com/do
 Den Universal-Release nur mit für diesen Fork geeigneten Werten ausführen:
 
 ```bash
-PORTGLANCE_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
+MENUBARIO_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
 ./script/release.sh VERSION
 ```
 
@@ -133,7 +134,8 @@ Das Release-Skript archiviert immer **beide** ausführbaren Slices: Apple
 Silicon (`arm64`) und Intel (`x86_64`). Es prüft jeden Slice vor dem Paketbau;
 der CI-Ablauf führt die XCTest-Suite nativ auf beiden Architekturen aus.
 Version 0.1.1 war ausschließlich für Apple Silicon bestimmt; die Releases ab
-0.1.2 einschließlich des aktuellen Releases 0.4.0 sind Universal-Versionen.
+0.1.2 einschließlich des aktuellen Releases MenuBarIO 0.5.0 sind
+Universal-Versionen.
 Wenn ein Release die Geräteerkennung ändert, die zutreffenden
 Hardware-Abnahmefälle in [`TESTING.md`](TESTING.md) einschließlich der
 Intel-Mac-Fälle ausführen oder eine ausdrückliche Release-Ausnahme

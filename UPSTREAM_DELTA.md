@@ -1,12 +1,12 @@
 # Differences from MenuBarUSB
 
-PortGlance is based on the publicly available
+MenuBarIO is based on the publicly available
 [`rafaelSwi/MenuBarUSB`](https://github.com/rafaelSwi/MenuBarUSB) project under
 the MIT License. This document records deliberate, product-relevant changes
 for future upstream comparisons. The original idea and source authorship remain
-credited, but PortGlance is not an official successor to MenuBarUSB, an official
+credited, but MenuBarIO is not an official successor to MenuBarUSB, an official
 continuation of it or a version endorsed by its original author. The original
-author is not involved in PortGlance development, maintenance, support or
+author is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history, not a current collaboration or affiliation.
 
@@ -14,7 +14,7 @@ the preserved source history, not a current collaboration or affiliation.
   identifier `de.r3d.menubarusb.tb` is retained only so existing installations
   keep their preferences and login-item identity.
 - The original custom app icon and seven custom in-app icon sets were removed.
-  PortGlance has its own app icon; in-app category and Ethernet indicators use
+  MenuBarIO has its own app icon; in-app category and Ethernet indicators use
   native SF Symbols.
 - Thunderbolt and USB4 devices are discovered alongside USB through IOKit;
   link speed, transport and USB4 version are displayed.
@@ -44,14 +44,14 @@ The complete technical difference remains traceable through Git against the
 
 # Abweichungen zu MenuBarUSB
 
-PortGlance basiert auf dem öffentlich verfügbaren Projekt
+MenuBarIO basiert auf dem öffentlich verfügbaren Projekt
 [`rafaelSwi/MenuBarUSB`](https://github.com/rafaelSwi/MenuBarUSB) unter der
 MIT-Lizenz. Dieses Dokument hält bewusst eingebrachte, produktrelevante
 Abweichungen für spätere Upstream-Vergleiche fest. Die ursprüngliche Idee und
-Urheberschaft am Ausgangscode werden ausdrücklich genannt; PortGlance ist
+Urheberschaft am Ausgangscode werden ausdrücklich genannt; MenuBarIO ist
 jedoch weder offizieller Nachfolger noch offizielle Fortführung von MenuBarUSB
 und auch keine vom ursprünglichen Autor bestätigte Variante. Der ursprüngliche
-Autor ist an Entwicklung, Pflege, Support und Releases von PortGlance nicht
+Autor ist an Entwicklung, Pflege, Support und Releases von MenuBarIO nicht
 beteiligt. Seine GitHub-Contributor-Einträge bilden ausschließlich die
 erhaltene Quellcodehistorie ab, nicht eine aktuelle Zusammenarbeit oder
 Zugehörigkeit.
@@ -61,7 +61,7 @@ Zugehörigkeit.
   damit bestehende Installationen ihre Einstellungen und die Identität des
   Anmeldeobjekts behalten.
 - Das ursprüngliche eigene App-Icon und sieben eigene Icon-Sets innerhalb der
-  App wurden entfernt. PortGlance besitzt ein neues App-Icon; Kategorien und
+  App wurden entfernt. MenuBarIO besitzt ein neues App-Icon; Kategorien und
   Ethernet-Anzeige verwenden native SF Symbols.
 - Thunderbolt- und USB4-Geräte werden neben USB per IOKit erfasst; Link-Speed,
   Transport und USB4-Version werden angezeigt.

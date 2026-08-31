@@ -7,18 +7,18 @@ if [[ $# -ne 1 ]]; then
 fi
 
 VERSION="$1"
-: "${PORTGLANCE_TEAM_ID:=G6JH37W285}"
-: "${PORTGLANCE_SIGNING_IDENTITY:?Set the Developer ID Application signing identity.}"
-: "${PORTGLANCE_NOTARY_PROFILE:=MenuBarUSB-TB-notary}"
+: "${MENUBARIO_TEAM_ID:=G6JH37W285}"
+: "${MENUBARIO_SIGNING_IDENTITY:?Set the Developer ID Application signing identity.}"
+: "${MENUBARIO_NOTARY_PROFILE:=MenuBarUSB-TB-notary}"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PRODUCT_NAME="PortGlance"
+PRODUCT_NAME="MenuBarIO"
 BUNDLE_IDENTIFIER="de.r3d.menubarusb.tb"
 # Distribution is deliberately Universal. Do not make this configurable: a
 # release must contain both supported Mac architectures.
 ARCHITECTURES="arm64 x86_64"
 VOLUME_NAME="$PRODUCT_NAME installieren"
-RELEASE_DIR="${PORTGLANCE_RELEASE_DIR:-$ROOT_DIR/.release/$VERSION}"
+RELEASE_DIR="${MENUBARIO_RELEASE_DIR:-$ROOT_DIR/.release/$VERSION}"
 ARCHIVE_PATH="$RELEASE_DIR/$PRODUCT_NAME.xcarchive"
 APP_PATH="$ARCHIVE_PATH/Products/Applications/$PRODUCT_NAME.app"
 APP_NOTARY_PATH="$RELEASE_DIR/$PRODUCT_NAME-notary.zip"
@@ -45,16 +45,16 @@ mkdir -p "$RELEASE_DIR"
 ./script/verify.sh
 
 xcodebuild archive \
-  -project PortGlance.xcodeproj \
-  -scheme PortGlance \
+  -project MenuBarIO.xcodeproj \
+  -scheme MenuBarIO \
   -configuration Release \
   -destination 'generic/platform=macOS' \
   -archivePath "$ARCHIVE_PATH" \
   ARCHS="$ARCHITECTURES" \
   ONLY_ACTIVE_ARCH=NO \
   CODE_SIGN_STYLE=Manual \
-  CODE_SIGN_IDENTITY="$PORTGLANCE_SIGNING_IDENTITY" \
-  DEVELOPMENT_TEAM="$PORTGLANCE_TEAM_ID" \
+  CODE_SIGN_IDENTITY="$MENUBARIO_SIGNING_IDENTITY" \
+  DEVELOPMENT_TEAM="$MENUBARIO_TEAM_ID" \
   MARKETING_VERSION="$VERSION" \
   PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_IDENTIFIER" \
   PRODUCT_NAME="$PRODUCT_NAME" \
@@ -81,7 +81,7 @@ done
 # Notarize and staple the app before it is copied into the installer. The DMG
 # receives its own independent ticket after packaging.
 ditto -c -k --keepParent "$APP_PATH" "$APP_NOTARY_PATH"
-xcrun notarytool submit "$APP_NOTARY_PATH" --keychain-profile "$PORTGLANCE_NOTARY_PROFILE" --wait
+xcrun notarytool submit "$APP_NOTARY_PATH" --keychain-profile "$MENUBARIO_NOTARY_PROFILE" --wait
 xcrun stapler staple "$APP_PATH"
 xcrun stapler validate "$APP_PATH"
 spctl --assess --type execute --verbose=4 "$APP_PATH"
@@ -96,9 +96,9 @@ ditto "$ROOT_DIR/LICENSE" "$STAGING_DIR/LICENSE"
   "$PRODUCT_NAME.app" \
   "Programme"
 
-codesign --force --sign "$PORTGLANCE_SIGNING_IDENTITY" --timestamp "$DMG_PATH"
+codesign --force --sign "$MENUBARIO_SIGNING_IDENTITY" --timestamp "$DMG_PATH"
 codesign --verify --verbose=2 "$DMG_PATH"
-xcrun notarytool submit "$DMG_PATH" --keychain-profile "$PORTGLANCE_NOTARY_PROFILE" --wait
+xcrun notarytool submit "$DMG_PATH" --keychain-profile "$MENUBARIO_NOTARY_PROFILE" --wait
 xcrun stapler staple "$DMG_PATH"
 "$ROOT_DIR/script/verify_release.sh" "$VERSION" "$DMG_PATH"
 

@@ -32,7 +32,7 @@ For an app-launch smoke test only:
 GitHub Actions runs the same checks natively on an Apple-Silicon runner and an
 Intel runner for pull requests and every push to `main`. The local XCTest run
 uses the architecture of the current Mac; it can be selected explicitly with
-`PORTGLANCE_TEST_ARCH=arm64` or `PORTGLANCE_TEST_ARCH=x86_64` when that native
+`MENUBARIO_TEST_ARCH=arm64` or `MENUBARIO_TEST_ARCH=x86_64` when that native
 architecture is available.
 
 ## CI recovery
@@ -148,7 +148,7 @@ Thunderbolt/USB4 acceptance cases above when a change affects that discovery.
   to 1. `BestAdapterIndex` remained 0 and must not be used as a port number.
   The four `AppleHPMDevice` records (`RID 0/1`, `Address 0/1`) and the root
   Thunderbolt routers' ordered `Socket ID` records provide the conservative
-  bridge to PortGlance's existing visible port numbers. The resulting build
+  bridge to MenuBarIO's existing visible port numbers. The resulting build
   must display an otherwise empty occupied row as **Port N · Power supply**
   with the adapter wattage, while leaving USB, native Thunderbolt and dock
   occupants unchanged. If any of those registry sources are incomplete or
@@ -240,7 +240,7 @@ Zum reinen Starttest der App:
 GitHub Actions führt dieselben Prüfungen bei Pull Requests und jedem Push auf
 `main` nativ auf einem Apple-Silicon- und einem Intel-Runner aus. Die lokalen
 XCTest-Tests verwenden die Architektur des aktuellen Macs; sie kann mit
-`PORTGLANCE_TEST_ARCH=arm64` beziehungsweise `PORTGLANCE_TEST_ARCH=x86_64`
+`MENUBARIO_TEST_ARCH=arm64` beziehungsweise `MENUBARIO_TEST_ARCH=x86_64`
 ausdrücklich gewählt werden, wenn diese Architektur nativ verfügbar ist.
 
 ## CI-Wiederherstellung

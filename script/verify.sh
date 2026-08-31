@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 UNIVERSAL_ARCHITECTURES="arm64 x86_64"
-TEST_ARCHITECTURE="${PORTGLANCE_TEST_ARCH:-$(uname -m)}"
-APP_NAME="PortGlance"
+TEST_ARCHITECTURE="${MENUBARIO_TEST_ARCH:-$(uname -m)}"
+APP_NAME="MenuBarIO"
 
 case "$TEST_ARCHITECTURE" in
   arm64|x86_64) ;;
@@ -14,17 +14,17 @@ case "$TEST_ARCHITECTURE" in
     ;;
 esac
 
-if [[ -n "${PORTGLANCE_VERIFY_DERIVED_DATA_PATH:-}" ]]; then
-  DERIVED_DATA_PATH="$PORTGLANCE_VERIFY_DERIVED_DATA_PATH"
+if [[ -n "${MENUBARIO_VERIFY_DERIVED_DATA_PATH:-}" ]]; then
+  DERIVED_DATA_PATH="$MENUBARIO_VERIFY_DERIVED_DATA_PATH"
 else
-  DERIVED_DATA_PATH="$(mktemp -d "${TMPDIR:-/tmp}/portglance-verify.XXXXXX")"
+  DERIVED_DATA_PATH="$(mktemp -d "${TMPDIR:-/tmp}/menubario-verify.XXXXXX")"
 fi
 
 cd "$ROOT_DIR"
 ./script/privacy_audit.sh
 ./script/localization_audit.sh
 swiftc -typecheck script/generate_dmg_background.swift
-xcrun swift-format lint --recursive --configuration .swift-format PortGlance PortGlanceTests
+xcrun swift-format lint --recursive --configuration .swift-format MenuBarIO MenuBarIOTests
 bash -n \
   script/create_installer_dmg.sh \
   script/localization_audit.sh \
@@ -34,16 +34,16 @@ bash -n \
   script/verify_entitlements.sh
 
 xcodebuild test -quiet \
-  -project PortGlance.xcodeproj \
-  -scheme PortGlance \
+  -project MenuBarIO.xcodeproj \
+  -scheme MenuBarIO \
   -configuration Debug \
   -destination "platform=macOS,arch=$TEST_ARCHITECTURE" \
   -derivedDataPath "$DERIVED_DATA_PATH" \
   CODE_SIGNING_ALLOWED=NO
 
 xcodebuild analyze -quiet \
-  -project PortGlance.xcodeproj \
-  -scheme PortGlance \
+  -project MenuBarIO.xcodeproj \
+  -scheme MenuBarIO \
   -configuration Release \
   -destination "platform=macOS,arch=$TEST_ARCHITECTURE" \
   -derivedDataPath "$DERIVED_DATA_PATH" \
@@ -52,8 +52,8 @@ xcodebuild analyze -quiet \
   DEVELOPMENT_TEAM=''
 
 xcodebuild build -quiet \
-  -project PortGlance.xcodeproj \
-  -scheme PortGlance \
+  -project MenuBarIO.xcodeproj \
+  -scheme MenuBarIO \
   -configuration Release \
   -destination 'generic/platform=macOS' \
   -derivedDataPath "$DERIVED_DATA_PATH" \

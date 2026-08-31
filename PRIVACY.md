@@ -1,6 +1,6 @@
 # Privacy and network access
 
-PortGlance has no telemetry, analytics SDKs, crash reporters, accounts,
+MenuBarIO has no telemetry, analytics SDKs, crash reporters, accounts,
 server API or background network access. It does not transmit device, usage or
 settings data.
 
@@ -20,7 +20,7 @@ script enforces this boundary in local verification and GitHub Actions.
 
 # Datenschutz und Netzwerkzugriffe
 
-PortGlance hat keine Telemetrie, Analyse-SDKs, Crash-Reporter, Konten,
+MenuBarIO hat keine Telemetrie, Analyse-SDKs, Crash-Reporter, Konten,
 Server-API oder Hintergrundnetzwerkzugriffe. Es übermittelt keine Geräte-,
 Nutzungs- oder Einstellungsdaten.
 

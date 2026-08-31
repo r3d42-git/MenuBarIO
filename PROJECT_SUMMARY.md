@@ -2,24 +2,40 @@
 
 ## Purpose and scope
 
-PortGlance is a local-only macOS menu-bar app for showing connected USB,
+MenuBarIO is a local-only macOS menu-bar app for showing connected USB,
 Thunderbolt/USB4 and Bluetooth devices. It targets macOS 13 or newer and does
 not contain telemetry, analytics, update checks or network client code.
+Its product subtitle is `USB, Thunderbolt, USB4 & Bluetooth Inspector for
+macOS`.
 
-The current product version is `0.4.0` (build 8). Releases are prepared from a
+The current product version is `0.5.0` (build 9). Releases are prepared from a
 reviewed branch and integrated into protected `main` before tagging.
-The product, executable, target, project and test target are named
-`PortGlance`. The legacy app bundle identifier `de.r3d.menubarusb.tb` remains
+The product, executable, target and project are named `MenuBarIO`; the test
+target is `MenuBarIOTests`. The legacy app bundle identifier
+`de.r3d.menubarusb.tb` remains
 unchanged so existing preferences and the login-item identity survive the
-rebrand; the test bundle uses `de.r3d.portglance.tests`.
+rebrand; the test bundle uses `de.r3d.menubario.tests`.
 
 Public product language must credit the original MenuBarUSB idea and
-MIT-licensed source without presenting PortGlance as an official successor to
+MIT-licensed source without presenting MenuBarIO as an official successor to
 MenuBarUSB, an official continuation of it or a version endorsed by its
 original author. There is no collaboration or affiliation with the original
-author, who is not involved in PortGlance development, maintenance, support or
+author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
+
+On 2026-08-31, the working product was renamed from PortGlance to MenuBarIO.
+The new name deliberately retains a visible connection to the MenuBarUSB
+source origin, while the subtitle states the current app scope. The source
+directory, Xcode project, app and test targets, executable, scripts, UI,
+privacy text and current documentation use the new identity. Historical
+PortGlance release names, tags and artifacts remain unchanged facts. The
+canonical GitHub repository is now `r3d42-git/MenuBarIO`; historical release
+links use that repository path while retaining their original tags and asset
+names. Version 0.5.0 packages this identity change as the first MenuBarIO
+release. The full local gate, Universal build and
+launch verification passed. A direct UI check confirmed the localized subtitle
+fits in the German settings view and the main device view shows the new name.
 
 On 2026-08-31, the configurable menu-bar symbol section was removed as a
 deliberate minimal-product change. The menu bar now always shows the fixed USB
@@ -286,7 +302,7 @@ battery charging power into one feature release. It preserves native
 Thunderbolt and USB device-count semantics, declines ambiguous assignments and
 keeps all hardware inspection local. It was published on 2026-08-31 as the
 signed, notarized and stapled Universal release
-[`v0.4.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.4.0) from
+[`v0.4.0`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.4.0) from
 merge commit `89c9d18546f27c197a796676a5487dbc9fb35c22`. Apple accepted the
 separately submitted app (`628f94de-7781-47ca-8a48-fdb49f47748b`) and DMG
 (`cc9d6127-78e6-4c9a-bc54-259f4eda8c62`). The public asset
@@ -304,7 +320,7 @@ measurements with a 100 W adapter.
 Version 0.3.0 packages the device-row metadata and USB/Thunderbolt topology
 work into a feature release. It was published on 2026-08-31 as the signed,
 notarized and stapled Universal release
-[`v0.3.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.3.0) from
+[`v0.3.0`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.3.0) from
 merge commit `323c25a5d7ac8cc00400681547eafa51e26a40b4`. Apple accepted the
 separately submitted app (`2d0460f3-5228-4cd1-97d2-9370cba3b541`) and DMG
 (`99669732-8ee5-490e-9b0d-231d662e452d`). The public asset
@@ -325,7 +341,7 @@ into one maintenance release. The device-discovery services, hardware
 classification and privacy model are unchanged. The complete automated gate,
 Universal build, local launch smoke test and user visual inspection passed.
 It was published on 2026-08-31 as the signed, notarized and stapled Universal
-release [`v0.2.1`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.2.1)
+release [`v0.2.1`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.2.1)
 from merge commit `22e7b542409fc024e5610ec4cc042d0315f939b8`. Apple accepted the
 separately submitted app (`bbce9e54-529e-4de9-aa3c-1a80e01bd42e`) and DMG
 (`5ce8ed88-2b8f-4f54-9c12-256ffa74dcbb`). The public asset
@@ -336,31 +352,31 @@ the physically stapled app inside the mounted DMG.
 
 The PortGlance rebrand was completed on 2026-08-30 and passed the complete
 local verification plus launch smoke test. The canonical repository is
-`r3d42-git/PortGlance`; `upstream` remains the read-only source reference to
+`r3d42-git/MenuBarIO`; `upstream` remains the read-only source reference to
 `rafaelSwi/MenuBarUSB`. The rebrand was published as the signed, notarized and
 stapled Universal release
-[`v0.2.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.2.0). Its
+[`v0.2.0`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.2.0). Its
 release asset is `PortGlance-0.2.0-mac.dmg` with SHA-256
 `c79e5a61dca6e6a160df23a8a2361f29121ce71ae402e4ecae9a131a55847709`; the
 publicly downloaded artifact passed the independent release verification.
 
 ## Code structure
 
-- `PortGlance/PortGlanceApp.swift` registers defaults, runs the one-time legacy
+- `MenuBarIO/MenuBarIOApp.swift` registers defaults, runs the one-time legacy
   migration and composes the app scenes.
-- `PortGlance/Services/` contains system adapters and lifecycle code for IOKit
+- `MenuBarIO/Services/` contains system adapters and lifecycle code for IOKit
   discovery, connection notifications, power sources, Ethernet state,
   login-item state and legacy-data migration.
-- `PortGlance/Structs/` and `PortGlance/Enums/` contain stable device models,
+- `MenuBarIO/Structs/` and `MenuBarIO/Enums/` contain stable device models,
   grouping rules and preference types.
-- `PortGlance/Support/` contains stateless formatting and system-action
+- `MenuBarIO/Support/` contains stateless formatting and system-action
   helpers.
-- `PortGlance/Views/` contains small menu-bar, list, row and settings
+- `MenuBarIO/Views/` contains small menu-bar, list, row and settings
   components. Current and legacy settings reuse the same controls.
-- `PortGlanceTests/` mirrors the model, service and migration boundaries with
+- `MenuBarIOTests/` mirrors the model, service and migration boundaries with
   focused test files.
-- `branding/PortGlance-AppIcon-master.png` is the generated high-resolution
-  icon master. `PortGlance/Assets.xcassets/AppIcon.appiconset/` contains the
+- `branding/MenuBarIO-AppIcon-master.png` is the generated high-resolution
+  icon master. `MenuBarIO/Assets.xcassets/AppIcon.appiconset/` contains the
   derived macOS icon sizes. In-app category and status icons use SF Symbols.
 
 USB and Thunderbolt identities must remain stable across refreshes. Internal
@@ -396,26 +412,45 @@ steps governed by `RELEASE.md`; do not infer them from a code change.
 
 ## Zweck und Umfang
 
-PortGlance ist eine rein lokal arbeitende macOS-Menüleisten-App zur Anzeige
+MenuBarIO ist eine rein lokal arbeitende macOS-Menüleisten-App zur Anzeige
 angeschlossener USB-, Thunderbolt-/USB4- und Bluetooth-Geräte. Sie unterstützt
 macOS 13 oder neuer und enthält weder Telemetrie noch Analysen,
 Update-Abfragen oder Netzwerk-Client-Code.
+Ihr Produktuntertitel lautet `USB, Thunderbolt, USB4 & Bluetooth Inspector for
+macOS`.
 
-Die aktuelle Produktversion ist `0.4.0` (Build 8). Releases werden auf einem
+Die aktuelle Produktversion ist `0.5.0` (Build 9). Releases werden auf einem
 geprüften Branch vorbereitet und vor dem Tagging in den geschützten Branch
 `main` integriert.
-Produkt, Programmdatei, Target, Projekt und Test-Target heißen `PortGlance`.
+Produkt, Programmdatei, Target und Projekt heißen `MenuBarIO`; das Test-Target
+heißt `MenuBarIOTests`.
 Die bisherige App-Bundle-ID `de.r3d.menubarusb.tb` bleibt erhalten, damit
 Einstellungen und Anmeldeobjekt-Identität die Umbenennung überstehen; das
-Test-Bundle verwendet `de.r3d.portglance.tests`.
+Test-Bundle verwendet `de.r3d.menubario.tests`.
 
 Die öffentliche Produktkommunikation muss die ursprüngliche MenuBarUSB-Idee
-und den MIT-lizenzierten Ausgangscode nennen, ohne PortGlance als offiziellen
+und den MIT-lizenzierten Ausgangscode nennen, ohne MenuBarIO als offiziellen
 Nachfolger, offizielle Fortführung oder vom ursprünglichen Autor bestätigte
 Variante darzustellen. Es bestehen weder Zusammenarbeit noch Zugehörigkeit zum
 ursprünglichen Autor, der an Entwicklung, Pflege, Support und Releases von
-PortGlance nicht beteiligt ist. GitHub-Contributor-Einträge der Upstream-Autoren
+MenuBarIO nicht beteiligt ist. GitHub-Contributor-Einträge der Upstream-Autoren
 bilden ausschließlich die erhaltene Quellcodehistorie ab.
+
+Am 31.08.2026 wurde das aktuelle Produkt von PortGlance in MenuBarIO
+umbenannt. Der neue Name hält die Herkunft aus MenuBarUSB bewusst sichtbar;
+der Untertitel beschreibt zugleich den heutigen Funktionsumfang. Quellordner,
+Xcode-Projekt, App- und Test-Targets, Programmdatei, Skripte, Oberfläche,
+Datenschutztext und aktuelle Dokumentation verwenden die neue Identität.
+Historische PortGlance-Releasenamen, Tags und Artefakte bleiben als Fakten
+unverändert. Das kanonische GitHub-Repository heißt jetzt
+`r3d42-git/MenuBarIO`; Links auf historische Releases verwenden diesen
+Repository-Pfad und behalten ihre ursprünglichen Tags und Artefaktnamen.
+Version 0.5.0 bündelt diese Identitätsänderung als ersten
+MenuBarIO-Release.
+Die vollständige lokale Prüfkette, der Universal-Build und der Starttest waren
+erfolgreich. Eine direkte UI-Prüfung bestätigte, dass der lokalisierte Untertitel
+in der deutschen Einstellungsansicht vollständig sichtbar ist und die
+Geräteansicht den neuen Namen zeigt.
 
 Am 31.08.2026 wurde der konfigurierbare Menüleisten-Symbolblock als bewusste
 Minimalisierung vollständig entfernt. Die Menüleiste zeigt jetzt immer das
@@ -708,7 +743,7 @@ in einem Funktionsrelease. Native Thunderbolt-Belegungen und die Semantik der
 Gerätezähler bleiben erhalten; mehrdeutige Zuordnungen werden nicht behauptet
 und alle Hardwaredaten bleiben lokal. Er wurde am 31.08.2026 als signierter,
 notarisierter und gestapelter Universal-Release
-[`v0.4.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.4.0) aus dem
+[`v0.4.0`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.4.0) aus dem
 Merge-Commit `89c9d18546f27c197a796676a5487dbc9fb35c22` veröffentlicht. Apple
 akzeptierte die getrennt eingereichte App
 (`628f94de-7781-47ca-8a48-fdb49f47748b`) und das DMG
@@ -728,7 +763,7 @@ dynamischen Messwerte von 10 W bis 41 W mit einem 100-W-Netzteil.
 Version 0.3.0 bündelt die Metadaten der Gerätezeilen und die neue
 USB-/Thunderbolt-Topologie in einem Funktionsrelease. Er wurde am 31.08.2026 als
 signierter, notarisierter und gestapelter Universal-Release
-[`v0.3.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.3.0) aus dem
+[`v0.3.0`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.3.0) aus dem
 Merge-Commit `323c25a5d7ac8cc00400681547eafa51e26a40b4` veröffentlicht. Apple
 akzeptierte die getrennt eingereichte App
 (`2d0460f3-5228-4cd1-97d2-9370cba3b541`) und das DMG
@@ -754,7 +789,7 @@ Prüfkette, der Universal-Build, der lokale Starttest und die Sichtprüfung des
 Benutzers waren erfolgreich.
 Der signierte, notarisierte und gestapelte Universal-Release wurde am
 31.08.2026 als
-[`v0.2.1`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.2.1) aus
+[`v0.2.1`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.2.1) aus
 dem Merge-Commit `22e7b542409fc024e5610ec4cc042d0315f939b8` veröffentlicht. Apple
 akzeptierte die getrennt eingereichte App
 (`bbce9e54-529e-4de9-aa3c-1a80e01bd42e`) und das DMG
@@ -766,33 +801,33 @@ der physisch gestapelten App im eingebundenen DMG.
 
 Das PortGlance-Rebranding wurde am 30.08.2026 abgeschlossen und hat die
 vollständige lokale Prüfkette sowie den Starttest bestanden. Das kanonische
-Repository ist `r3d42-git/PortGlance`; `upstream` bleibt die schreibgeschützte
+Repository ist `r3d42-git/MenuBarIO`; `upstream` bleibt die schreibgeschützte
 Quellreferenz auf `rafaelSwi/MenuBarUSB`. Das Rebranding wurde als signierter,
 notarisierter und gestapelter Universal-Release
-[`v0.2.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.2.0)
+[`v0.2.0`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.2.0)
 veröffentlicht. Das Release-Artefakt `PortGlance-0.2.0-mac.dmg` hat den SHA-256
 `c79e5a61dca6e6a160df23a8a2361f29121ce71ae402e4ecae9a131a55847709`; der
 öffentlich heruntergeladene Stand bestand die unabhängige Release-Prüfung.
 
 ## Codestruktur
 
-- `PortGlance/PortGlanceApp.swift` registriert Standardwerte, führt die
+- `MenuBarIO/MenuBarIOApp.swift` registriert Standardwerte, führt die
   einmalige Altdatenmigration aus und setzt die App-Szenen zusammen.
-- `PortGlance/Services/` enthält Systemadapter und Lebenszykluscode für
+- `MenuBarIO/Services/` enthält Systemadapter und Lebenszykluscode für
   IOKit-Erkennung, Anschlussmeldungen, Stromquellen, Ethernet-Status,
   Anmeldeobjekt-Status und Altdatenmigration.
-- `PortGlance/Structs/` und `PortGlance/Enums/` enthalten stabile
+- `MenuBarIO/Structs/` und `MenuBarIO/Enums/` enthalten stabile
   Gerätemodelle, Gruppierungsregeln und Einstellungstypen.
-- `PortGlance/Support/` enthält zustandslose Formatierungs- und
+- `MenuBarIO/Support/` enthält zustandslose Formatierungs- und
   Systemaktions-Helfer.
-- `PortGlance/Views/` enthält kleine Menüleisten-, Listen-, Zeilen- und
+- `MenuBarIO/Views/` enthält kleine Menüleisten-, Listen-, Zeilen- und
   Einstellungskomponenten. Aktuelle und klassische Einstellungen verwenden
   dieselben Bedienelemente.
-- `PortGlanceTests/` bildet die Modell-, Service- und Migrationsgrenzen in
+- `MenuBarIOTests/` bildet die Modell-, Service- und Migrationsgrenzen in
   gezielten Testdateien ab.
-- `branding/PortGlance-AppIcon-master.png` ist die hochauflösende generierte
+- `branding/MenuBarIO-AppIcon-master.png` ist die hochauflösende generierte
   Icon-Vorlage. Die abgeleiteten macOS-Größen liegen in
-  `PortGlance/Assets.xcassets/AppIcon.appiconset/`. Kategorien und Status in
+  `MenuBarIO/Assets.xcassets/AppIcon.appiconset/`. Kategorien und Status in
   der App verwenden SF Symbols.
 
 USB- und Thunderbolt-Identitäten müssen über Aktualisierungen hinweg stabil

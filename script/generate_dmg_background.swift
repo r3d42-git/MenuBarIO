@@ -62,7 +62,7 @@ color(255, 255, 255, 0.13).setStroke()
 divider.stroke()
 
 drawCentered(
-    "PortGlance installieren",
+    "MenuBarIO installieren",
     y: 352,
     font: .systemFont(ofSize: 22, weight: .semibold),
     color: color(244, 247, 250)
