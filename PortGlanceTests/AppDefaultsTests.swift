@@ -9,6 +9,8 @@ final class AppDefaultsTests: XCTestCase {
 
             XCTAssertFalse(defaults.bool(forKey: StorageKeys.bluetoothGroupExpanded))
             XCTAssertFalse(defaults.bool(forKey: StorageKeys.internalGroupExpanded))
+            XCTAssertFalse(defaults.bool(forKey: StorageKeys.thunderboltPortGroupExpanded))
+            XCTAssertFalse(defaults.bool(forKey: StorageKeys.externalThunderboltPortGroupExpanded))
         }
     }
 

@@ -53,22 +53,52 @@ After every change to IOKit discovery, check them once:
 1. Connect a normal USB device and at least one USB hub. The device must appear
    under **USB Devices**, the hub under **USB Hubs**; the counter counts devices
    only.
-2. Connect a Thunderbolt/USB4 device (for example, an SSD enclosure). Its name,
-   vendor, Thunderbolt/USB4 version and negotiated link speed must be visible.
-3. Connect a Thunderbolt dock with a USB-C Billboard interface. The dock must
+2. Verify that built-in hubs appear below **This Mac** and USB hubs tunneled by
+   a Thunderbolt/USB4 device appear below that device rather than below their
+   chip vendor.
+3. Connect a Thunderbolt/USB4 device (for example, an SSD enclosure). Its name,
+   vendor, Thunderbolt/USB4 version and negotiated link speed must be visible
+   below its physical port, but it must not also appear under **USB Devices**.
+   The overall connected-device counter must still include it.
+4. Expand **Thunderbolt/USB4 Ports**. Every physical host receptacle must appear
+   once. Occupied ports show the attached device, actual protocol and negotiated
+   speed; an empty port shows its maximum capability instead.
+5. Expand **External TB/USB4 Ports**. Every downstream Thunderbolt connector of
+   a connected dock must appear once below that dock. Connect a native
+   Thunderbolt device to one of them and verify that the port shows that device,
+   its protocol and negotiated speed.
+6. Connect a USB device to a Thunderbolt-capable USB-C connector on the Mac or a
+   dock. It must remain under **USB Devices** and must not appear as a connected
+   device in either Thunderbolt port group.
+7. Connect a Thunderbolt dock with a USB-C Billboard interface. The dock must
    appear once only as a Thunderbolt device, not additionally as a slow USB
    interface.
-4. Connect two identical USB devices without serial numbers to different ports.
+8. Connect two identical USB devices without serial numbers to different ports.
    Both must remain visible and retain separate settings.
-5. Disconnect and reconnect each device. The list and group counter must
+9. Disconnect and reconnect each device. The list and group counter must
    react only once per physical device.
-6. If the Ethernet indicator is enabled, turn its setting off and on twice. The
+10. If the Ethernet indicator is enabled, turn its setting off and on twice. The
    cable icon may appear only when a wired link is active and must not initiate
    a network connection from the app.
-7. For a release that changes device discovery, repeat the applicable cases
-   1–6 on an Intel Mac. If the required Intel Mac or device is unavailable,
+11. For a release that changes device discovery, repeat the applicable cases
+   1–10 on an Intel Mac. If the required Intel Mac or device is unavailable,
    record the approved exception in the release notes instead of claiming
    physical acceptance that was not performed.
+
+### Recorded M4 Pro Mac mini topology validation — 2026-08-31
+
+- The three rear host receptacles appeared once each. Port 1 updated live from
+  empty at up to 120 Gbps to TerraMaster TDAS at 40 Gbps; Port 2 showed
+  TerraMaster D1 SSD Pro at 80 Gbps; Port 3 showed Anker Thunderbolt 4 Mini Dock
+  at 40 Gbps.
+- The two built-in Apple hub functions appeared below **This Mac**. The D1 USB
+  hub functions appeared below **TerraMaster D1 SSD Pro**, and the Fresco Logic
+  plus Intel functions appeared below **Anker Thunderbolt 4 Mini Dock**.
+- The Anker dock exposed three downstream protocol connectors. PortGlance
+  displayed all three below the dock in **External TB/USB4 Ports**, each free
+  with up to 40 Gbps during this observation.
+- The live connection change updated the device and port totals without an app
+  restart. This Apple-silicon observation does not replace the Intel cases.
 
 ### Recorded Intel MacBook validation — 2026-08-26
 
@@ -154,25 +184,56 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
 1. Ein normales USB-Gerät und mindestens ein USB-Hub anschließen. Das Gerät
    muss unter **USB-Geräte**, der Hub unter **USB Hubs** erscheinen; der
    Zähler zählt nur Geräte.
-2. Ein Thunderbolt-/USB4-Gerät (beispielsweise ein SSD-Gehäuse) anschließen.
+2. Prüfen, dass integrierte Hubs unter **Dieser Mac** und über ein
+   Thunderbolt-/USB4-Gerät getunnelte USB-Hubs unter diesem Gerät statt unter
+   ihrem Chip-Hersteller erscheinen.
+3. Ein Thunderbolt-/USB4-Gerät (beispielsweise ein SSD-Gehäuse) anschließen.
    Name, Anbieter, Thunderbolt-/USB4-Version und die ausgehandelte
-   Link-Geschwindigkeit müssen sichtbar sein.
-3. Ein Thunderbolt-Dock mit USB-C-Billboard-Interface anschließen. Das Dock
+   Link-Geschwindigkeit müssen unter seinem physischen Port sichtbar sein; das
+   Gerät darf nicht zusätzlich unter **USB-Geräte** erscheinen. Der
+   Gesamtzähler der verbundenen Geräte muss es weiterhin mitzählen.
+4. **Thunderbolt-/USB4-Ports** aufklappen. Jeder physische Host-Anschluss muss
+   genau einmal erscheinen. Belegte Ports zeigen Gerät, tatsächliches Protokoll
+   und ausgehandelte Geschwindigkeit; ein freier Port stattdessen seine
+   maximale Fähigkeit.
+5. **Externe TB-/USB4-Ports** aufklappen. Jeder nachgelagerte
+   Thunderbolt-Anschluss eines verbundenen Docks muss genau einmal unter diesem
+   Dock erscheinen. Ein natives Thunderbolt-Gerät anschließen und prüfen, dass
+   der Port Gerät, Protokoll und ausgehandelte Geschwindigkeit anzeigt.
+6. Ein USB-Gerät an eine Thunderbolt-fähige USB-C-Buchse des Mac oder eines
+   Docks anschließen. Es muss unter **USB-Geräte** bleiben und darf in keiner der
+   beiden Thunderbolt-Portgruppen als verbundenes Gerät erscheinen.
+7. Ein Thunderbolt-Dock mit USB-C-Billboard-Interface anschließen. Das Dock
    darf nur einmal als Thunderbolt-Gerät erscheinen, nicht zusätzlich als
    langsames USB-Interface.
-4. Zwei baugleiche USB-Geräte ohne Seriennummer an unterschiedliche Ports
+8. Zwei baugleiche USB-Geräte ohne Seriennummer an unterschiedliche Ports
    anschließen. Beide müssen sichtbar bleiben und getrennte Einstellungen
    behalten.
-5. Geräte jeweils ab- und wieder anstecken. Liste und Gruppenzähler dürfen pro
+9. Geräte jeweils ab- und wieder anstecken. Liste und Gruppenzähler dürfen pro
    physischem Gerät nur einmal reagieren.
-6. Falls die Ethernet-Anzeige aktiviert ist: Einstellung zweimal ein- und
+10. Falls die Ethernet-Anzeige aktiviert ist: Einstellung zweimal ein- und
    ausschalten. Das Kabelsymbol darf nur bei aktivem kabelgebundenem Link
    erscheinen und darf keine Netzwerkverbindung der App auslösen.
-7. Bei einem Release mit Änderungen an der Geräteerkennung die zutreffenden
-   Fälle 1–6 auf einem Intel-Mac wiederholen. Falls der benötigte Intel-Mac oder
+11. Bei einem Release mit Änderungen an der Geräteerkennung die zutreffenden
+   Fälle 1–10 auf einem Intel-Mac wiederholen. Falls der benötigte Intel-Mac oder
    ein Gerät nicht verfügbar ist, die genehmigte Ausnahme in den Release Notes
    dokumentieren, statt eine nicht durchgeführte physische Abnahme zu
    behaupten.
+
+### Dokumentierte Topologie-Abnahme am M4-Pro-Mac-mini — 31.08.2026
+
+- Die drei rückseitigen Host-Anschlüsse erschienen jeweils einmal. Port 1
+  wechselte live von frei mit bis zu 120 Gbit/s zu TerraMaster TDAS mit
+  40 Gbit/s; Port 2 zeigte TerraMaster D1 SSD Pro mit 80 Gbit/s; Port 3 zeigte
+  das Anker Thunderbolt 4 Mini Dock mit 40 Gbit/s.
+- Die zwei integrierten Apple-Hub-Funktionen erschienen unter **Dieser Mac**.
+  Die USB-Hub-Funktionen des D1 erschienen unter **TerraMaster D1 SSD Pro**,
+  die Fresco-Logic- und Intel-Funktionen unter **Anker Thunderbolt 4 Mini Dock**.
+- Das Anker Dock stellte drei nachgelagerte Protokollanschlüsse bereit.
+  PortGlance zeigte alle drei unter dem Dock in **Externe TB-/USB4-Ports**, bei
+  dieser Beobachtung jeweils frei mit bis zu 40 Gbit/s.
+- Die laufende App aktualisierte Geräte- und Portanzahl beim Anschließen ohne
+  Neustart. Diese Apple-Silicon-Beobachtung ersetzt keine Intel-Abnahme.
 
 ### Dokumentierte Intel-MacBook-Abnahme — 26.08.2026
 

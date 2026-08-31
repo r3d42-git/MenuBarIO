@@ -76,7 +76,7 @@ struct USBDeviceRow: View {
     }
 
     private var speed: String? {
-        guard let speed = device.speedMbps ?? device.portMaxSpeedMbps else {
+        guard let speed = device.speedMbps else {
             return nil
         }
         return USBFormatting.transferRate(speed)

@@ -13,6 +13,8 @@ enum StorageKeys {
     static let hubGroupExpanded = "hubGroupExpanded"
     static let internalGroupExpanded = "internalGroupExpanded"
     static let bluetoothGroupExpanded = "bluetoothGroupExpanded"
+    static let thunderboltPortGroupExpanded = "thunderboltPortGroupExpanded"
+    static let externalThunderboltPortGroupExpanded = "externalThunderboltPortGroupExpanded"
     static let powerSourceInfo = "powerSourceInfo"
     static let powerSupplyAsCharger = "powerSupplyAsCharger"
     static let appAppearance = "appAppearance"
@@ -28,6 +30,8 @@ enum AppDefaults {
         StorageKeys.showEthernet: true,
         StorageKeys.internalGroupExpanded: false,
         StorageKeys.bluetoothGroupExpanded: false,
+        StorageKeys.thunderboltPortGroupExpanded: false,
+        StorageKeys.externalThunderboltPortGroupExpanded: false,
         StorageKeys.appAppearance: AppAppearance.system.rawValue,
         StorageKeys.appLanguage: AppLanguage.automatic.rawValue,
     ]

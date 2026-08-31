@@ -110,7 +110,11 @@ struct USBDevice: Identifiable, Equatable, Hashable {
 
     var speedDescription: String {
         guard let devMbps = speedMbps else {
-            return "unknown_speed".localized
+            var parts = ["unknown_speed".localized]
+            if let port = portMaxSpeedMbps {
+                parts.append("— \("supports_up_to".localized) \(USBFormatting.transferRate(port))")
+            }
+            return parts.joined(separator: " ")
         }
         var parts: [String] = [USBFormatting.speedTierLabel(for: devMbps)]
 
@@ -126,16 +130,27 @@ struct USBDevice: Identifiable, Equatable, Hashable {
 
     var connectionDescription: String {
         guard transport == .thunderbolt else { return speedDescription }
-
-        if let speedMbps {
-            return "\(transport.displayName) — \(USBFormatting.transferRate(speedMbps))"
-        }
         return transport.displayName
     }
 
     var hardwareIdentifier: String {
         let identifier = String(format: "%04X:%04X", vendorId, productId)
         return transport == .thunderbolt ? "TB \(identifier)" : identifier
+    }
+
+    var displayNameWithVendor: String {
+        guard let vendor = vendor?.trimmingCharacters(in: .whitespacesAndNewlines),
+            !vendor.isEmpty,
+            !name.localizedCaseInsensitiveContains(vendor)
+        else {
+            return name
+        }
+        return "\(vendor) \(name)"
+    }
+
+    var usbControllerID: Int? {
+        guard transport == .usb, let locationId else { return nil }
+        return Int(locationId >> 24)
     }
 
     var isHub: Bool {

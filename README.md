@@ -21,8 +21,14 @@ maintained independently.
 
 ## Highlights
 
-- USB devices and USB hubs in independently collapsible groups
+- USB devices and topology-owned USB hubs in independently collapsible groups;
+  Thunderbolt devices remain in the overall count but appear only with their
+  physical ports
 - Thunderbolt and USB4 devices, including negotiated link speed and protocol
+- Physical Thunderbolt/USB4 host ports with occupancy, attached device and
+  negotiated or maximum link speed
+- External Thunderbolt/USB4 ports are detected from dock topology and grouped
+  by their owning device; USB devices connected there remain under USB Devices
 - USB-C Billboard interfaces are identified as companion interfaces, so compatible Thunderbolt docks are not listed twice
 - Optional local Ethernet-link indicator; network traffic monitoring is not included
 - Compact device-first view without saved per-device customizations
@@ -32,7 +38,7 @@ maintained independently.
 
 ## Compatibility
 
-The current release, **PortGlance 0.2.1**, is a **Universal** app for Apple
+The current release, **PortGlance 0.3.0**, is a **Universal** app for Apple
 Silicon (`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. Automated
 checks run natively on both architectures. The physical Intel-Mac observations
 and the hardware cases that still apply after discovery changes are documented
@@ -85,9 +91,16 @@ PortGlance selbst wird unabhängig entwickelt und gepflegt.
 
 ## Wichtige Funktionen
 
-- USB-Geräte und USB-Hubs in unabhängig einklappbaren Gruppen
+- USB-Geräte und nach ihrem Topologie-Besitzer gegliederte USB-Hubs in
+  unabhängig einklappbaren Gruppen; Thunderbolt-Geräte bleiben im
+  Gesamtzähler, erscheinen aber nur an ihren physischen Ports
 - Thunderbolt- und USB4-Geräte einschließlich ausgehandelter Link-Geschwindigkeit
   und Protokoll
+- Physische Thunderbolt-/USB4-Host-Ports mit Belegung, angeschlossenem Gerät
+  und ausgehandelter beziehungsweise maximaler Link-Geschwindigkeit
+- Externe Thunderbolt-/USB4-Ports werden aus der Dock-Topologie erkannt und
+  nach ihrem Gerät gruppiert; dort angeschlossene USB-Geräte bleiben unter
+  USB-Geräte
 - USB-C-Billboard-Schnittstellen werden als Begleitschnittstellen erkannt,
   sodass kompatible Thunderbolt-Docks nicht doppelt erscheinen
 - Optionale lokale Ethernet-Link-Anzeige; eine Überwachung des Netzwerkverkehrs
@@ -100,7 +113,7 @@ PortGlance selbst wird unabhängig entwickelt und gepflegt.
 
 ## Kompatibilität
 
-Der aktuelle Release **PortGlance 0.2.1** ist eine **Universal-App** für
+Der aktuelle Release **PortGlance 0.3.0** ist eine **Universal-App** für
 Apple-Silicon- (`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die
 automatischen Prüfungen laufen nativ auf beiden Architekturen. Die physischen
 Beobachtungen auf einem Intel-Mac und die nach Änderungen an der

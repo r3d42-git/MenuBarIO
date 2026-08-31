@@ -57,20 +57,100 @@ final class USBDeviceTests: XCTestCase {
 
     func testGroupsClassifyExternalInternalAndHubDevicesOnce() {
         let externalDevice = makeDevice(productID: 1)
+        let thunderboltDevice = makeThunderboltDevice(
+            name: "Thunderbolt Device",
+            vendor: "Example",
+            identifier: "TB"
+        )
         let internalDevice = makeDevice(
             productID: 2,
             portType: Int(kIOUSBHostPortTypeInternal.rawValue)
         )
         let hub = makeDevice(productID: 3, deviceClass: 9)
 
-        let groups = USBDeviceGroups(devices: [externalDevice, internalDevice, hub])
+        let groups = USBDeviceGroups(
+            devices: [externalDevice, thunderboltDevice, internalDevice, hub]
+        )
 
-        XCTAssertEqual(groups.externalDevices.map(\.id), [externalDevice.id])
+        XCTAssertEqual(groups.usbDevices.map(\.id), [externalDevice.id])
+        XCTAssertEqual(groups.thunderboltDevices.map(\.id), [thunderboltDevice.id])
+        XCTAssertEqual(groups.countedExternalDeviceCount, 2)
         XCTAssertEqual(groups.internalDevices.map(\.id), [internalDevice.id])
         XCTAssertEqual(groups.hubs.map(\.id), [hub.id])
     }
 
-    func testThunderboltDescriptionUsesNegotiatedLinkSpeed() {
+    func testHubGroupsUseInternalAndThunderboltTopologyOwners() {
+        let internalHub = makeDevice(
+            productID: 1,
+            locationID: 0x0310_0000,
+            portType: Int(kIOUSBHostPortTypeInternal.rawValue),
+            deviceClass: 9
+        )
+        let d1Hub = makeDevice(
+            productID: 2,
+            locationID: 0x0110_0000,
+            deviceClass: 9
+        )
+        let ankerHub = makeDevice(
+            productID: 3,
+            locationID: 0x0210_0000,
+            deviceClass: 9
+        )
+        let d1 = makeThunderboltDevice(
+            name: "D1 SSD Pro",
+            vendor: "TerraMaster",
+            identifier: "D1"
+        )
+        let anker = makeThunderboltDevice(
+            name: "Thunderbolt 4 Mini Dock",
+            vendor: "Anker",
+            identifier: "ANKER"
+        )
+        let ports = [
+            ThunderboltPort(
+                id: "port-2",
+                controllerID: 1,
+                connectorNumber: 2,
+                protocolVersion: 64,
+                maximumSpeedMbps: 120_000,
+                connectedDevice: d1
+            ),
+            ThunderboltPort(
+                id: "port-3",
+                controllerID: 2,
+                connectorNumber: 3,
+                protocolVersion: 64,
+                maximumSpeedMbps: 120_000,
+                connectedDevice: anker
+            ),
+        ]
+
+        let groups = USBDeviceGroups(
+            devices: [internalHub, d1Hub, ankerHub],
+            thunderboltPorts: ports
+        )
+
+        XCTAssertEqual(groups.hubGroups.map(\.devices), [[internalHub], [d1Hub], [ankerHub]])
+        XCTAssertEqual(groups.hubGroups[0].owner, .thisMac)
+        XCTAssertEqual(
+            groups.hubGroups[1].owner,
+            .thunderboltDevice(
+                id: d1.id,
+                displayName: "TerraMaster D1 SSD Pro",
+                connectorNumber: 2
+            )
+        )
+        XCTAssertEqual(
+            groups.hubGroups[2].owner,
+            .thunderboltDevice(
+                id: anker.id,
+                displayName: "Anker Thunderbolt 4 Mini Dock",
+                connectorNumber: 3
+            )
+        )
+    }
+
+    func testThunderboltDescriptionLeavesNegotiatedSpeedToTrailingValue() {
         let device = USBDevice(
             name: "SSD",
             vendor: "Example",
@@ -87,8 +167,91 @@ final class USBDeviceTests: XCTestCase {
             transportIdentifier: "ABC"
         )
 
-        XCTAssertEqual(device.connectionDescription, "Thunderbolt/USB4 — 80.0 Gbps")
+        XCTAssertEqual(device.connectionDescription, "Thunderbolt/USB4")
+        XCTAssertEqual(USBFormatting.transferRate(device.speedMbps ?? 0), "80.0 Gbps")
         XCTAssertEqual(device.id, "thunderbolt-4369-8738-ABC")
+    }
+
+    func testThunderboltPortUsesConnectedProtocolAndFreePortCapability() {
+        let dock = makeThunderboltDevice(
+            name: "Dock",
+            vendor: "Example",
+            identifier: "DOCK",
+            transportVersion: "Thunderbolt 3/4 / USB4"
+        )
+        let connectedPort = ThunderboltPort(
+            id: "port-1",
+            controllerID: 0,
+            connectorNumber: 1,
+            protocolVersion: 64,
+            maximumSpeedMbps: 120_000,
+            connectedDevice: dock
+        )
+        let freePort = ThunderboltPort(
+            id: "port-2",
+            controllerID: 1,
+            connectorNumber: 2,
+            protocolVersion: 64,
+            maximumSpeedMbps: 120_000,
+            connectedDevice: nil
+        )
+
+        XCTAssertEqual(connectedPort.protocolDescription, "Thunderbolt 3/4 / USB4")
+        XCTAssertEqual(freePort.protocolDescription, "Thunderbolt 5 / USB4 v2")
+    }
+
+    func testUSBDeviceOnThunderboltCapableConnectorRemainsUSBOnly() {
+        let usbDevice = makeDevice(productID: 4)
+        let port = ThunderboltPort(
+            id: "external-port-1",
+            controllerID: 2,
+            connectorNumber: 1,
+            protocolVersion: 32,
+            maximumSpeedMbps: 40_000,
+            connectedDevice: usbDevice
+        )
+        let groups = USBDeviceGroups(devices: [usbDevice])
+
+        XCTAssertNil(port.connectedDevice)
+        XCTAssertEqual(groups.usbDevices, [usbDevice])
+        XCTAssertTrue(groups.thunderboltDevices.isEmpty)
+        XCTAssertEqual(groups.countedExternalDeviceCount, 1)
+    }
+
+    func testUSBDescriptionKeepsTierAndDifferentPortMaximum() {
+        let device = USBDevice(
+            name: "Keyboard",
+            vendor: "Example",
+            vendorId: 0x1111,
+            productId: 0x2222,
+            serialNumber: nil,
+            locationId: 1,
+            speedMbps: 480,
+            portMaxSpeedMbps: 5_000,
+            usbVersionBCD: 0x0200,
+            isExternalStorage: false
+        )
+
+        XCTAssertTrue(device.connectionDescription.hasPrefix("USB 2.0 "))
+        XCTAssertTrue(device.connectionDescription.contains("5.0 Gbps"))
+        XCTAssertFalse(device.connectionDescription.contains("480 Mbps"))
+    }
+
+    func testUSBDescriptionKeepsPortMaximumWhenNegotiatedSpeedIsMissing() {
+        let device = USBDevice(
+            name: "Device",
+            vendor: "Example",
+            vendorId: 0x1111,
+            productId: 0x2222,
+            serialNumber: nil,
+            locationId: 1,
+            speedMbps: nil,
+            portMaxSpeedMbps: 5_000,
+            usbVersionBCD: nil,
+            isExternalStorage: false
+        )
+
+        XCTAssertTrue(device.connectionDescription.contains("5.0 Gbps"))
     }
 
     func testThunderboltBillboardIsExplicitOptIn() {
@@ -130,6 +293,29 @@ final class USBDeviceTests: XCTestCase {
             isExternalStorage: false,
             usbPortType: portType,
             deviceClass: deviceClass
+        )
+    }
+
+    private func makeThunderboltDevice(
+        name: String,
+        vendor: String,
+        identifier: String,
+        transportVersion: String = "USB4"
+    ) -> USBDevice {
+        USBDevice(
+            name: name,
+            vendor: vendor,
+            vendorId: 0x8087,
+            productId: 1,
+            serialNumber: nil,
+            locationId: 1,
+            speedMbps: 40_000,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: nil,
+            isExternalStorage: nil,
+            transport: .thunderbolt,
+            transportVersion: transportVersion,
+            transportIdentifier: identifier
         )
     }
 }

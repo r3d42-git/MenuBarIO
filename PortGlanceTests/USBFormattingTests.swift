@@ -32,6 +32,32 @@ final class USBFormattingTests: XCTestCase {
         XCTAssertNil(USBFormatting.thunderboltMegabitsPerSecond(fromLinkBandwidth: Int.max))
     }
 
+    func testSpeedTierAndTransferRateHaveSeparateDisplayRoles() {
+        XCTAssertEqual(
+            USBFormatting.speedTierLabel(for: 5_000),
+            "USB 3.0 / 3.1 Gen1 / 3.2 Gen1x1"
+        )
+        XCTAssertEqual(USBFormatting.speedTierLabel(for: 7_500), "USB")
+        XCTAssertEqual(USBFormatting.transferRate(5_000), "5.0 Gbps")
+        XCTAssertEqual(USBFormatting.transferRate(1), "1.5 Mbps")
+        XCTAssertEqual(USBFormatting.transferRate(2), "1.5 Mbps")
+    }
+
+    func testThunderboltProtocolLabelsDistinguishUSB4Generations() {
+        XCTAssertEqual(
+            USBFormatting.thunderboltProtocolLabel(for: 64),
+            "Thunderbolt 5 / USB4 v2"
+        )
+        XCTAssertEqual(
+            USBFormatting.thunderboltProtocolLabel(for: 32),
+            "Thunderbolt 3/4 / USB4"
+        )
+        XCTAssertEqual(
+            USBFormatting.thunderboltProtocolLabel(for: nil),
+            "Thunderbolt/USB4"
+        )
+    }
+
     func testDeviceCountFormatting() {
         XCTAssertEqual(DeviceCountFormatter.string(for: 7), "7")
         XCTAssertEqual(DeviceCountFormatter.string(for: 100), "99＋")

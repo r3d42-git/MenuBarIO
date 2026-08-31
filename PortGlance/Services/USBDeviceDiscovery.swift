@@ -3,14 +3,21 @@ import IOKit
 import IOKit.usb
 
 protocol USBDeviceDiscovering {
-    func connectedDevices() -> [USBDevice]
+    func connectedTopology() -> USBTopologySnapshot
+}
+
+extension USBDeviceDiscovering {
+    func connectedDevices() -> [USBDevice] {
+        connectedTopology().devices
+    }
 }
 
 final class USBDeviceDiscovery: USBDeviceDiscovering {
     static let usbDeviceClassNames = [kIOUSBHostDeviceClassName, kIOUSBDeviceClassName]
 
-    func connectedDevices() -> [USBDevice] {
-        let thunderboltDevices = fetchThunderboltDevices()
+    func connectedTopology() -> USBTopologySnapshot {
+        let thunderboltTopology = fetchThunderboltTopology()
+        let thunderboltDevices = thunderboltTopology.devices
         var devices = fetchUSBDevices().filter { usbDevice in
             !thunderboltDevices.contains { thunderboltDevice in
                 representsSamePhysicalDevice(usbDevice, as: thunderboltDevice)
@@ -22,7 +29,11 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
             devices.append(device)
         }
 
-        return devices
+        return USBTopologySnapshot(
+            devices: devices,
+            thunderboltPorts: thunderboltTopology.ports,
+            externalThunderboltPortGroups: thunderboltTopology.externalPortGroups
+        )
     }
 
     private func fetchUSBDevices() -> [USBDevice] {
@@ -58,23 +69,139 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
         return devices
     }
 
-    private func fetchThunderboltDevices() -> [USBDevice] {
+    private func fetchThunderboltTopology() -> ThunderboltTopologyRecords {
         let matching = IOServiceMatching(USBConnectionMonitor.thunderboltClassName)
         var iterator: io_iterator_t = 0
 
         guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else {
-            return []
+            return ThunderboltTopologyRecords(
+                devices: [],
+                ports: [],
+                externalPortGroups: []
+            )
         }
         defer { IOObjectRelease(iterator) }
 
         var devices: [USBDevice] = []
+        var hostRouters: [ThunderboltHostRouterRecord] = []
+        var attachments: [ThunderboltDeviceAttachment] = []
+        var deviceRouters: [ThunderboltDeviceRouterRecord] = []
+
         while case let entry = IOIteratorNext(iterator), entry != 0 {
-            if let device = makeThunderboltDevice(from: entry) {
+            let properties = registryProperties(for: entry)
+
+            if let properties,
+                properties.uint64Value("Route String") == 0,
+                let hostRouter = makeThunderboltHostRouter(from: entry, properties: properties)
+            {
+                hostRouters.append(hostRouter)
+            } else if let device = makeThunderboltDevice(from: entry) {
                 devices.append(device)
+                let router = ThunderboltDeviceRouterRecord(
+                    controllerID: rootThunderboltRouterID(for: entry),
+                    hostPortNumber: parentThunderboltPortNumber(for: entry),
+                    depth: properties?.intValue("Depth") ?? 1,
+                    protocolVersion: properties?.intValue("Thunderbolt Version"),
+                    device: device,
+                    downstreamConnectors: thunderboltDownstreamConnectors(for: entry)
+                )
+                deviceRouters.append(router)
+                attachments.append(router.attachment)
             }
             IOObjectRelease(entry)
         }
-        return devices
+
+        let ports = makeThunderboltPorts(
+            hostRouters: hostRouters,
+            attachments: attachments
+        )
+        let externalPortGroups = makeExternalThunderboltPortGroups(
+            deviceRouters: deviceRouters,
+            hostPorts: ports
+        )
+
+        return ThunderboltTopologyRecords(
+            devices: devices,
+            ports: ports,
+            externalPortGroups: externalPortGroups
+        )
+    }
+
+    private func makeExternalThunderboltPortGroups(
+        deviceRouters: [ThunderboltDeviceRouterRecord],
+        hostPorts: [ThunderboltPort]
+    ) -> [ExternalThunderboltPortGroup] {
+        deviceRouters.compactMap { router in
+            guard !router.downstreamConnectors.isEmpty else { return nil }
+
+            let ports = router.downstreamConnectors.enumerated().map { index, connector in
+                ThunderboltPort(
+                    id: "external-thunderbolt-port-\(router.device.id)-\(connector.hostPortNumber)",
+                    controllerID: router.controllerID ?? -1,
+                    connectorNumber: index + 1,
+                    protocolVersion: router.protocolVersion,
+                    maximumSpeedMbps: router.device.speedMbps,
+                    connectedDevice: connector.connectedDevice
+                )
+            }
+            let hostConnectorNumber =
+                hostPorts.first {
+                    $0.connectedDevice?.id == router.device.id
+                }?.connectorNumber ?? Int.max
+
+            return ExternalThunderboltPortGroup(
+                owner: router.device,
+                hostConnectorNumber: hostConnectorNumber,
+                depth: router.depth,
+                ports: ports
+            )
+        }.sorted {
+            $0.hostConnectorNumber < $1.hostConnectorNumber
+                || ($0.hostConnectorNumber == $1.hostConnectorNumber && $0.depth < $1.depth)
+                || ($0.hostConnectorNumber == $1.hostConnectorNumber
+                    && $0.depth == $1.depth
+                    && $0.owner.name.localizedCaseInsensitiveCompare($1.owner.name) == .orderedAscending)
+        }
+    }
+
+    private func makeThunderboltPorts(
+        hostRouters: [ThunderboltHostRouterRecord],
+        attachments: [ThunderboltDeviceAttachment]
+    ) -> [ThunderboltPort] {
+        var ports: [ThunderboltPort] = []
+
+        for router in hostRouters {
+            for connector in router.connectors {
+                let exactAttachment = attachments.first {
+                    $0.controllerID == router.controllerID
+                        && $0.depth == 1
+                        && $0.hostPortNumber == connector.hostPortNumber
+                }
+
+                var attachment = exactAttachment
+                if attachment == nil, router.connectors.count == 1 {
+                    attachment = attachments.first {
+                        $0.controllerID == router.controllerID && $0.depth == 1
+                    }
+                }
+
+                ports.append(
+                    ThunderboltPort(
+                        id: "thunderbolt-port-\(router.uid)-\(connector.hostPortNumber)",
+                        controllerID: router.controllerID,
+                        connectorNumber: connector.connectorNumber,
+                        protocolVersion: router.protocolVersion,
+                        maximumSpeedMbps: router.maximumSpeedMbps,
+                        connectedDevice: attachment?.device
+                    )
+                )
+            }
+        }
+
+        return ports.sorted {
+            $0.connectorNumber < $1.connectorNumber
+                || ($0.connectorNumber == $1.connectorNumber && $0.id < $1.id)
+        }
     }
 
     private func representsSamePhysicalDevice(
@@ -141,13 +268,15 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
         guard let properties = registryProperties(for: entry),
             // Local controllers use route 0. A positive route identifies a
             // physical Thunderbolt/USB4 device connected to that controller.
-            let locationID = properties.uint32Value("Route String"),
-            locationID > 0,
+            let route = properties.uint64Value("Route String"),
+            route > 0,
             let name = properties.stringValue("Device Model Name"),
             !name.isEmpty
         else {
             return nil
         }
+
+        let locationID = UInt32(truncatingIfNeeded: route)
 
         let transportIdentifier = properties.numberValue("UID").map {
             String(format: "%016llX", $0.uint64Value)
@@ -174,6 +303,178 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
             ),
             transportIdentifier: transportIdentifier
         )
+    }
+
+    private func makeThunderboltHostRouter(
+        from entry: io_registry_entry_t,
+        properties: RegistryProperties
+    ) -> ThunderboltHostRouterRecord? {
+        guard let controllerID = properties.intValue("Router ID") else { return nil }
+
+        let uid =
+            properties.numberValue("UID").map {
+                String(format: "%016llX", $0.uint64Value)
+            } ?? "controller-\(controllerID)"
+
+        let connectors = thunderboltHostConnectors(
+            for: entry,
+            fallbackConnectorNumber: controllerID + 1
+        )
+
+        return ThunderboltHostRouterRecord(
+            controllerID: controllerID,
+            uid: uid,
+            protocolVersion: properties.intValue("Thunderbolt Version"),
+            maximumSpeedMbps: thunderboltLinkSpeed(from: entry),
+            connectors: connectors
+        )
+    }
+
+    private func thunderboltHostConnectors(
+        for entry: io_registry_entry_t,
+        fallbackConnectorNumber: Int
+    ) -> [ThunderboltConnectorRecord] {
+        var iterator: io_iterator_t = 0
+        guard
+            IORegistryEntryGetChildIterator(entry, kIOServicePlane, &iterator) == KERN_SUCCESS
+        else {
+            return [
+                ThunderboltConnectorRecord(
+                    connectorNumber: fallbackConnectorNumber,
+                    hostPortNumber: 1,
+                    connectedDevice: nil
+                )
+            ]
+        }
+        defer { IOObjectRelease(iterator) }
+
+        var connectors: [ThunderboltConnectorRecord] = []
+        while case let child = IOIteratorNext(iterator), child != 0 {
+            if let properties = registryProperties(for: child),
+                properties.intValue("Adapter Type") == 1,
+                properties.intValue("Lane") == 1,
+                let hostPortNumber = properties.intValue("Port Number")
+            {
+                let connectorNumber =
+                    properties.intValueOrString("Socket ID")
+                    ?? fallbackConnectorNumber
+                connectors.append(
+                    ThunderboltConnectorRecord(
+                        connectorNumber: connectorNumber,
+                        hostPortNumber: hostPortNumber,
+                        connectedDevice: nil
+                    )
+                )
+            }
+            IOObjectRelease(child)
+        }
+
+        if connectors.isEmpty {
+            connectors.append(
+                ThunderboltConnectorRecord(
+                    connectorNumber: fallbackConnectorNumber,
+                    hostPortNumber: 1,
+                    connectedDevice: nil
+                )
+            )
+        }
+
+        return connectors.sorted {
+            $0.connectorNumber < $1.connectorNumber
+                || ($0.connectorNumber == $1.connectorNumber && $0.hostPortNumber < $1.hostPortNumber)
+        }
+    }
+
+    private func thunderboltDownstreamConnectors(
+        for entry: io_registry_entry_t
+    ) -> [ThunderboltConnectorRecord] {
+        var iterator: io_iterator_t = 0
+        guard
+            IORegistryEntryGetChildIterator(entry, kIOServicePlane, &iterator) == KERN_SUCCESS
+        else {
+            return []
+        }
+        defer { IOObjectRelease(iterator) }
+
+        var connectors: [ThunderboltConnectorRecord] = []
+        while case let child = IOIteratorNext(iterator), child != 0 {
+            if let properties = registryProperties(for: child),
+                properties.intValue("Adapter Type") == 1,
+                properties.intValue("Lane") == 1,
+                let portNumber = properties.intValue("Port Number")
+            {
+                connectors.append(
+                    ThunderboltConnectorRecord(
+                        connectorNumber: portNumber,
+                        hostPortNumber: portNumber,
+                        connectedDevice: firstThunderboltDeviceDescendant(of: child)
+                    )
+                )
+            }
+            IOObjectRelease(child)
+        }
+
+        return connectors.sorted { $0.hostPortNumber < $1.hostPortNumber }
+    }
+
+    private func firstThunderboltDeviceDescendant(
+        of entry: io_registry_entry_t
+    ) -> USBDevice? {
+        var iterator: io_iterator_t = 0
+        guard
+            IORegistryEntryCreateIterator(
+                entry,
+                kIOServicePlane,
+                IOOptionBits(kIORegistryIterateRecursively),
+                &iterator
+            ) == KERN_SUCCESS
+        else {
+            return nil
+        }
+        defer { IOObjectRelease(iterator) }
+
+        while case let child = IOIteratorNext(iterator), child != 0 {
+            let device = makeThunderboltDevice(from: child)
+            IOObjectRelease(child)
+            if let device {
+                return device
+            }
+        }
+        return nil
+    }
+
+    private func parentThunderboltPortNumber(for entry: io_registry_entry_t) -> Int? {
+        var parent: io_registry_entry_t = 0
+        guard IORegistryEntryGetParentEntry(entry, kIOServicePlane, &parent) == KERN_SUCCESS else {
+            return nil
+        }
+        defer { IOObjectRelease(parent) }
+        return registryProperties(for: parent)?.intValue("Port Number")
+    }
+
+    private func rootThunderboltRouterID(for entry: io_registry_entry_t) -> Int? {
+        var current = entry
+        var currentIsRetained = false
+
+        while true {
+            if let properties = registryProperties(for: current),
+                properties.uint64Value("Route String") == 0,
+                let routerID = properties.intValue("Router ID")
+            {
+                if currentIsRetained { IOObjectRelease(current) }
+                return routerID
+            }
+
+            var parent: io_registry_entry_t = 0
+            guard IORegistryEntryGetParentEntry(current, kIOServicePlane, &parent) == KERN_SUCCESS else {
+                if currentIsRetained { IOObjectRelease(current) }
+                return nil
+            }
+
+            if currentIsRetained { IOObjectRelease(current) }
+            current = parent
+            currentIsRetained = true
+        }
     }
 
     private func deviceLinkSpeed(from properties: RegistryProperties) -> Int? {
@@ -282,13 +583,8 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
     }
 
     private func thunderboltTransportVersion(from rawVersion: Int?) -> String? {
-        // These values are how IOKit represents the USB4 modes shown by
-        // System Information on current Apple platforms.
-        switch rawVersion {
-        case 32: "USB4"
-        case 64: "USB4 v2"
-        default: nil
-        }
+        guard rawVersion != nil else { return nil }
+        return USBFormatting.thunderboltProtocolLabel(for: rawVersion)
     }
 
     private func thunderboltLinkSpeed(from entry: io_registry_entry_t) -> Int? {
@@ -331,6 +627,57 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
     }
 }
 
+struct USBTopologySnapshot: Equatable {
+    let devices: [USBDevice]
+    let thunderboltPorts: [ThunderboltPort]
+    let externalThunderboltPortGroups: [ExternalThunderboltPortGroup]
+}
+
+private struct ThunderboltTopologyRecords {
+    let devices: [USBDevice]
+    let ports: [ThunderboltPort]
+    let externalPortGroups: [ExternalThunderboltPortGroup]
+}
+
+private struct ThunderboltHostRouterRecord {
+    let controllerID: Int
+    let uid: String
+    let protocolVersion: Int?
+    let maximumSpeedMbps: Int?
+    let connectors: [ThunderboltConnectorRecord]
+}
+
+private struct ThunderboltConnectorRecord {
+    let connectorNumber: Int
+    let hostPortNumber: Int
+    let connectedDevice: USBDevice?
+}
+
+private struct ThunderboltDeviceAttachment {
+    let controllerID: Int?
+    let hostPortNumber: Int?
+    let depth: Int
+    let device: USBDevice
+}
+
+private struct ThunderboltDeviceRouterRecord {
+    let controllerID: Int?
+    let hostPortNumber: Int?
+    let depth: Int
+    let protocolVersion: Int?
+    let device: USBDevice
+    let downstreamConnectors: [ThunderboltConnectorRecord]
+
+    var attachment: ThunderboltDeviceAttachment {
+        ThunderboltDeviceAttachment(
+            controllerID: controllerID,
+            hostPortNumber: hostPortNumber,
+            depth: depth,
+            device: device
+        )
+    }
+}
+
 private struct RegistryProperties {
     let values: [String: Any]
 
@@ -350,11 +697,19 @@ private struct RegistryProperties {
         numberValue(key)?.uint32Value
     }
 
+    func uint64Value(_ key: String) -> UInt64? {
+        numberValue(key)?.uint64Value
+    }
+
     func doubleValue(_ key: String) -> Double? {
         numberValue(key)?.doubleValue
     }
 
     func stringValue(_ key: String) -> String? {
         values[key] as? String
+    }
+
+    func intValueOrString(_ key: String) -> Int? {
+        intValue(key) ?? stringValue(key).flatMap(Int.init)
     }
 }
