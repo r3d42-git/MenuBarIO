@@ -21,13 +21,13 @@ struct ThunderboltPort: Identifiable, Equatable, Hashable {
         self.connectorNumber = connectorNumber
         self.protocolVersion = protocolVersion
         self.maximumSpeedMbps = maximumSpeedMbps
-        self.connectedDevice =
-            connectedDevice?.transport == .thunderbolt
-            ? connectedDevice
-            : nil
+        self.connectedDevice = connectedDevice
     }
 
     var protocolDescription: String {
+        if let connectedDevice, connectedDevice.transport == .usb {
+            return connectedDevice.connectionDescription
+        }
         if let connectedProtocol = connectedDevice?.transportVersion,
             !connectedProtocol.isEmpty
         {

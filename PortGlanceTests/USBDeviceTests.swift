@@ -55,6 +55,27 @@ final class USBDeviceTests: XCTestCase {
         XCTAssertTrue(captiveDevice.countsTowardUSBDeviceTotal)
     }
 
+    func testUnnamedInternalUSBDeviceUsesFriendlyDisplayNameOnly() {
+        let internalDevice = USBDevice(
+            name: "IOUSBHostDevice",
+            vendor: "Apple",
+            vendorId: 0x05AC,
+            productId: 1,
+            serialNumber: nil,
+            locationId: 0x8080_0000,
+            speedMbps: 480,
+            portMaxSpeedMbps: nil,
+            usbVersionBCD: 0x0200,
+            isExternalStorage: false,
+            usbPortType: Int(kIOUSBHostPortTypeInternal.rawValue)
+        )
+        let externalDevice = makeDevice()
+
+        XCTAssertEqual(internalDevice.displayName, "unnamed_internal_usb_component".localized)
+        XCTAssertEqual(internalDevice.name, "IOUSBHostDevice")
+        XCTAssertEqual(externalDevice.displayName, externalDevice.name)
+    }
+
     func testGroupsClassifyExternalInternalAndHubDevicesOnce() {
         let externalDevice = makeDevice(productID: 1)
         let thunderboltDevice = makeThunderboltDevice(
@@ -80,22 +101,6 @@ final class USBDeviceTests: XCTestCase {
     }
 
     func testHubGroupsUseInternalAndThunderboltTopologyOwners() {
-        let internalHub = makeDevice(
-            productID: 1,
-            locationID: 0x0310_0000,
-            portType: Int(kIOUSBHostPortTypeInternal.rawValue),
-            deviceClass: 9
-        )
-        let d1Hub = makeDevice(
-            productID: 2,
-            locationID: 0x0110_0000,
-            deviceClass: 9
-        )
-        let ankerHub = makeDevice(
-            productID: 3,
-            locationID: 0x0210_0000,
-            deviceClass: 9
-        )
         let d1 = makeThunderboltDevice(
             name: "D1 SSD Pro",
             vendor: "TerraMaster",
@@ -105,6 +110,25 @@ final class USBDeviceTests: XCTestCase {
             name: "Thunderbolt 4 Mini Dock",
             vendor: "Anker",
             identifier: "ANKER"
+        )
+        let internalHub = makeDevice(
+            productID: 1,
+            locationID: 0x0310_0000,
+            portType: Int(kIOUSBHostPortTypeInternal.rawValue),
+            deviceClass: 9
+        )
+        let d1Hub = makeDevice(
+            productID: 2,
+            // The ancestry owner must win even when an Intel AppleUSBXHCITR
+            // bus number happens to equal a different host router ID.
+            locationID: 0x0210_0000,
+            deviceClass: 9,
+            thunderboltOwnerID: d1.id
+        )
+        let ankerHub = makeDevice(
+            productID: 3,
+            locationID: 0x0210_0000,
+            deviceClass: 9
         )
         let ports = [
             ThunderboltPort(
@@ -172,6 +196,125 @@ final class USBDeviceTests: XCTestCase {
         XCTAssertEqual(device.id, "thunderbolt-4369-8738-ABC")
     }
 
+    func testSingleThunderboltDeviceOwnsUnresolvedIntelTunneledHub() {
+        let dock = makeThunderboltDevice(
+            name: "TS3 Plus",
+            vendor: "CalDigit, Inc.",
+            identifier: "CALDIGIT"
+        )
+        let hub = makeDevice(
+            locationID: 0x0010_0000,
+            deviceClass: 9,
+            isThunderboltTunneledUSB: true
+        )
+        let port = ThunderboltPort(
+            id: "port-2",
+            controllerID: 3,
+            connectorNumber: 2,
+            protocolVersion: 32,
+            maximumSpeedMbps: 40_000,
+            connectedDevice: nil
+        )
+
+        let groups = USBDeviceGroups(devices: [hub, dock], thunderboltPorts: [port])
+
+        XCTAssertEqual(
+            groups.hubGroups.first?.owner,
+            .thunderboltDevice(
+                id: dock.id,
+                displayName: "CalDigit, Inc. TS3 Plus",
+                connectorNumber: Int.max
+            )
+        )
+    }
+
+    func testGenericIntelHubUsesSoleThunderboltVendorSiblingWithoutHostPortAttachment() {
+        let dock = makeThunderboltDevice(
+            name: "TS3 Plus",
+            vendor: "CalDigit, Inc.",
+            identifier: "CALDIGIT"
+        )
+        let hub = makeDevice(
+            name: "IOUSBHostDevice",
+            productID: 1,
+            locationID: 0x0110_0000,
+            deviceClass: 9
+        )
+        let dockUSBFunction = makeDevice(
+            name: "CalDigit Thunderbolt 3 Audio",
+            vendor: "CalDigit",
+            productID: 2,
+            locationID: 0x0111_0000
+        )
+
+        let groups = USBDeviceGroups(devices: [hub, dockUSBFunction, dock])
+
+        XCTAssertEqual(
+            groups.hubGroups.first?.owner,
+            .thunderboltDevice(
+                id: dock.id,
+                displayName: "CalDigit, Inc. TS3 Plus",
+                connectorNumber: Int.max
+            )
+        )
+    }
+
+    func testGenericHubHasUnknownOwnerWithoutMatchingThunderboltVendorSibling() {
+        let dock = makeThunderboltDevice(
+            name: "TS3 Plus",
+            vendor: "CalDigit, Inc.",
+            identifier: "CALDIGIT"
+        )
+        let hub = makeDevice(
+            name: "IOUSBHostDevice",
+            productID: 1,
+            locationID: 0x0110_0000,
+            deviceClass: 9
+        )
+        let unrelatedUSBFunction = makeDevice(
+            name: "Webcam",
+            vendor: "Polycom Inc.",
+            productID: 2,
+            locationID: 0x0111_0000
+        )
+
+        let groups = USBDeviceGroups(devices: [hub, unrelatedUSBFunction, dock])
+
+        XCTAssertEqual(groups.hubGroups.first?.owner, .unknown)
+    }
+
+    func testNamedDirectHubRemainsDirectWhileThunderboltDeviceIsConnected() {
+        let dock = makeThunderboltDevice(
+            name: "TS3 Plus",
+            vendor: "CalDigit, Inc.",
+            identifier: "CALDIGIT"
+        )
+        let directHub = makeDevice(
+            name: "Standalone USB Hub",
+            vendor: "Example",
+            productID: 1,
+            locationID: 0x0110_0000,
+            deviceClass: 9
+        )
+
+        let groups = USBDeviceGroups(devices: [directHub, dock])
+
+        XCTAssertEqual(groups.hubGroups.first?.owner, .direct)
+    }
+
+    func testGenericHubRemainsDirectWithoutThunderboltAmbiguity() {
+        let directHub = makeDevice(
+            name: "IOUSBHostDevice",
+            productID: 1,
+            locationID: 0x0110_0000,
+            deviceClass: 9
+        )
+
+        let groups = USBDeviceGroups(devices: [directHub])
+
+        XCTAssertEqual(groups.hubGroups.first?.owner, .direct)
+    }
+
     func testThunderboltPortUsesConnectedProtocolAndFreePortCapability() {
         let dock = makeThunderboltDevice(
             name: "Dock",
@@ -200,7 +343,7 @@ final class USBDeviceTests: XCTestCase {
         XCTAssertEqual(freePort.protocolDescription, "Thunderbolt 5 / USB4 v2")
     }
 
-    func testUSBDeviceOnThunderboltCapableConnectorRemainsUSBOnly() {
+    func testUSBDeviceCanOccupyThunderboltCapableConnectorWithoutChangingTransport() {
         let usbDevice = makeDevice(productID: 4)
         let port = ThunderboltPort(
             id: "external-port-1",
@@ -210,10 +353,26 @@ final class USBDeviceTests: XCTestCase {
             maximumSpeedMbps: 40_000,
             connectedDevice: usbDevice
         )
-        let groups = USBDeviceGroups(devices: [usbDevice])
+        let owner = makeThunderboltDevice(
+            name: "Dock",
+            vendor: "Example",
+            identifier: "DOCK"
+        )
+        let externalGroup = ExternalThunderboltPortGroup(
+            owner: owner,
+            hostConnectorNumber: 1,
+            depth: 1,
+            ports: [port]
+        )
+        let groups = USBDeviceGroups(
+            devices: [usbDevice],
+            externalThunderboltPortGroups: [externalGroup]
+        )
 
-        XCTAssertNil(port.connectedDevice)
-        XCTAssertEqual(groups.usbDevices, [usbDevice])
+        XCTAssertEqual(port.connectedDevice, usbDevice)
+        XCTAssertEqual(port.protocolDescription, usbDevice.connectionDescription)
+        XCTAssertTrue(groups.usbDevices.isEmpty)
+        XCTAssertEqual(groups.portAttachedUSBDevices, [usbDevice])
         XCTAssertTrue(groups.thunderboltDevices.isEmpty)
         XCTAssertEqual(groups.countedExternalDeviceCount, 1)
     }
@@ -275,14 +434,18 @@ final class USBDeviceTests: XCTestCase {
     }
 
     private func makeDevice(
+        name: String = "USB Device",
+        vendor: String? = "Example",
         productID: Int = 0x5678,
         locationID: UInt32? = nil,
         portType: Int? = nil,
-        deviceClass: Int? = nil
+        deviceClass: Int? = nil,
+        thunderboltOwnerID: String? = nil,
+        isThunderboltTunneledUSB: Bool = false
     ) -> USBDevice {
         USBDevice(
-            name: "USB Device",
-            vendor: "Example",
+            name: name,
+            vendor: vendor,
             vendorId: 0x1234,
             productId: productID,
             serialNumber: nil,
@@ -292,7 +455,9 @@ final class USBDeviceTests: XCTestCase {
             usbVersionBCD: nil,
             isExternalStorage: false,
             usbPortType: portType,
-            deviceClass: deviceClass
+            deviceClass: deviceClass,
+            thunderboltOwnerID: thunderboltOwnerID,
+            isThunderboltTunneledUSB: isThunderboltTunneledUSB
         )
     }
 

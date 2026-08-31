@@ -28,7 +28,10 @@ maintained independently.
 - Physical Thunderbolt/USB4 host ports with occupancy, attached device and
   negotiated or maximum link speed
 - External Thunderbolt/USB4 ports are detected from dock topology and grouped
-  by their owning device; USB devices connected there remain under USB Devices
+  by their owning device; USB devices are shown on those ports when the
+  physical topology identifies the connection unambiguously
+- Optional MacBook power information shows battery percentage, live charging
+  watts, adapter capacity and a power-only occupied USB-C port when available
 - USB-C Billboard interfaces are identified as companion interfaces, so compatible Thunderbolt docks are not listed twice
 - Optional local Ethernet-link indicator; network traffic monitoring is not included
 - Compact device-first view without saved per-device customizations
@@ -38,7 +41,7 @@ maintained independently.
 
 ## Compatibility
 
-The current release, **PortGlance 0.3.0**, is a **Universal** app for Apple
+The current release, **PortGlance 0.4.0**, is a **Universal** app for Apple
 Silicon (`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. Automated
 checks run natively on both architectures. The physical Intel-Mac observations
 and the hardware cases that still apply after discovery changes are documented
@@ -99,8 +102,11 @@ PortGlance selbst wird unabhängig entwickelt und gepflegt.
 - Physische Thunderbolt-/USB4-Host-Ports mit Belegung, angeschlossenem Gerät
   und ausgehandelter beziehungsweise maximaler Link-Geschwindigkeit
 - Externe Thunderbolt-/USB4-Ports werden aus der Dock-Topologie erkannt und
-  nach ihrem Gerät gruppiert; dort angeschlossene USB-Geräte bleiben unter
-  USB-Geräte
+  nach ihrem Gerät gruppiert; USB-Geräte erscheinen dort an ihrem Port, wenn
+  die physische Topologie die Verbindung eindeutig bestimmt
+- Optionale MacBook-Strominformationen zeigen Akkustand, aktuelle
+  Ladeleistung, Netzteilkapazität und einen rein zur Stromversorgung belegten
+  USB-C-Port, soweit macOS diese Angaben bereitstellt
 - USB-C-Billboard-Schnittstellen werden als Begleitschnittstellen erkannt,
   sodass kompatible Thunderbolt-Docks nicht doppelt erscheinen
 - Optionale lokale Ethernet-Link-Anzeige; eine Überwachung des Netzwerkverkehrs
@@ -113,7 +119,7 @@ PortGlance selbst wird unabhängig entwickelt und gepflegt.
 
 ## Kompatibilität
 
-Der aktuelle Release **PortGlance 0.3.0** ist eine **Universal-App** für
+Der aktuelle Release **PortGlance 0.4.0** ist eine **Universal-App** für
 Apple-Silicon- (`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die
 automatischen Prüfungen laufen nativ auf beiden Architekturen. Die physischen
 Beobachtungen auf einem Intel-Mac und die nach Änderungen an der

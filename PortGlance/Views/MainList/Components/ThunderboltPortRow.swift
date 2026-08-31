@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ThunderboltPortRow: View {
     let port: ThunderboltPort
+    var isPowerSourceConnected = false
+    var powerSourceWatts: Int?
 
     var body: some View {
         HStack(spacing: 10) {
@@ -49,12 +51,25 @@ struct ThunderboltPortRow: View {
 
     private var title: String {
         guard let device = port.connectedDevice else {
+            if isPowerSourceConnected {
+                return "\(portName) · \("power_supply".localized)"
+            }
             return "\(portName) · \("port_free".localized)"
         }
-        return "\(portName) · \(device.name)"
+        return "\(portName) · \(device.displayName)"
     }
 
     private var detail: String {
+        if port.connectedDevice == nil, isPowerSourceConnected {
+            if let powerSourceWatts {
+                return String(
+                    format: "power_adapter_watts_format".localized,
+                    powerSourceWatts
+                )
+            }
+            return "power_supply".localized
+        }
+
         var parts: [String] = []
         if let vendor = port.connectedDevice?.vendor, !vendor.isEmpty {
             parts.append(vendor)
@@ -64,8 +79,11 @@ struct ThunderboltPortRow: View {
     }
 
     private var speed: String? {
-        if let speed = port.negotiatedSpeedMbps {
-            return USBFormatting.transferRate(speed)
+        if isPowerSourceConnected {
+            return nil
+        }
+        if port.connectedDevice != nil {
+            return port.negotiatedSpeedMbps.map(USBFormatting.transferRate)
         }
         if let maximum = port.maximumSpeedMbps {
             return "\("up_to".localized) \(USBFormatting.transferRate(maximum))"

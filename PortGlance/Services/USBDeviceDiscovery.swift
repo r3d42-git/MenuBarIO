@@ -16,9 +16,10 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
     static let usbDeviceClassNames = [kIOUSBHostDeviceClassName, kIOUSBDeviceClassName]
 
     func connectedTopology() -> USBTopologySnapshot {
-        let thunderboltTopology = fetchThunderboltTopology()
+        let discoveredUSBDevices = fetchUSBDevices()
+        let thunderboltTopology = fetchThunderboltTopology(usbDevices: discoveredUSBDevices)
         let thunderboltDevices = thunderboltTopology.devices
-        var devices = fetchUSBDevices().filter { usbDevice in
+        var devices = discoveredUSBDevices.filter { usbDevice in
             !thunderboltDevices.contains { thunderboltDevice in
                 representsSamePhysicalDevice(usbDevice, as: thunderboltDevice)
             }
@@ -69,7 +70,9 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
         return devices
     }
 
-    private func fetchThunderboltTopology() -> ThunderboltTopologyRecords {
+    private func fetchThunderboltTopology(
+        usbDevices: [USBDevice]
+    ) -> ThunderboltTopologyRecords {
         let matching = IOServiceMatching(USBConnectionMonitor.thunderboltClassName)
         var iterator: io_iterator_t = 0
 
@@ -103,7 +106,10 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
                     depth: properties?.intValue("Depth") ?? 1,
                     protocolVersion: properties?.intValue("Thunderbolt Version"),
                     device: device,
-                    downstreamConnectors: thunderboltDownstreamConnectors(for: entry)
+                    downstreamConnectors: thunderboltDownstreamConnectors(for: entry),
+                    usbPortMap: ThunderboltUSBPortMapEntry.entries(
+                        from: properties?.dataValue("USB Port Map")
+                    )
                 )
                 deviceRouters.append(router)
                 attachments.append(router.attachment)
@@ -117,7 +123,8 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
         )
         let externalPortGroups = makeExternalThunderboltPortGroups(
             deviceRouters: deviceRouters,
-            hostPorts: ports
+            hostPorts: ports,
+            usbDevices: usbDevices
         )
 
         return ThunderboltTopologyRecords(
@@ -129,12 +136,17 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
 
     private func makeExternalThunderboltPortGroups(
         deviceRouters: [ThunderboltDeviceRouterRecord],
-        hostPorts: [ThunderboltPort]
+        hostPorts: [ThunderboltPort],
+        usbDevices: [USBDevice]
     ) -> [ExternalThunderboltPortGroup] {
         deviceRouters.compactMap { router in
             guard !router.downstreamConnectors.isEmpty else { return nil }
 
-            let ports = router.downstreamConnectors.enumerated().map { index, connector in
+            let hostConnectorNumber =
+                hostPorts.first {
+                    $0.connectedDevice?.id == router.device.id
+                }?.connectorNumber ?? Int.max
+            let nativePorts = router.downstreamConnectors.enumerated().map { index, connector in
                 ThunderboltPort(
                     id: "external-thunderbolt-port-\(router.device.id)-\(connector.hostPortNumber)",
                     controllerID: router.controllerID ?? -1,
@@ -144,10 +156,14 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
                     connectedDevice: connector.connectedDevice
                 )
             }
-            let hostConnectorNumber =
-                hostPorts.first {
-                    $0.connectedDevice?.id == router.device.id
-                }?.connectorNumber ?? Int.max
+            let ports = USBPortAttachmentResolver.attachingUSBDevices(
+                to: nativePorts,
+                ownerID: router.device.id,
+                controllerID: router.controllerID,
+                hostConnectorNumber: hostConnectorNumber,
+                portMap: router.usbPortMap,
+                usbDevices: usbDevices
+            )
 
             return ExternalThunderboltPortGroup(
                 owner: router.device,
@@ -244,6 +260,20 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
         let productID = properties.intValue(kUSBProductID as String) ?? 0
         let registryName = registryName(for: entry) ?? "USB Device"
         let linkSpeed = deviceLinkSpeed(from: properties)
+        let topologyContext = usbTopologyContext(for: entry)
+        let locationId = properties.uint32Value(kUSBDevicePropertyLocationID as String)
+        let parentHubContext = usbParentHubContext(
+            for: entry,
+            deviceLocationId: locationId
+        )
+        let isThunderboltTunneled =
+            properties.boolValue("UsbTunnel") == true
+            || topologyContext.isThunderboltTunneled
+            || hasRegistryClass(
+                "AppleUSBXHCITR",
+                inParentPlane: "IOUSB",
+                startingAt: entry
+            )
 
         return USBDevice(
             name: properties.stringValue(kUSBProductString as String) ?? registryName,
@@ -251,7 +281,7 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
             vendorId: vendorID,
             productId: productID,
             serialNumber: properties.stringValue(kUSBSerialNumberString as String),
-            locationId: properties.uint32Value(kUSBDevicePropertyLocationID as String),
+            locationId: locationId,
             speedMbps: linkSpeed ?? speedFromIOKitCode(properties.intValue(kUSBDevicePropertySpeed as String)),
             portMaxSpeedMbps: parentPortMaxSpeed(for: entry),
             usbVersionBCD: ["bcdUSB", "kUSBDevicePropertyUSBReleaseNumber", "USB-bcdUSB"]
@@ -260,8 +290,116 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
             isExternalStorage: isExternalStorageDevice(entry),
             usbPortType: properties.intValue(kUSBHostMatchingPropertyPortType),
             deviceClass: properties.intValue("bDeviceClass"),
-            isThunderboltBillboard: containsUSBInterfaceClass(entry, 0x11)
+            isThunderboltBillboard: containsUSBInterfaceClass(entry, 0x11),
+            thunderboltOwnerID: topologyContext.thunderboltOwnerID,
+            isThunderboltTunneledUSB: isThunderboltTunneled,
+            parentHubLocationId: parentHubContext?.locationId,
+            parentHubPortNumber: parentHubContext?.portNumber
         )
+    }
+
+    private func usbParentHubContext(
+        for entry: io_registry_entry_t,
+        deviceLocationId: UInt32?
+    ) -> (locationId: UInt32, portNumber: Int)? {
+        var parent: io_registry_entry_t = 0
+        guard IORegistryEntryGetParentEntry(entry, "IOUSB", &parent) == KERN_SUCCESS else {
+            return nil
+        }
+        defer { IOObjectRelease(parent) }
+
+        guard let properties = registryProperties(for: parent),
+            properties.intValue("bDeviceClass") == 9,
+            let parentLocationId = properties.uint32Value(kUSBDevicePropertyLocationID as String),
+            let deviceLocationId,
+            let portNumber = directUSBHubPortNumber(
+                deviceLocationId: deviceLocationId,
+                parentHubLocationId: parentLocationId
+            )
+        else {
+            return nil
+        }
+
+        return (parentLocationId, portNumber)
+    }
+
+    private func directUSBHubPortNumber(
+        deviceLocationId: UInt32,
+        parentHubLocationId: UInt32
+    ) -> Int? {
+        guard deviceLocationId >> 24 == parentHubLocationId >> 24 else { return nil }
+
+        for shift in stride(from: 20, through: 0, by: -4) {
+            let deviceNibble = Int((deviceLocationId >> UInt32(shift)) & 0x0F)
+            let parentNibble = Int((parentHubLocationId >> UInt32(shift)) & 0x0F)
+            if deviceNibble != parentNibble {
+                return deviceNibble > 0 ? deviceNibble : nil
+            }
+        }
+        return nil
+    }
+
+    /// Intel Thunderbolt controllers such as AppleUSBXHCITR live below the
+    /// external Thunderbolt router in the IOService plane. Walking that real
+    /// parent chain associates their USB hubs with the dock without assuming
+    /// that a USB location-ID byte equals a Thunderbolt controller number.
+    private func usbTopologyContext(
+        for entry: io_registry_entry_t
+    ) -> (thunderboltOwnerID: String?, isThunderboltTunneled: Bool) {
+        var current = entry
+        var currentIsRetained = false
+        var isThunderboltTunneled = false
+
+        while true {
+            if registryClassName(for: current) == "AppleUSBXHCITR" {
+                isThunderboltTunneled = true
+            }
+
+            if current != entry, let device = makeThunderboltDevice(from: current) {
+                if currentIsRetained { IOObjectRelease(current) }
+                return (device.id, isThunderboltTunneled)
+            }
+
+            var parent: io_registry_entry_t = 0
+            guard IORegistryEntryGetParentEntry(current, kIOServicePlane, &parent) == KERN_SUCCESS else {
+                if currentIsRetained { IOObjectRelease(current) }
+                return (nil, isThunderboltTunneled)
+            }
+
+            if currentIsRetained { IOObjectRelease(current) }
+            current = parent
+            currentIsRetained = true
+        }
+    }
+
+    /// USB devices can participate in several IORegistry planes at once. On
+    /// Intel Macs, `ioreg -p IOUSB` exposes AppleUSBXHCITR as the hub's parent
+    /// even when the IOService provider chain does not. Follow that USB-plane
+    /// topology explicitly instead of treating both planes as interchangeable.
+    private func hasRegistryClass(
+        _ className: String,
+        inParentPlane plane: String,
+        startingAt entry: io_registry_entry_t
+    ) -> Bool {
+        var current = entry
+        var currentIsRetained = false
+
+        while true {
+            if registryClassName(for: current) == className {
+                if currentIsRetained { IOObjectRelease(current) }
+                return true
+            }
+
+            var parent: io_registry_entry_t = 0
+            guard IORegistryEntryGetParentEntry(current, plane, &parent) == KERN_SUCCESS else {
+                if currentIsRetained { IOObjectRelease(current) }
+                return false
+            }
+
+            if currentIsRetained { IOObjectRelease(current) }
+            current = parent
+            currentIsRetained = true
+        }
     }
 
     private func makeThunderboltDevice(from entry: io_registry_entry_t) -> USBDevice? {
@@ -625,6 +763,12 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
         guard IORegistryEntryGetName(entry, &name) == KERN_SUCCESS else { return nil }
         return String(cString: name)
     }
+
+    private func registryClassName(for entry: io_registry_entry_t) -> String? {
+        var name = [CChar](repeating: 0, count: 128)
+        guard IOObjectGetClass(entry, &name) == KERN_SUCCESS else { return nil }
+        return String(cString: name)
+    }
 }
 
 struct USBTopologySnapshot: Equatable {
@@ -667,6 +811,7 @@ private struct ThunderboltDeviceRouterRecord {
     let protocolVersion: Int?
     let device: USBDevice
     let downstreamConnectors: [ThunderboltConnectorRecord]
+    let usbPortMap: [ThunderboltUSBPortMapEntry]
 
     var attachment: ThunderboltDeviceAttachment {
         ThunderboltDeviceAttachment(
@@ -703,6 +848,14 @@ private struct RegistryProperties {
 
     func doubleValue(_ key: String) -> Double? {
         numberValue(key)?.doubleValue
+    }
+
+    func boolValue(_ key: String) -> Bool? {
+        numberValue(key)?.boolValue
+    }
+
+    func dataValue(_ key: String) -> Data? {
+        values[key] as? Data
     }
 
     func stringValue(_ key: String) -> String? {

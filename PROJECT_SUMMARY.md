@@ -6,7 +6,7 @@ PortGlance is a local-only macOS menu-bar app for showing connected USB,
 Thunderbolt/USB4 and Bluetooth devices. It targets macOS 13 or newer and does
 not contain telemetry, analytics, update checks or network client code.
 
-The current product version is `0.3.0` (build 7). Releases are prepared from a
+The current product version is `0.4.0` (build 8). Releases are prepared from a
 reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target, project and test target are named
 `PortGlance`. The legacy app bundle identifier `de.r3d.menubarusb.tb` remains
@@ -69,6 +69,160 @@ transport can populate a Thunderbolt port row. The complete local verification,
 Universal build, launch smoke test and visual inspection passed; no new version
 or release was created.
 
+That transport-only presentation was revised after physical testing showed why
+the Anker dock's three downstream ports looked empty while carrying USB
+devices. PortGlance now parses the router's Thunderbolt DROM `USB Port Map` and
+combines it with the direct IOUSB parent-hub path. A USB device is attached to
+an external multi-protocol port only when the dock is itself linked to a known
+host port, tunnel evidence exists, the DROM maps that connector to the observed
+companion-hub port and exactly one device matches. Native Thunderbolt remains
+higher priority and every ambiguous case stays unassigned. The local M4 Pro Mac
+mini check assigned Maono Wireless Mic RX, ASM1352R-Fast and Loupedeck Live S to
+Anker Ports 1, 2 and 3 with their actual USB protocols and rates. YubiKey stayed
+under the renamed **Other USB Devices** group because the dock's front USB-A
+port is USB-only in the DROM map. Attached USB devices are removed from that
+residual list without changing the overall count. Intel docks whose native
+host-port relationship is missing, including the observed TS3 Plus topology,
+are deliberately left unchanged instead of being guessed. Unit tests cover the
+Anker map, USB-only socket, native-Thunderbolt priority, ambiguity rejection and
+Intel safeguard. The complete local verification, Universal build, launch
+smoke test and visual inspection passed. Apple accepted the standalone test app
+under submission `dcbd88ba-1d31-4c72-ab60-29048bdc8c94`; its ticket was
+stapled before packaging `PortGlance-Port-Assignment-Test-2026-08-31-v6.zip`,
+SHA-256 `57b6604901423dfda9c044e5cc23f9e654ddc8abfc206a6c46b4686462aefaa8`.
+The app re-extracted from that exact ZIP passed strict signature, physical
+ticket, Gatekeeper and both-architecture verification. No new version or
+release was created.
+
+Physical Intel/T2 testing of that v6 artifact also passed, but exposed one
+remaining host-port ambiguity: a directly connected 100 W USB-C power adapter
+correctly appeared in the power-supply row while its occupied Thunderbolt port
+still said Free because a power-only USB-C PD connection creates no USB or
+Thunderbolt data device. Follow-up registry captures established a conservative
+model-specific bridge. `AppleSmartBattery.PortControllerInfo` contains exactly
+one winning controller with an active PD state, a nonzero FET status and a
+positive maximum power value. Moving the adapter from visible Port 2 to Port 1
+changed that winner from array position 0 to 1, while `BestAdapterIndex` stayed
+0 and was therefore rejected as a physical-port signal. Four `AppleHPMDevice`
+records identify the same controllers by `RID` and `Address`; root
+`IOThunderboltSwitch` records map each router's ordered connector pair to the
+existing visible `Socket ID` numbers. PortGlance now combines those three
+sources and labels an otherwise empty matching row **Port N · Power supply**
+with the rated adapter wattage. It returns no port at all unless the contract,
+controller and Thunderbolt topologies are complete, unique and internally
+consistent. Existing USB and native Thunderbolt occupants always retain
+priority. Five focused resolver tests cover both controller sides and rejection
+of incomplete or multiple-winner data; the full 58-test gate, static analysis
+and Universal build passed. Apple accepted the standalone test app under
+submission `b98bddbc-253f-4f07-b05a-84d8018957a3`; its ticket was stapled
+before packaging `PortGlance-Power-Port-Test-2026-08-31-v7.zip`, SHA-256
+`f0e33d36da497c7cce5aa04b402da601f469d454990d9ff319a755f52355decf`.
+The app re-extracted from that exact ZIP passed strict signature, physical
+ticket, Gatekeeper and both-architecture verification. Physical Intel/T2
+validation of that exact v7 artifact subsequently confirmed the 100 W adapter
+on each of the four host ports, with the previous assignment clearing after
+every move. The TS3 Plus and TDAS remained the visible data occupants while
+supplying power, confirming that USB, Thunderbolt and dock occupancy retains
+priority over the power-only label. No new product version or public release
+was created.
+
+A physical Intel/T2 MacBook follow-up confirmed that its eight built-in USB
+functions attach directly below `AppleUSBVHCIBCE`; it exposes no intervening
+class-9 USB hub device. PortGlance therefore correctly reports zero USB hubs on
+that machine even though each host controller necessarily provides root-port
+functionality. To make the resulting list clearer without guessing hardware
+identities, the group is now named Internal USB Components and a raw
+`IOUSBHostDevice`/`IOUSBDevice` registry fallback is displayed as Unnamed
+Internal USB Component. The original registry name remains available when
+device details are copied.
+
+The optional power-supply row now combines battery percentage with live charging
+power and the attached adapter wattage when macOS provides those values. It uses
+the public IOPowerSources current and voltage keys to calculate actual battery
+charging power, and `IOPSCopyExternalPowerAdapterDetails` for the adapter's
+rated wattage. The measurement refreshes every five seconds while the feature
+is enabled. Missing values are omitted instead of estimated; macOS does not
+reliably expose an adapter marketing name or manufacturer through this API. The
+complete local verification, Universal build and launch smoke test passed. Apple
+accepted the standalone test app under submission
+`aa29ea83-811c-4cdb-b240-a8bcc29e3d2f`; its ticket was stapled before the final
+Universal ZIP was created and independently re-extracted and verified. The test
+ZIP is `PortGlance-MacBook-Test-2026-08-31.zip`, SHA-256
+`b04b11a273e1124ced9468042eb118e7b43fbd3990a8929b9c359d1ae12b0c6c`.
+Physical Intel validation of that artifact confirmed an 87 W supply through a
+CalDigit TS3 Plus dock and a separate 100 W adapter at a full battery. The row
+correctly omitted live charging power at 100%; live charging-power validation
+therefore remained pending until the battery was below its charging threshold.
+A later check at 86% confirmed active charging but still showed no live watts:
+the Intel/T2 IOPowerSources description omitted its public `Current` value.
+The already captured `AppleSmartBattery` properties did expose
+`InstantAmperage = 997 mA` and `Voltage = 12618 mV`, which represents about
+12.6 W of actual battery charging power. PortGlance now prefers the public
+current and voltage values, then uses positive `InstantAmperage` with the
+battery voltage only when that calculation is unavailable; averaged
+`Amperage` is considered only when the instantaneous field itself is absent.
+Zero, negative or incomplete values produce no wattage, and charger target
+current is never presented as an actual measurement. Six additional tests
+cover this priority and rejection behavior; all 64 tests, static analysis, the
+Universal build and launch smoke test passed. Apple accepted the standalone
+test app under submission `14534bdd-6ca2-4521-8d71-7c9b7dfb51e7`; its ticket
+was stapled before packaging
+`PortGlance-Charging-Power-Test-2026-08-31-v8.zip`, SHA-256
+`83b05e6580c33705067a7b6c6758b638c98a97c17a96600666b2caff5625048a`.
+The app re-extracted from that exact ZIP passed strict signature, physical
+ticket, Gatekeeper and both-architecture verification. Physical Intel/T2
+validation of that exact v8 artifact subsequently showed **Charging at 10 W ·
+100 W adapter** at 79% and **Charging at 41 W · 100 W adapter** at 80%, while
+the power-only connector remained assigned to Port 2. The changing value
+confirmed that the five-second refresh reports the live battery-side charging
+measurement rather than the adapter rating. No new product version or public
+release had been created at that test stage.
+The dock, its downstream Thunderbolt port, five USB functions and two USB hub
+functions were detected. Both dock hubs initially appeared under Directly
+Connected USB Hubs because Intel `AppleUSBXHCITR` bus numbers do not identify
+the physical Thunderbolt host router. A second physical test showed that the
+v2 attempt still left both hubs in that group: on this Intel Mac the tunneled
+controller is visible in the `IOUSB` registry plane used by `ioreg -p IOUSB`,
+but not in the IOService parent chain that v2 inspected. Discovery now follows
+both planes independently and also consumes the direct `UsbTunnel` property
+when macOS supplies it. Physical testing showed that v3 still left both hubs in
+the direct group, while the unchanged M4 Pro Mac mini mapping continued to
+work. The remaining Intel difference is that the CalDigit Thunderbolt router
+is present without being attached to a host-port model. The final v4 fallback
+therefore also resolves an explicit tunneled hub against the discovered native
+Thunderbolt devices. For a generic `IOUSBHostDevice` hub lacking that signal,
+it requires one native Thunderbolt device plus a same-controller USB sibling
+whose vendor matches that Thunderbolt device; otherwise the hub remains direct
+or unknown. This keeps the inference restricted to the observed Intel topology
+instead of assigning every unresolved hub. Regression tests cover explicit
+ancestry precedence, tunnel-based ownership, the same-controller vendor match
+and the no-match safeguard. The complete verification and Universal launch
+build passed. Apple accepted the final v4 test app under submission
+`7f1d2fd1-4f82-48d2-928a-ea145bd51da0`; its ticket was stapled before creating
+`PortGlance-MacBook-Hub-Test-2026-08-31-v4.zip`, SHA-256
+`fb4a4b407ef35b7dbe8242f4dedf8da7b7f8c740c766ecb5c1e5ea4a92717bfc`. The app
+re-extracted from that final ZIP passed strict code-signature, physical-ticket,
+Gatekeeper and both-architecture verification. Physical v4 testing assigned
+the 480 Mbps hub to the CalDigit TS3 Plus through the constrained vendor
+evidence, while the generic 12 Mbps hub remained in the direct group. This
+partial result confirms that macOS does not expose enough ownership evidence
+for the second hub. The v5 presentation now separates this ambiguity from the
+existing direct cases: ordinary named hubs and generic hubs without any native
+Thunderbolt topology remain under Directly Connected USB Hubs, while a generic
+unresolved registry entry in the presence of native Thunderbolt devices appears
+under USB Hubs with Unknown Assignment. Existing internal and Thunderbolt owner
+paths are unchanged. Regression tests cover all four outcomes. Apple accepted
+the v5 test app under submission `4b1b1153-f924-4002-84c2-6b3f3570de78`; its
+ticket was stapled before creating
+`PortGlance-MacBook-Hub-Test-2026-08-31-v5.zip`, SHA-256
+`594b615d24a61cc328b8fd01180d42ced5f628ae7d7fcee891f975ea3a480132`. The app
+re-extracted from that final ZIP passed strict code-signature, physical-ticket,
+Gatekeeper and both-architecture verification. Physical Intel testing of that
+exact v5 artifact confirmed the intended final presentation: the 480 Mbps hub
+remained below CalDigit, Inc. TS3 Plus and the unresolved 12 Mbps hub appeared
+below USB Hubs with Unknown Assignment. No new product version or public
+release was created.
+
 The System Information button is now always available in the device-list
 footer, so its setting, stored preference, hide action and localization strings
 were removed as well. All remaining settings are presented in one flat view
@@ -125,6 +279,17 @@ The always-visible app-language explanation was also removed because the
 description arguments and the now-unused Info color asset and localization keys
 were deleted. The complete local verification and launch smoke test passed; no
 new version or release was created.
+
+Version 0.4.0 packages the Intel/T2 MacBook work, conservative USB ownership
+and downstream-port attachment, power-only USB-C port occupancy and live
+battery charging power into one feature release. It preserves native
+Thunderbolt and USB device-count semantics, declines ambiguous assignments and
+keeps all hardware inspection local. The release candidate passed all 64
+tests, static analysis, the Universal build and launch smoke test. Physical
+acceptance covered the M4 Pro Mac mini topology plus the Intel/T2 MacBook's
+internal components, CalDigit hub ownership, unknown-hub fallback, all four
+power-only host ports, TS3 Plus and TDAS data-priority cases, and dynamic 10 W
+to 41 W charging measurements with a 100 W adapter.
 
 Version 0.3.0 packages the device-row metadata and USB/Thunderbolt topology
 work into a feature release. It was published on 2026-08-31 as the signed,
@@ -191,8 +356,10 @@ publicly downloaded artifact passed the independent release verification.
 USB and Thunderbolt identities must remain stable across refreshes. Internal
 devices and USB hubs do not count toward the external-device total. Thunderbolt
 devices remain in that total but are rendered only in the physical port group,
-not in USB Devices. Bluetooth devices count separately. The visible group order
-is Thunderbolt/USB4 host ports, external Thunderbolt/USB4 ports, USB devices,
+not in Other USB Devices. Safely mapped USB devices likewise remain counted but
+are rendered at the external multi-protocol port instead of in the residual
+list. Bluetooth devices count separately. The visible group order is
+Thunderbolt/USB4 host ports, external Thunderbolt/USB4 ports, Other USB Devices,
 Bluetooth devices, internal devices, then USB hubs.
 
 ## Verification
@@ -224,7 +391,7 @@ angeschlossener USB-, Thunderbolt-/USB4- und Bluetooth-Geräte. Sie unterstützt
 macOS 13 oder neuer und enthält weder Telemetrie noch Analysen,
 Update-Abfragen oder Netzwerk-Client-Code.
 
-Die aktuelle Produktversion ist `0.3.0` (Build 7). Releases werden auf einem
+Die aktuelle Produktversion ist `0.4.0` (Build 8). Releases werden auf einem
 geprüften Branch vorbereitet und vor dem Tagging in den geschützten Branch
 `main` integriert.
 Produkt, Programmdatei, Target, Projekt und Test-Target heißen `PortGlance`.
@@ -349,6 +516,169 @@ Thunderbolt-Portzeile belegen. Die vollständige lokale Prüfung, der
 Universal-Build, der Starttest und die Sichtprüfung waren erfolgreich; es wurde
 keine neue Version und kein Release erstellt.
 
+Diese rein transportbezogene Darstellung wurde nach der physischen Beobachtung
+überarbeitet, dass die drei nachgelagerten Anker-Ports trotz angeschlossener
+USB-Geräte leer wirkten. PortGlance wertet jetzt die Thunderbolt-DROM-Eigenschaft
+`USB Port Map` des Routers zusammen mit dem direkten IOUSB-Elternhubpfad aus.
+Ein USB-Gerät wird einem externen Mehrprotokoll-Port nur zugeordnet, wenn das
+Dock selbst an einem bekannten Hostport hängt, ein Tunnelhinweis vorliegt, die
+DROM-Map den Anschluss mit dem beobachteten Begleithub-Port verbindet und genau
+ein Gerät passt. Nativer Thunderbolt-Transport hat Vorrang; jeder mehrdeutige
+Fall bleibt unzugeordnet. Die lokale Prüfung am M4-Pro-Mac-mini ordnete Maono
+Wireless Mic RX, ASM1352R-Fast und Loupedeck Live S den Anker-Ports 1, 2 und 3
+mit den tatsächlichen USB-Protokollen und Geschwindigkeiten zu. Der YubiKey
+blieb in der umbenannten Gruppe **Weitere USB-Geräte**, weil der vordere
+USB-A-Port des Docks laut DROM-Map nur USB unterstützt. Zugeordnete USB-Geräte
+verschwinden aus dieser Restliste, ohne den Gesamtzähler zu verändern. Bei
+Intel-Docks ohne native Hostportbeziehung, darunter die beobachtete TS3-Plus-
+Topologie, wird bewusst nichts geraten und die bisherige Darstellung bleibt
+erhalten. Unit-Tests decken Anker-Map, reine USB-Buchse, Thunderbolt-Vorrang,
+Mehrdeutigkeitsabbruch und Intel-Absicherung ab. Die vollständige lokale
+Prüfung, der Universal-Build, der Starttest und die Sichtprüfung waren
+erfolgreich. Apple akzeptierte die eigenständige Test-App unter der
+Einreichungs-ID `dcbd88ba-1d31-4c72-ab60-29048bdc8c94`; ihr Ticket wurde vor
+dem Erzeugen von `PortGlance-Port-Assignment-Test-2026-08-31-v6.zip` gestapelt.
+Das ZIP hat den SHA-256
+`57b6604901423dfda9c044e5cc23f9e654ddc8abfc206a6c46b4686462aefaa8`. Die
+daraus erneut entpackte App bestand die strenge Signatur-, physische Ticket-,
+Gatekeeper- und Architekturprüfung. Es wurde keine neue Version und kein
+Release erstellt.
+
+Die physische Intel-/T2-Prüfung dieses v6-Artefakts war ebenfalls erfolgreich,
+zeigte aber eine verbleibende Mehrdeutigkeit am Hostanschluss: Ein direkt
+angeschlossenes 100-W-USB-C-Netzteil erschien korrekt in der Zeile zur
+Stromversorgung, während sein belegter Thunderbolt-Port **Frei** meldete, weil
+eine reine USB-C-PD-Verbindung kein USB- oder Thunderbolt-Datengerät erzeugt.
+Registry-Aufnahmen beim Umstecken von Port 2 auf Port 1 belegen eine
+konservative, modellspezifische Zuordnung aus `PortControllerInfo`,
+`AppleHPMDevice` sowie den geordneten `Socket ID`-Einträgen der
+Thunderbolt-Root-Router. PortGlance kennzeichnet damit einen ansonsten leeren,
+eindeutig zugeordneten Anschluss als **Port N · Stromversorgung** und zeigt die
+Netzteilleistung an. Bei unvollständigen, widersprüchlichen oder mehrdeutigen
+Daten wird keine Zuordnung behauptet; bestehende USB- und native
+Thunderbolt-Belegungen haben stets Vorrang. Fünf fokussierte Resolver-Tests
+decken beide Controllerseiten und die Abbruchfälle ab; alle 58 Tests, die
+statische Analyse und der Universal-Build waren erfolgreich. Apple akzeptierte
+die eigenständige Test-App unter der Einreichungs-ID
+`b98bddbc-253f-4f07-b05a-84d8018957a3`; ihr Ticket wurde vor dem Erzeugen von
+`PortGlance-Power-Port-Test-2026-08-31-v7.zip` gestapelt. Das ZIP hat den
+SHA-256 `f0e33d36da497c7cce5aa04b402da601f469d454990d9ff319a755f52355decf`.
+Die daraus erneut entpackte App bestand die strenge Signatur-, physische
+Ticket-, Gatekeeper- und Architekturprüfung. Die anschließende physische
+Intel-/T2-Prüfung genau dieses v7-Artefakts erkannte das 100-W-Netzteil an
+jedem der vier Hostanschlüsse und entfernte die vorherige Zuordnung nach jedem
+Umstecken. TS3 Plus und TDAS blieben beim gleichzeitigen Bereitstellen von
+Strom als Datenbelegung sichtbar; USB-, Thunderbolt- und Dock-Belegungen haben
+damit bestätigt Vorrang vor der Kennzeichnung für reine Stromversorgung. Es
+wurde keine neue Produktversion und kein öffentlicher Release erstellt.
+
+Eine anschließende physische Prüfung auf einem Intel-/T2-MacBook bestätigte,
+dass dessen acht integrierte USB-Funktionen direkt unter
+`AppleUSBVHCIBCE` hängen; ein dazwischenliegendes USB-Hub-Gerät der Klasse 9
+wird nicht bereitgestellt. PortGlance zeigt auf diesem Mac daher trotz der
+notwendigen Root-Port-Funktion der Hostcontroller korrekt null USB-Hubs an. Für
+eine verständlichere Darstellung ohne erratene Hardwareidentitäten heißt die
+Gruppe nun Interne USB-Komponenten; ein roher Registry-Ersatzname
+`IOUSBHostDevice` beziehungsweise `IOUSBDevice` erscheint als Unbenannte
+interne USB-Komponente. Beim Kopieren der Gerätedetails bleibt der ursprüngliche
+Registry-Name erhalten.
+
+Die optionale Zeile zur Stromversorgung verbindet den Akkustand nun mit der
+aktuellen Ladeleistung und der Leistung des angeschlossenen Netzteils, sofern
+macOS diese Werte bereitstellt. Die tatsächliche Batterieladeleistung wird aus
+den öffentlichen IOPowerSources-Werten für Strom und Spannung berechnet; die
+Netzteil-Nennleistung stammt aus `IOPSCopyExternalPowerAdapterDetails`. Bei
+aktivierter Funktion werden die Werte alle fünf Sekunden aktualisiert. Fehlende
+Angaben werden nicht geschätzt, und einen Marketingnamen oder Hersteller des
+Netzteils stellt diese API nicht verlässlich bereit. Die vollständige lokale
+Prüfung, der Universal-Build und der Starttest waren erfolgreich. Apple
+akzeptierte die eigenständige Test-App unter der Einreichungs-ID
+`aa29ea83-811c-4cdb-b240-a8bcc29e3d2f`; ihr Ticket wurde vor dem Erzeugen des
+finalen Universal-ZIP gestapelt und die daraus erneut entpackte App anschließend
+unabhängig geprüft. Das Test-ZIP
+`PortGlance-MacBook-Test-2026-08-31.zip` hat den SHA-256
+`b04b11a273e1124ced9468042eb118e7b43fbd3990a8929b9c359d1ae12b0c6c`.
+Die physische Intel-Prüfung dieses Artefakts bestätigte 87 W über ein CalDigit
+TS3 Plus Dock und ein separates 100-W-Netzteil bei vollem Akku. Die Zeile
+blendete bei 100 % korrekt keine aktuelle Ladeleistung ein; deren physische
+Prüfung blieb deshalb offen, bis der Akku wieder unterhalb seiner Ladeschwelle
+lag. Eine spätere Prüfung bei 86 % bestätigte aktives Laden, zeigte aber
+weiterhin keine Ladeleistung: In der IOPowerSources-Beschreibung des Intel-/T2-
+MacBooks fehlte der öffentliche Wert `Current`. Die bereits erfassten
+`AppleSmartBattery`-Eigenschaften stellten dagegen `InstantAmperage = 997 mA`
+und `Voltage = 12618 mV` bereit, entsprechend rund 12,6 W tatsächlicher
+Batterieladeleistung. PortGlance bevorzugt weiterhin die öffentlichen Strom-
+und Spannungswerte und verwendet nur dann einen positiven
+`InstantAmperage`-Wert zusammen mit der Batteriespannung, wenn diese Berechnung
+nicht möglich ist. Der gemittelte Wert `Amperage` wird nur berücksichtigt, wenn
+das momentane Feld selbst fehlt. Null, negative oder unvollständige Werte
+erzeugen keine Wattangabe; der Soll-Ladestrom des Netzteils wird nie als
+tatsächliche Messung ausgegeben. Sechs zusätzliche Tests decken diese
+Priorität und die Abbruchfälle ab; alle 64 Tests, die statische Analyse, der
+Universal-Build und der Starttest waren erfolgreich. Apple akzeptierte die
+eigenständige Test-App unter der Einreichungs-ID
+`14534bdd-6ca2-4521-8d71-7c9b7dfb51e7`; ihr Ticket wurde vor dem Erzeugen von
+`PortGlance-Charging-Power-Test-2026-08-31-v8.zip` gestapelt. Das ZIP hat den
+SHA-256 `83b05e6580c33705067a7b6c6758b638c98a97c17a96600666b2caff5625048a`.
+Die daraus erneut entpackte App bestand die strenge Signatur-, physische
+Ticket-, Gatekeeper- und Architekturprüfung. Die physische Intel-/T2-Abnahme
+genau dieses v8-Artefakts zeigte anschließend bei 79 % **Lädt mit 10 W ·
+100-W-Netzteil** und bei 80 % **Lädt mit 41 W · 100-W-Netzteil**, während der
+rein zur Stromversorgung belegte Anschluss weiter Port 2 zugeordnet blieb. Der
+wechselnde Wert bestätigt, dass die Aktualisierung im Fünf-Sekunden-Takt die
+aktuelle batterieseitige Ladeleistung und nicht die Netzteilkapazität anzeigt.
+In diesem Testschritt wurde noch keine neue Produktversion und kein öffentlicher
+Release erstellt. Das Dock,
+sein nachgelagerter Thunderbolt-Port, fünf USB-Funktionen und
+zwei USB-Hub-Funktionen wurden erkannt. Beide Dock-Hubs erschienen zunächst
+unter Direkt angeschlossene USB-Hubs, weil die Busnummern von Intel
+`AppleUSBXHCITR` nicht den physischen Thunderbolt-Hostrouter bezeichnen. Eine
+zweite physische Prüfung zeigte, dass auch der v2-Versuch beide Hubs in dieser
+Gruppe beließ: Auf diesem Intel-Mac ist der getunnelte Controller in der durch
+`ioreg -p IOUSB` dargestellten IOUSB-Registry-Ebene sichtbar, aber nicht in der
+von v2 geprüften IOService-Elternkette. Die Erkennung verfolgt beide Ebenen nun
+getrennt und wertet zusätzlich die direkte Eigenschaft `UsbTunnel` aus, falls
+macOS sie bereitstellt. Die physische Prüfung zeigte, dass auch v3 beide Hubs in
+der direkten Gruppe beließ, während die unveränderte Zuordnung auf dem
+M4-Pro-Mac-mini weiterhin funktionierte. Der verbleibende Intel-Unterschied ist,
+dass der CalDigit-Thunderbolt-Router vorhanden ist, ohne im Host-Port-Modell
+angehängt zu sein. Der abschließende v4-Rückfall löst deshalb einen ausdrücklich
+getunnelten Hub auch gegen die erkannten nativen Thunderbolt-Geräte auf. Für
+einen generischen `IOUSBHostDevice`-Hub ohne dieses Signal verlangt er genau ein
+natives Thunderbolt-Gerät sowie eine USB-Funktion desselben Controllers, deren
+Hersteller zum Thunderbolt-Gerät passt; andernfalls bleibt der Hub direkt oder
+unbekannt. Die Ableitung bleibt damit auf die beobachtete Intel-Topologie
+beschränkt, statt jeden unaufgelösten Hub zuzuordnen. Regressionstests decken
+den Vorrang der expliziten Abstammung, getunnelten Besitz, den
+Herstellerabgleich auf demselben Controller und die Absicherung ohne Treffer ab.
+Die vollständige Prüfung und der Universal-Starttest waren erfolgreich. Apple
+akzeptierte die abschließende v4-Test-App unter der Einreichungs-ID
+`7f1d2fd1-4f82-48d2-928a-ea145bd51da0`; ihr Ticket wurde vor dem Erzeugen von
+`PortGlance-MacBook-Hub-Test-2026-08-31-v4.zip` gestapelt. Das ZIP hat den
+SHA-256 `fb4a4b407ef35b7dbe8242f4dedf8da7b7f8c740c766ecb5c1e5ea4a92717bfc`. Die
+daraus erneut entpackte App bestand die strenge Signatur-, physische Ticket-,
+Gatekeeper- und Architekturprüfung. Die physische v4-Prüfung ordnete den
+480-Mbit/s-Hub anhand des eng begrenzten Herstellerhinweises dem CalDigit TS3
+Plus zu; der generische 12-Mbit/s-Hub blieb in der direkten Gruppe. Dieses
+Teilergebnis bestätigt, dass macOS für den zweiten Hub nicht genügend
+Besitzinformationen bereitstellt. Die v5-Darstellung trennt diese Unklarheit
+nun von den bestehenden direkten Fällen: normal benannte Hubs und generische Hubs
+ohne native Thunderbolt-Topologie bleiben unter Direkt angeschlossene
+USB-Hubs; ein generischer, nicht auflösbarer Registry-Eintrag bei vorhandenen
+nativen Thunderbolt-Geräten erscheint unter USB-Hubs mit unbekannter Zuordnung.
+Bestehende interne und Thunderbolt-Zuordnungen bleiben unverändert.
+Regressionstests decken alle vier Ergebnisse ab. Apple akzeptierte die
+v5-Test-App unter der Einreichungs-ID
+`4b1b1153-f924-4002-84c2-6b3f3570de78`; ihr Ticket wurde vor dem Erzeugen von
+`PortGlance-MacBook-Hub-Test-2026-08-31-v5.zip` gestapelt. Das ZIP hat den
+SHA-256 `594b615d24a61cc328b8fd01180d42ced5f628ae7d7fcee891f975ea3a480132`. Die
+daraus erneut entpackte App bestand die strenge Signatur-, physische Ticket-,
+Gatekeeper- und Architekturprüfung. Die physische Intel-Prüfung genau dieses
+v5-Artefakts bestätigte die beabsichtigte endgültige Darstellung: Der
+480-Mbit/s-Hub blieb unter CalDigit, Inc. TS3 Plus und der nicht auflösbare
+12-Mbit/s-Hub erschien unter USB-Hubs mit unbekannter Zuordnung. Es wurde weder
+eine neue Produktversion noch ein öffentlicher Release erstellt.
+
 Die drei verbliebenen Schalterzeilen wurden nach dem Audit weiter vereinfacht.
 Ihre bisherigen blauen Info-Schaltflächen und aufklappbaren Beschreibungen
 wurden durch vollständige, handlungsorientierte Bezeichnungen ersetzt: „Beim
@@ -360,6 +690,19 @@ Beschreibungsparameter sowie das nun ungenutzte Info-Farbasset und die
 zugehörigen Übersetzungsschlüssel wurden gelöscht. Die vollständige lokale
 Prüfung und der Starttest waren erfolgreich; es wurde keine neue Version und
 kein Release erstellt.
+
+Version 0.4.0 bündelt die Intel-/T2-MacBook-Arbeiten, die konservative
+USB-Zuordnung zu Besitzern und nachgelagerten Ports, die Belegung eines
+USB-C-Ports allein durch Stromversorgung und die aktuelle Batterieladeleistung
+in einem Funktionsrelease. Native Thunderbolt-Belegungen und die Semantik der
+Gerätezähler bleiben erhalten; mehrdeutige Zuordnungen werden nicht behauptet
+und alle Hardwaredaten bleiben lokal. Der Release-Kandidat bestand alle 64
+Tests, die statische Analyse, den Universal-Build und den Starttest. Die
+physische Abnahme umfasste die Topologie am M4-Pro-Mac-mini sowie auf dem
+Intel-/T2-MacBook die internen Komponenten, die CalDigit-Hub-Zuordnung, den
+Fallback für unbekannte Hubs, alle vier rein zur Stromversorgung belegten
+Host-Ports, den Vorrang der Datenbelegung bei TS3 Plus und TDAS und die
+dynamischen Messwerte von 10 W bis 41 W mit einem 100-W-Netzteil.
 
 Version 0.3.0 bündelt die Metadaten der Gerätezeilen und die neue
 USB-/Thunderbolt-Topologie in einem Funktionsrelease. Er wurde am 31.08.2026 als
@@ -434,10 +777,12 @@ veröffentlicht. Das Release-Artefakt `PortGlance-0.2.0-mac.dmg` hat den SHA-256
 USB- und Thunderbolt-Identitäten müssen über Aktualisierungen hinweg stabil
 bleiben. Interne Geräte und USB-Hubs zählen nicht zum Zähler externer Geräte.
 Thunderbolt-Geräte bleiben Teil dieses Zählers, werden aber nur in der Gruppe
-der physischen Ports und nicht unter USB-Geräte dargestellt. Bluetooth-Geräte
-werden getrennt gezählt. Die sichtbare Gruppenreihenfolge lautet
-Thunderbolt-/USB4-Hostports, externe Thunderbolt-/USB4-Ports, USB-Geräte,
-Bluetooth-Geräte, interne Geräte und USB-Hubs.
+der physischen Ports und nicht unter Weitere USB-Geräte dargestellt. Sicher
+zugeordnete USB-Geräte bleiben ebenfalls gezählt, erscheinen aber am externen
+Mehrprotokoll-Port statt in dieser Restliste. Bluetooth-Geräte werden getrennt
+gezählt. Die sichtbare Gruppenreihenfolge lautet Thunderbolt-/USB4-Hostports,
+externe Thunderbolt-/USB4-Ports, Weitere USB-Geräte, Bluetooth-Geräte, interne
+Geräte und USB-Hubs.
 
 ## Prüfung
 

@@ -77,7 +77,13 @@ struct MainListDeviceList: View {
 
         if thunderboltPortGroupExpanded {
             ForEach(manager.thunderboltPorts) { port in
-                ThunderboltPortRow(port: port)
+                ThunderboltPortRow(
+                    port: port,
+                    isPowerSourceConnected:
+                        port.connectedDevice == nil
+                        && manager.powerSourceConnectorNumber == port.connectorNumber,
+                    powerSourceWatts: manager.adapterPowerWatts
+                )
             }
         }
     }

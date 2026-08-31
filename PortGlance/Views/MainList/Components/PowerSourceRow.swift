@@ -12,12 +12,21 @@ struct PowerSourceRow: View {
             let percentage = manager.chargePercentage
         {
             HStack {
-                Text((powerSupplyAsCharger ? "charger" : "power_supply").localized)
-                    .font(.system(size: 18, weight: .semibold))
+                VStack(alignment: .leading, spacing: 3) {
+                    Text((powerSupplyAsCharger ? "charger" : "power_supply").localized)
+                        .font(.system(size: 18, weight: .semibold))
+
+                    if !powerDetails.isEmpty {
+                        Text(powerDetails)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                }
 
                 Spacer()
 
-                Image(systemName: percentage == 100 ? "battery.100percent" : "bolt.fill")
+                Image(systemName: manager.batteryIsCharging ? "bolt.fill" : "battery.100percent")
                     .font(.system(size: 10))
                 Text("\(percentage)%")
                     .font(.system(size: 12, weight: .semibold))
@@ -35,5 +44,18 @@ struct PowerSourceRow: View {
 
             Divider()
         }
+    }
+
+    private var powerDetails: String {
+        var parts: [String] = []
+
+        if let watts = manager.chargingPowerWatts {
+            parts.append(String(format: "charging_at_watts_format".localized, watts))
+        }
+        if let watts = manager.adapterPowerWatts {
+            parts.append(String(format: "power_adapter_watts_format".localized, watts))
+        }
+
+        return parts.joined(separator: " · ")
     }
 }
