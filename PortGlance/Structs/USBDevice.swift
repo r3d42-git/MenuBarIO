@@ -46,6 +46,20 @@ struct USBDevice: Identifiable, Equatable, Hashable {
     let transportVersion: String?
     /// Stable bus-specific ID. Thunderbolt UIDs must not be shown as USB serial numbers.
     let transportIdentifier: String?
+    /// Stable ID of the native Thunderbolt device found in this USB device's
+    /// IOService ancestry. Intel Macs expose tunneled USB controllers below
+    /// the external Thunderbolt router instead of sharing its controller ID.
+    let thunderboltOwnerID: String?
+    /// True when the USB device reports a tunnel or appears below Intel's
+    /// dedicated Thunderbolt USB host controller (`AppleUSBXHCITR`) in either
+    /// the IOService or IOUSB registry plane.
+    let isThunderboltTunneledUSB: Bool
+    /// Location ID of the directly containing class-9 USB hub in the IOUSB
+    /// plane. This is topology metadata and is never shown to the user.
+    let parentHubLocationId: UInt32?
+    /// Downstream port number relative to `parentHubLocationId`. Unlike the
+    /// USB controller byte, this identifies the actual socket on that hub.
+    let parentHubPortNumber: Int?
 
     var id: String { uniqueId }
 
@@ -65,7 +79,11 @@ struct USBDevice: Identifiable, Equatable, Hashable {
         isThunderboltBillboard: Bool = false,
         transport: ConnectionTransport = .usb,
         transportVersion: String? = nil,
-        transportIdentifier: String? = nil
+        transportIdentifier: String? = nil,
+        thunderboltOwnerID: String? = nil,
+        isThunderboltTunneledUSB: Bool = false,
+        parentHubLocationId: UInt32? = nil,
+        parentHubPortNumber: Int? = nil
     ) {
         self.name = name
         self.vendor = vendor
@@ -83,6 +101,10 @@ struct USBDevice: Identifiable, Equatable, Hashable {
         self.transport = transport
         self.transportVersion = transportVersion
         self.transportIdentifier = transportIdentifier
+        self.thunderboltOwnerID = thunderboltOwnerID
+        self.isThunderboltTunneledUSB = isThunderboltTunneledUSB
+        self.parentHubLocationId = parentHubLocationId
+        self.parentHubPortNumber = parentHubPortNumber
     }
 
     var uniqueId: String {
@@ -139,13 +161,26 @@ struct USBDevice: Identifiable, Equatable, Hashable {
     }
 
     var displayNameWithVendor: String {
+        let displayName = displayName
         guard let vendor = vendor?.trimmingCharacters(in: .whitespacesAndNewlines),
             !vendor.isEmpty,
-            !name.localizedCaseInsensitiveContains(vendor)
+            !displayName.localizedCaseInsensitiveContains(vendor)
         else {
-            return name
+            return displayName
         }
-        return "\(vendor) \(name)"
+        return "\(vendor) \(displayName)"
+    }
+
+    /// Replaces IOKit's class-name fallback only after the device has already
+    /// been identified as internal. The raw registry name remains available in
+    /// `name` and in copied device details.
+    var displayName: String {
+        guard isInternal, hasGenericRegistryName else { return name }
+        return "unnamed_internal_usb_component".localized
+    }
+
+    var hasGenericRegistryName: Bool {
+        ["IOUSBHostDevice", "IOUSBDevice"].contains(name)
     }
 
     var usbControllerID: Int? {

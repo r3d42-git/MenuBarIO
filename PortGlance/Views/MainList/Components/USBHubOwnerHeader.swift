@@ -32,8 +32,10 @@ struct USBHubOwnerHeader: View {
             return "this_mac".localized
         case .thunderboltDevice(_, let displayName, _):
             return displayName
-        case .directOrUnknown:
+        case .direct:
             return "direct_usb_hubs".localized
+        case .unknown:
+            return "unknown_usb_hub_assignment".localized
         }
     }
 
@@ -43,8 +45,10 @@ struct USBHubOwnerHeader: View {
             return "desktopcomputer"
         case .thunderboltDevice:
             return "bolt.horizontal.circle"
-        case .directOrUnknown:
+        case .direct:
             return "cable.connector"
+        case .unknown:
+            return "questionmark.circle"
         }
     }
 }

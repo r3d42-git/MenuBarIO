@@ -41,10 +41,18 @@ final class USBDeviceManager: ObservableObject {
     @Published private(set) var externalThunderboltPortGroups: [ExternalThunderboltPortGroup] = []
     @Published private(set) var chargeConnected = false
     @Published private(set) var chargePercentage: Int?
+    @Published private(set) var batteryIsCharging = false
+    @Published private(set) var chargingPowerWatts: Int?
+    @Published private(set) var adapterPowerWatts: Int?
+    @Published private(set) var powerSourceConnectorNumber: Int?
     @Published private(set) var ethernetCableConnected = false
 
     var deviceGroups: USBDeviceGroups {
-        USBDeviceGroups(devices: devices, thunderboltPorts: thunderboltPorts)
+        USBDeviceGroups(
+            devices: devices,
+            thunderboltPorts: thunderboltPorts,
+            externalThunderboltPortGroups: externalThunderboltPortGroups
+        )
     }
 
     var count: Int {
@@ -253,10 +261,18 @@ final class USBDeviceManager: ObservableObject {
         guard isPowerSourceInfoEnabled else {
             chargeConnected = false
             chargePercentage = nil
+            batteryIsCharging = false
+            chargingPowerWatts = nil
+            adapterPowerWatts = nil
+            powerSourceConnectorNumber = nil
             return
         }
 
         chargeConnected = state.isConnected
         chargePercentage = state.chargePercentage
+        batteryIsCharging = state.isCharging
+        chargingPowerWatts = state.chargingPowerWatts
+        adapterPowerWatts = state.adapterPowerWatts
+        powerSourceConnectorNumber = state.powerSourceConnectorNumber
     }
 }

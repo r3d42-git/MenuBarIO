@@ -17,7 +17,7 @@ struct USBDeviceRow: View {
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(device.name)
+                Text(device.displayName)
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.primary)
                     .lineLimit(1)
