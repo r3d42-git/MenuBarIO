@@ -14,8 +14,6 @@ struct MainListBottomBar: View {
 
     @Binding var currentWindow: AppWindow
 
-    @AS(Key.profilerButton) private var profilerButton = false
-
     private func goToSettings() {
         if #available(macOS 15.0, *) {
             currentWindow = .settings
@@ -26,18 +24,13 @@ struct MainListBottomBar: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            if profilerButton {
-                Button {
-                    SystemActions.openSystemInformation()
-                } label: {
-                    Image(systemName: "info.circle")
-                        .help("open_profiler")
-                        .contextMenu {
-                            MainListBottomBarContextMenuProfiler()
-                        }
-                }
-                .buttonStyle(.plain)
+            Button {
+                SystemActions.openSystemInformation()
+            } label: {
+                Image(systemName: "info.circle")
+                    .help("open_profiler")
             }
+            .buttonStyle(.plain)
 
             Button {
                 goToSettings()

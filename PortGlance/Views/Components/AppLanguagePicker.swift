@@ -16,14 +16,8 @@ struct AppLanguagePicker: View {
     }
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text("app_language".localized)
-                Text("app_language_description".localized)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+        HStack(spacing: 12) {
+            Text("app_language".localized)
 
             Spacer(minLength: 8)
 

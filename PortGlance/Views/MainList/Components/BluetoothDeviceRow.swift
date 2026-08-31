@@ -4,7 +4,6 @@ import SwiftUI
 struct BluetoothDeviceRow: View {
     let device: BluetoothDevice
     let isHovered: Bool
-    let usesLargeName: Bool
     let onHover: (Bool) -> Void
 
     var body: some View {
@@ -17,7 +16,7 @@ struct BluetoothDeviceRow: View {
             }
 
             Text(device.name)
-                .font(.system(size: usesLargeName ? 17 : 14, weight: .semibold))
+                .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(.primary)
                 .lineLimit(1)
 

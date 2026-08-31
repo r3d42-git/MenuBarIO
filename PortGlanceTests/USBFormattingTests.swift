@@ -32,10 +32,8 @@ final class USBFormattingTests: XCTestCase {
         XCTAssertNil(USBFormatting.thunderboltMegabitsPerSecond(fromLinkBandwidth: Int.max))
     }
 
-    func testDeviceCountRepresentations() {
-        XCTAssertEqual(DeviceCountFormatter.string(for: 100, representation: .base10), "99＋")
-        XCTAssertEqual(DeviceCountFormatter.string(for: 14, representation: .roman), "XIV")
-        XCTAssertEqual(DeviceCountFormatter.string(for: 12, representation: .greek), "ιβ")
-        XCTAssertEqual(DeviceCountFormatter.string(for: 12, representation: .egyptian), "𓎆𓏺𓏺")
+    func testDeviceCountFormatting() {
+        XCTAssertEqual(DeviceCountFormatter.string(for: 7), "7")
+        XCTAssertEqual(DeviceCountFormatter.string(for: 100), "99＋")
     }
 }

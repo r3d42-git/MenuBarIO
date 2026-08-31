@@ -5,10 +5,6 @@ struct PowerSourceRow: View {
 
     @AS(Key.powerSourceInfo) private var powerSourceInfo = false
     @AS(Key.powerSupplyAsCharger) private var powerSupplyAsCharger = false
-    @AS(Key.hideSecondaryInfo) private var hideSecondaryInfo = false
-    @AS(Key.mouseHoverInfo) private var mouseHoverInfo = false
-    @AS(Key.bigNames) private var bigNames = false
-    @State private var isHovering = false
 
     var body: some View {
         if powerSourceInfo,
@@ -17,16 +13,14 @@ struct PowerSourceRow: View {
         {
             HStack {
                 Text((powerSupplyAsCharger ? "charger" : "power_supply").localized)
-                    .font(.system(size: bigNames ? 18 : 12, weight: .semibold))
+                    .font(.system(size: 18, weight: .semibold))
 
                 Spacer()
 
-                if !hideSecondaryInfo || isHovering {
-                    Image(systemName: percentage == 100 ? "battery.100percent" : "bolt.fill")
-                        .font(.system(size: 10))
-                    Text("\(percentage)%")
-                        .font(.system(size: 12, weight: .semibold))
-                }
+                Image(systemName: percentage == 100 ? "battery.100percent" : "bolt.fill")
+                    .font(.system(size: 10))
+                Text("\(percentage)%")
+                    .font(.system(size: 12, weight: .semibold))
             }
             .foregroundColor(.primary)
             .padding(.horizontal, 10)
@@ -35,9 +29,6 @@ struct PowerSourceRow: View {
                 .primary.opacity(0.07),
                 in: RoundedRectangle(cornerRadius: 8, style: .continuous)
             )
-            .onHover { hovering in
-                isHovering = mouseHoverInfo && hovering
-            }
             .contextMenu {
                 MainListDeviceListContextMenuCharger()
             }

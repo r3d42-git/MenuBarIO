@@ -3,12 +3,7 @@ import SwiftUI
 struct USBDeviceRow: View {
     let device: USBDevice
     let isHovered: Bool
-    let showsSecondaryInfo: Bool
-    let showsTechnicalInfo: Bool
-    let showsSpeed: Bool
-    let usesLargeName: Bool
     let onHover: (Bool) -> Void
-    @Binding var expandedDeviceIDs: Set<String>
 
     var body: some View {
         HStack(spacing: 10) {
@@ -23,7 +18,7 @@ struct USBDeviceRow: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(device.name)
-                    .font(.system(size: usesLargeName ? 17 : 14, weight: .semibold))
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.primary)
                     .lineLimit(1)
 
@@ -54,13 +49,8 @@ struct USBDeviceRow: View {
         .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .onHover(perform: onHover)
         .animation(.easeInOut(duration: 0.12), value: isHovered)
-        .animation(.easeInOut(duration: 0.12), value: showsSecondaryInfo)
-        .animation(.easeInOut(duration: 0.12), value: showsTechnicalInfo)
         .contextMenu {
-            MainListDeviceListContextMenuDevice(
-                expandedDeviceIDs: $expandedDeviceIDs,
-                device: device
-            )
+            MainListDeviceListContextMenuDevice(device: device)
         }
 
         Divider()
@@ -76,19 +66,17 @@ struct USBDeviceRow: View {
 
     private var detail: String {
         var parts: [String] = []
-        if showsSecondaryInfo, let vendor = device.vendor, !vendor.isEmpty {
+        if let vendor = device.vendor, !vendor.isEmpty {
             parts.append(vendor)
         }
-        if showsTechnicalInfo {
+        if !device.connectionDescription.isEmpty {
             parts.append(device.connectionDescription)
         }
         return parts.joined(separator: " · ")
     }
 
     private var speed: String? {
-        guard showsTechnicalInfo, showsSpeed,
-            let speed = device.speedMbps ?? device.portMaxSpeedMbps
-        else {
+        guard let speed = device.speedMbps ?? device.portMaxSpeedMbps else {
             return nil
         }
         return USBFormatting.transferRate(speed)

@@ -6,14 +6,12 @@ struct PortGlanceApp: App {
     @StateObject private var bluetoothManager: BluetoothDeviceManager
     @State private var currentWindow: AppWindow = .devices
 
-    @AS(Key.reduceTransparency) private var reduceTransparency = false
-    @AS(Key.forceDarkMode) private var forceDarkMode = false
-    @AS(Key.forceLightMode) private var forceLightMode = false
+    @AS(Key.appAppearance) private var appAppearance: AppAppearance = .system
     @AS(Key.appLanguage) private var appLanguageIdentifier = AppLanguage.automatic.rawValue
 
     init() {
-        AppDefaults.register()
         LegacyDataMigrator.runIfNeeded()
+        AppDefaults.register()
 
         let isRunningTests =
             ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
@@ -29,8 +27,7 @@ struct PortGlanceApp: App {
     var body: some Scene {
         MenuBarExtra {
             MenuBarRootView(currentWindow: $currentWindow)
-                .appBackground(reduceTransparency)
-                .colorSchemeForce(light: forceLightMode, dark: forceDarkMode)
+                .appColorScheme(appAppearance)
                 .environment(\.locale, appLanguage.locale)
                 .environmentObject(deviceManager)
                 .environmentObject(bluetoothManager)
@@ -45,7 +42,7 @@ struct PortGlanceApp: App {
 
         Window("settings", id: "legacy_settings") {
             LegacySettingsView()
-                .colorSchemeForce(light: false, dark: true)
+                .appColorScheme(.dark)
                 .environment(\.locale, appLanguage.locale)
                 .environmentObject(deviceManager)
                 .environmentObject(bluetoothManager)
