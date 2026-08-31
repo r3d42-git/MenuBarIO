@@ -3,7 +3,7 @@ set -euo pipefail
 
 if [[ $# -ne 1 ]]; then
   echo "usage: $0 APPLE_ID" >&2
-  echo "Creates or validates the local notarytool Keychain profile used by PortGlance." >&2
+  echo "Creates or validates the local notarytool Keychain profile used by MenuBarIO." >&2
   exit 2
 fi
 

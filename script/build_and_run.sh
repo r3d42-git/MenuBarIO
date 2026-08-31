@@ -2,11 +2,11 @@
 set -euo pipefail
 
 MODE="${1:-run}"
-APP_NAME="PortGlance"
+APP_NAME="MenuBarIO"
 BUNDLE_ID="de.r3d.menubarusb.tb"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TARGET_ARCHITECTURE="${PORTGLANCE_BUILD_ARCH:-$(uname -m)}"
-DERIVED_DATA_PATH="${PORTGLANCE_DERIVED_DATA_PATH:-${TMPDIR:-/tmp}/portglance-derived-data}"
+TARGET_ARCHITECTURE="${MENUBARIO_BUILD_ARCH:-$(uname -m)}"
+DERIVED_DATA_PATH="${MENUBARIO_DERIVED_DATA_PATH:-${TMPDIR:-/tmp}/menubario-derived-data}"
 APP_BUNDLE="$DERIVED_DATA_PATH/Build/Products/Debug/$APP_NAME.app"
 
 case "$TARGET_ARCHITECTURE" in
@@ -21,8 +21,8 @@ pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
 cd "$ROOT_DIR"
 xcodebuild build -quiet \
-  -project PortGlance.xcodeproj \
-  -scheme PortGlance \
+  -project MenuBarIO.xcodeproj \
+  -scheme MenuBarIO \
   -configuration Debug \
   -destination "platform=macOS,arch=$TARGET_ARCHITECTURE" \
   -derivedDataPath "$DERIVED_DATA_PATH" \
@@ -47,13 +47,17 @@ case "$MODE" in
     open_app
     /usr/bin/log stream --info --style compact --predicate "process == \"$APP_NAME\""
     ;;
+  --telemetry|telemetry)
+    open_app
+    /usr/bin/log stream --info --style compact --predicate "subsystem == \"$BUNDLE_ID\""
+    ;;
   --verify|verify)
     open_app
     sleep 1
     pgrep -x "$APP_NAME" >/dev/null
     ;;
   *)
-    echo "usage: $0 [run|--debug|--logs|--verify]" >&2
+    echo "usage: $0 [run|--debug|--logs|--telemetry|--verify]" >&2
     exit 2
     ;;
 esac

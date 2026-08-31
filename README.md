@@ -1,21 +1,23 @@
-# PortGlance
+# MenuBarIO
 
-<img src="branding/PortGlance-AppIcon-master.png" alt="PortGlance app icon" width="128">
+<img src="branding/MenuBarIO-AppIcon-master.png" alt="MenuBarIO app icon" width="128">
 
-PortGlance is a native macOS menu-bar utility for inspecting connected USB,
-Thunderbolt and USB4 hardware.
+**USB, Thunderbolt, USB4 & Bluetooth Inspector for macOS**
 
-PortGlance began with the MIT-licensed source of
+MenuBarIO is a native macOS menu-bar utility for inspecting connected USB,
+Thunderbolt, USB4 and Bluetooth hardware.
+
+MenuBarIO began with the MIT-licensed source of
 [rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi/MenuBarUSB). That original
 idea and source authorship remain explicitly credited, and the original
-copyright notice remains in the license. PortGlance itself is developed and
+copyright notice remains in the license. MenuBarIO itself is developed and
 maintained independently.
 
 > [!IMPORTANT]
-> PortGlance is not an official successor to MenuBarUSB, an official
+> MenuBarIO is not an official successor to MenuBarUSB, an official
 > continuation of it or a version endorsed by its original author. There is no
 > collaboration or affiliation with the original author, who is not involved
-> in PortGlance development, maintenance, support or releases. GitHub lists
+> in MenuBarIO development, maintenance, support or releases. GitHub lists
 > upstream author accounts under **Contributors** only because this repository
 > preserves the earlier source history.
 
@@ -41,7 +43,7 @@ maintained independently.
 
 ## Compatibility
 
-The current release, **PortGlance 0.4.0**, is a **Universal** app for Apple
+The current release, **MenuBarIO 0.5.0**, is a **Universal** app for Apple
 Silicon (`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. Automated
 checks run natively on both architectures. The physical Intel-Mac observations
 and the hardware cases that still apply after discovery changes are documented
@@ -52,7 +54,7 @@ so existing installations keep their preferences and login-item identity.
 
 ## Build and test
 
-Open `PortGlance.xcodeproj` in Xcode, or use the local checks:
+Open `MenuBarIO.xcodeproj` in Xcode, or use the local checks:
 
 ```bash
 ./script/verify.sh
@@ -64,32 +66,34 @@ Hardware acceptance cases and the release workflow are documented in
 
 ## License and origin
 
-PortGlance is distributed under the [MIT License](LICENSE). The original
+MenuBarIO is distributed under the [MIT License](LICENSE). The original
 copyright notice and license terms are preserved. This credits the licensed
 source origin and does not imply collaboration, endorsement or successor
 status.
 
 ---
 
-# PortGlance – Deutsch
+# MenuBarIO – Deutsch
 
-<img src="branding/PortGlance-AppIcon-master.png" alt="PortGlance App-Icon" width="128">
+<img src="branding/MenuBarIO-AppIcon-master.png" alt="MenuBarIO App-Icon" width="128">
 
-PortGlance ist ein natives macOS-Menüleistenprogramm zur Anzeige
-angeschlossener USB-, Thunderbolt- und USB4-Hardware.
+**USB-, Thunderbolt-, USB4- & Bluetooth-Inspektor für macOS**
 
-PortGlance entstand auf Grundlage des MIT-lizenzierten Quellcodes von
+MenuBarIO ist ein natives macOS-Menüleistenprogramm zur Anzeige angeschlossener
+USB-, Thunderbolt-, USB4- und Bluetooth-Hardware.
+
+MenuBarIO entstand auf Grundlage des MIT-lizenzierten Quellcodes von
 [rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi/MenuBarUSB). Die
 ursprüngliche Idee und Urheberschaft am Ausgangscode werden ausdrücklich
 genannt; der ursprüngliche Copyright-Hinweis bleibt in der Lizenz erhalten.
-PortGlance selbst wird unabhängig entwickelt und gepflegt.
+MenuBarIO selbst wird unabhängig entwickelt und gepflegt.
 
 > [!IMPORTANT]
-> PortGlance ist weder ein offizieller Nachfolger noch eine offizielle
+> MenuBarIO ist weder ein offizieller Nachfolger noch eine offizielle
 > Fortführung von MenuBarUSB und auch keine vom ursprünglichen Autor bestätigte
 > Variante. Es bestehen weder Zusammenarbeit noch Zugehörigkeit; der
 > ursprüngliche Autor ist an Entwicklung, Pflege, Support und Releases von
-> PortGlance nicht beteiligt. GitHub führt dessen Konten ausschließlich wegen
+> MenuBarIO nicht beteiligt. GitHub führt dessen Konten ausschließlich wegen
 > der erhaltenen früheren Quellcodehistorie unter **Contributors** auf.
 
 ## Wichtige Funktionen
@@ -119,7 +123,7 @@ PortGlance selbst wird unabhängig entwickelt und gepflegt.
 
 ## Kompatibilität
 
-Der aktuelle Release **PortGlance 0.4.0** ist eine **Universal-App** für
+Der aktuelle Release **MenuBarIO 0.5.0** ist eine **Universal-App** für
 Apple-Silicon- (`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die
 automatischen Prüfungen laufen nativ auf beiden Architekturen. Die physischen
 Beobachtungen auf einem Intel-Mac und die nach Änderungen an der
@@ -132,7 +136,7 @@ Anmeldeobjekts behalten.
 
 ## Bauen und testen
 
-`PortGlance.xcodeproj` in Xcode öffnen oder die lokalen Prüfungen ausführen:
+`MenuBarIO.xcodeproj` in Xcode öffnen oder die lokalen Prüfungen ausführen:
 
 ```bash
 ./script/verify.sh
@@ -144,7 +148,7 @@ Hardware-Abnahmefälle und der Release-Ablauf sind in
 
 ## Lizenz und Herkunft
 
-PortGlance wird unter der [MIT-Lizenz](LICENSE) vertrieben. Der ursprüngliche
+MenuBarIO wird unter der [MIT-Lizenz](LICENSE) vertrieben. Der ursprüngliche
 Copyright-Hinweis und die Lizenzbedingungen bleiben erhalten. Damit wird die
 lizenzierte Herkunft des Ausgangscodes gewürdigt; eine Zusammenarbeit,
 Bestätigung oder Nachfolgestellung ist damit nicht verbunden.
