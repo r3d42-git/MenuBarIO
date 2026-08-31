@@ -127,14 +127,23 @@ were deleted. The complete local verification and launch smoke test passed; no
 new version or release was created.
 
 Version 0.3.0 packages the device-row metadata and USB/Thunderbolt topology
-work into a feature release. The complete automated gate, static analysis,
+work into a feature release. It was published on 2026-08-31 as the signed,
+notarized and stapled Universal release
+[`v0.3.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.3.0) from
+merge commit `323c25a5d7ac8cc00400681547eafa51e26a40b4`. Apple accepted the
+separately submitted app (`2d0460f3-5228-4cd1-97d2-9370cba3b541`) and DMG
+(`99669732-8ee5-490e-9b0d-231d662e452d`). The public asset
+`PortGlance-0.3.0-mac.dmg` has SHA-256
+`2a1fee426174beb54c9a91c7c233a137187ca5f209d5196f9f2cee849d2013ed`, matching
+GitHub's reported digest; a fresh GitHub download passed the independent
+release verification, including the physically stapled app inside the mounted
+DMG. The complete automated gate, both native GitHub CI jobs, static analysis,
 Universal build, local launch smoke test and user visual inspection passed.
 Physical validation on the M4 Pro Mac mini covered the documented host ports,
-attached devices, hub ownership and live connection change. GitHub CI must pass
-natively on both Apple Silicon and Intel before merge. The physical Intel check
-of the new topology will be performed later with the published v0.3.0 GitHub
-artifact; the initial release therefore does not claim physical Intel hardware
-acceptance for the new topology.
+attached devices, hub ownership and live connection change. The physical Intel
+check of the new topology will be performed later with the published v0.3.0
+GitHub artifact; this release does not claim physical Intel hardware acceptance
+for the new topology.
 
 Version 0.2.1 collects these minimal-settings, appearance and cleanup changes
 into one maintenance release. The device-discovery services, hardware
@@ -353,15 +362,25 @@ Prüfung und der Starttest waren erfolgreich; es wurde keine neue Version und
 kein Release erstellt.
 
 Version 0.3.0 bündelt die Metadaten der Gerätezeilen und die neue
-USB-/Thunderbolt-Topologie in einem Funktionsrelease. Die vollständige
-automatische Prüfkette, die statische Analyse, der Universal-Build, der lokale
-Starttest und die Sichtprüfung des Benutzers waren erfolgreich. Die physische
-Abnahme am M4-Pro-Mac-mini umfasste die dokumentierten Hostanschlüsse,
-angeschlossenen Geräte, Hub-Zuordnung und eine laufende Anschlussänderung. Vor
-dem Merge muss die GitHub-CI nativ auf Apple Silicon und Intel bestehen. Die
-physische Intel-Prüfung der neuen Topologie wird später mit dem veröffentlichten
-GitHub-Artefakt von v0.3.0 nachgeholt; der erste Release beansprucht daher keine
-physische Intel-Hardwareabnahme für die neue Topologie.
+USB-/Thunderbolt-Topologie in einem Funktionsrelease. Er wurde am 31.08.2026 als
+signierter, notarisierter und gestapelter Universal-Release
+[`v0.3.0`](https://github.com/r3d42-git/PortGlance/releases/tag/v0.3.0) aus dem
+Merge-Commit `323c25a5d7ac8cc00400681547eafa51e26a40b4` veröffentlicht. Apple
+akzeptierte die getrennt eingereichte App
+(`2d0460f3-5228-4cd1-97d2-9370cba3b541`) und das DMG
+(`99669732-8ee5-490e-9b0d-231d662e452d`). Das öffentliche Artefakt
+`PortGlance-0.3.0-mac.dmg` hat den SHA-256
+`2a1fee426174beb54c9a91c7c233a137187ca5f209d5196f9f2cee849d2013ed`, der mit
+GitHubs gemeldetem Digest übereinstimmt; ein frischer GitHub-Download bestand
+die unabhängige Release-Prüfung einschließlich der physisch gestapelten App im
+eingebundenen DMG. Die vollständige automatische Prüfkette, beide nativen
+GitHub-CI-Jobs, die statische Analyse, der Universal-Build, der lokale Starttest
+und die Sichtprüfung des Benutzers waren erfolgreich. Die physische Abnahme am
+M4-Pro-Mac-mini umfasste die dokumentierten Hostanschlüsse, angeschlossenen
+Geräte, Hub-Zuordnung und eine laufende Anschlussänderung. Die physische
+Intel-Prüfung der neuen Topologie wird später mit dem veröffentlichten
+GitHub-Artefakt von v0.3.0 nachgeholt; dieser Release beansprucht keine physische
+Intel-Hardwareabnahme für die neue Topologie.
 
 Version 0.2.1 fasst diese Minimalisierung der Einstellungen, die neue
 Darstellungswahl und die Bereinigung in einem Wartungsrelease zusammen. Die
