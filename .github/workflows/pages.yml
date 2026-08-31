@@ -1,0 +1,69 @@
+name: Verify and publish GitHub Pages
+
+on:
+  pull_request:
+    paths:
+      - website/**
+      - README.md
+      - PROJECT_SUMMARY.md
+      - .github/workflows/pages.yml
+  push:
+    branches: [main]
+    paths:
+      - website/**
+      - README.md
+      - PROJECT_SUMMARY.md
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build-site:
+    name: Build GitHub Pages site
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run check:artifact
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: website/dist
+
+  deploy:
+    name: Deploy GitHub Pages site
+    if: github.event_name != 'pull_request'
+    needs: build-site
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Verify public routes and assets
+        run: node website/scripts/verify-public.mjs "${{ steps.deployment.outputs.page_url }}"

@@ -24,6 +24,14 @@ author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
 
+The bilingual project-history website is maintained as a curated static site
+in `website/` and published from protected `main` through GitHub Pages at
+[`r3d42-git.github.io/MenuBarIO`](https://r3d42-git.github.io/MenuBarIO/).
+It preserves the exact design and editorial line of Sites version 3 while
+remaining technically separate from the macOS app and its release process.
+The private Sites deployment remains an unchanged backup rather than a second
+synchronized publication channel.
+
 On 2026-08-31, the working product was renamed from PortGlance to MenuBarIO.
 The new name deliberately retains a visible connection to the MenuBarUSB
 source origin, while the subtitle states the current app scope. The source
@@ -858,6 +866,8 @@ veröffentlicht. Das Release-Artefakt `PortGlance-0.2.0-mac.dmg` hat den SHA-256
   Icon-Vorlage. Die abgeleiteten macOS-Größen liegen in
   `MenuBarIO/Assets.xcassets/AppIcon.appiconset/`. Kategorien und Status in
   der App verwenden SF Symbols.
+- `website/` enthält den zweisprachigen statischen Projektverlauf, seine
+  lokal eingebundenen Assets und die GitHub-Pages-Prüfungen.
 
 USB- und Thunderbolt-Identitäten müssen über Aktualisierungen hinweg stabil
 bleiben. Interne Geräte und USB-Hubs zählen nicht zum Zähler externer Geräte.
@@ -888,3 +898,9 @@ getrennt notarisierte und gestapelte enthaltene App geprüft.
 Release, Signierung, Notarisierung, GitHub-Upload und Veröffentlichung sind
 getrennte Schritte nach `RELEASE.md`; sie sind nicht automatisch Teil einer
 Codeänderung.
+
+Änderungen am Projektverlauf werden in `website/` auf Deutsch und Englisch
+gemeinsam gepflegt. Vor einem Pull Request sind dort Installation, Lint,
+TypeScript-Prüfung, Produktions-Build und Artefaktprüfung auszuführen; nach
+dem Merge veröffentlicht der separate Pages-Workflow ausschließlich den
+statischen Build.

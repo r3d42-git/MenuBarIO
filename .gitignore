@@ -1,5 +1,7 @@
 # macOS and Xcode user state
 .DS_Store
+website/node_modules/
+website/dist/
 xcuserdata/
 *.xcuserstate
 DerivedData/

@@ -4,6 +4,8 @@
 
 **USB, Thunderbolt, USB4 & Bluetooth Inspector for macOS**
 
+[**Projektverlauf / Project History**](https://r3d42-git.github.io/MenuBarIO/)
+
 MenuBarIO is a native macOS menu-bar utility for inspecting connected USB,
 Thunderbolt, USB4 and Bluetooth hardware.
 
