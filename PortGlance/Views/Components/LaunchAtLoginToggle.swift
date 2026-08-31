@@ -6,8 +6,6 @@
 import SwiftUI
 
 struct LaunchAtLoginToggle: View {
-    @Binding var activeRowID: String?
-
     @AS(Key.launchAtLogin) private var launchAtLogin = false
     @State private var errorMessage: String?
 
@@ -20,9 +18,7 @@ struct LaunchAtLoginToggle: View {
     var body: some View {
         ToggleRow(
             label: "open_on_startup",
-            description: "open_on_startup_description",
             binding: $launchAtLogin,
-            activeRowID: $activeRowID,
             onToggle: updateLoginItem
         )
         .alert(

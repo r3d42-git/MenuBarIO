@@ -20,6 +20,14 @@ final class AppDefaultsTests: XCTestCase {
         }
     }
 
+    func testAppearanceDefaultsToSystem() {
+        withIsolatedDefaults { defaults in
+            AppDefaults.register(in: defaults)
+
+            XCTAssertEqual(AppAppearance.selected(in: defaults), .system)
+        }
+    }
+
     func testAppLanguageContainsOnlyBundledManualLanguages() {
         XCTAssertEqual(
             Set(AppLanguage.allCases.map(\.rawValue)),
@@ -30,15 +38,11 @@ final class AppDefaultsTests: XCTestCase {
     func testCuratedDefaultsDoNotOverwriteExistingPreferences() {
         withIsolatedDefaults { defaults in
             AppDefaults.register(in: defaults)
-            XCTAssertTrue(defaults.bool(forKey: StorageKeys.showPortMax))
-            XCTAssertTrue(defaults.bool(forKey: StorageKeys.longList))
-            XCTAssertFalse(defaults.bool(forKey: StorageKeys.showScrollBar))
-            XCTAssertTrue(defaults.bool(forKey: StorageKeys.bigNames))
             XCTAssertTrue(defaults.bool(forKey: StorageKeys.showEthernet))
 
-            defaults.set(false, forKey: StorageKeys.longList)
+            defaults.set(false, forKey: StorageKeys.showEthernet)
             AppDefaults.register(in: defaults)
-            XCTAssertFalse(defaults.bool(forKey: StorageKeys.longList))
+            XCTAssertFalse(defaults.bool(forKey: StorageKeys.showEthernet))
         }
     }
 }

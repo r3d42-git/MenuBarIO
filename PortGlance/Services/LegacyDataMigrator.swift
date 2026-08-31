@@ -2,7 +2,18 @@ import Foundation
 
 enum LegacyDataMigrator {
     private static let migrationVersionKey = "legacyDataMigrationVersion"
-    private static let currentMigrationVersion = 1
+    private static let currentMigrationVersion = 4
+    private static let appearanceMigrationVersion = 2
+    private static let retiredSettingsMigrationVersion = 4
+    private static let forceDarkModeKey = "forceDarkMode"
+    private static let forceLightModeKey = "forceLightMode"
+
+    private static let retiredSettingsKeys = [
+        "showPortMax", "longList", "hideTechInfo", "reduceTransparency",
+        "forceDarkMode", "forceLightMode", "hideSecondaryInfo", "hideCount",
+        "numberRepresentation", "macBarIcon", "hideMenubarIcon", "mouseHoverInfo",
+        "profilerButton", "showScrollBar", "bigNames",
+    ]
 
     private static let retiredPreferenceKeys = [
         "soundDevices", "customHardwareSounds", "hardwareSound", "playHardwareSound",
@@ -29,19 +40,53 @@ enum LegacyDataMigrator {
         ).first,
         fileManager: FileManager = .default
     ) {
-        guard defaults.integer(forKey: migrationVersionKey) < currentMigrationVersion else {
+        let storedMigrationVersion = defaults.integer(forKey: migrationVersionKey)
+        guard storedMigrationVersion < currentMigrationVersion else {
             return
         }
 
-        for key in retiredPreferenceKeys {
-            defaults.removeObject(forKey: key)
+        if storedMigrationVersion < 1 {
+            for key in retiredPreferenceKeys {
+                defaults.removeObject(forKey: key)
+            }
+            removeLegacySoundDirectory(
+                bundleIdentifier: bundleIdentifier,
+                applicationSupportDirectory: applicationSupportDirectory,
+                fileManager: fileManager
+            )
         }
-        removeLegacySoundDirectory(
-            bundleIdentifier: bundleIdentifier,
-            applicationSupportDirectory: applicationSupportDirectory,
-            fileManager: fileManager
-        )
+
+        if storedMigrationVersion < appearanceMigrationVersion {
+            migrateAppearance(in: defaults)
+        }
+
+        if storedMigrationVersion < retiredSettingsMigrationVersion {
+            for key in retiredSettingsKeys {
+                defaults.removeObject(forKey: key)
+            }
+        }
+
         defaults.set(currentMigrationVersion, forKey: migrationVersionKey)
+    }
+
+    private static func migrateAppearance(in defaults: UserDefaults) {
+        let hasLegacyAppearance =
+            defaults.object(forKey: forceDarkModeKey) != nil
+            || defaults.object(forKey: forceLightModeKey) != nil
+        guard hasLegacyAppearance else { return }
+
+        let appearance: AppAppearance
+        if defaults.bool(forKey: forceLightModeKey) {
+            appearance = .light
+        } else if defaults.bool(forKey: forceDarkModeKey) {
+            appearance = .dark
+        } else {
+            appearance = .system
+        }
+        defaults.set(appearance.rawValue, forKey: StorageKeys.appAppearance)
+
+        defaults.removeObject(forKey: forceDarkModeKey)
+        defaults.removeObject(forKey: forceLightModeKey)
     }
 
     private static func removeLegacySoundDirectory(

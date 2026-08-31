@@ -14,36 +14,11 @@ struct MainListView: View {
 
     @Binding var currentWindow: AppWindow
 
-    @AS(Key.longList) private var longList = false
-    @AS(Key.hideTechInfo) private var hideTechInfo = false
     @AS(Key.windowWidth) private var windowWidth: WindowWidth = .normal
     @AS(Key.deviceGroupExpanded) private var deviceGroupExpanded = true
     @AS(Key.hubGroupExpanded) private var hubGroupExpanded = false
     @AS(Key.internalGroupExpanded) private var internalGroupExpanded = false
     @AS(Key.bluetoothGroupExpanded) private var bluetoothGroupExpanded = false
-
-    private var windowHeight: CGFloat? {
-        if isTrulyEmpty {
-            return nil
-        }
-        let baseValue: CGFloat = 202
-        let rowHeight: CGFloat = hideTechInfo ? 48 : 68
-
-        // The header and bottom bar live outside this scrollable device area.
-        // Device rows stay comfortably readable until scrolling becomes useful.
-        let groups = manager.deviceGroups
-        let externalRows = deviceGroupExpanded ? groups.externalDevices.count : 0
-        let internalRows = internalGroupExpanded ? groups.internalDevices.count : 0
-        let hubRows = hubGroupExpanded ? groups.hubs.count : 0
-        let usbRows = externalRows + internalRows + hubRows
-        let bluetoothRows = bluetoothGroupExpanded ? bluetoothManager.count : 0
-        let sum: CGFloat = baseValue + (CGFloat(usbRows) * rowHeight) + (CGFloat(bluetoothRows) * 48)
-        var max: CGFloat = 420
-        if longList {
-            max = 640
-        }
-        return sum >= max ? max : sum
-    }
 
     private var isTrulyEmpty: Bool {
         manager.devices.isEmpty && bluetoothManager.devices.isEmpty
@@ -107,7 +82,6 @@ struct MainListView: View {
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 7)
-            .frame(height: windowHeight)
 
             Divider()
 
@@ -116,6 +90,5 @@ struct MainListView: View {
                 .padding(.vertical, 8)
         }
         .frame(width: CGFloat(windowWidth.rawValue))
-        .background(.regularMaterial)
     }
 }

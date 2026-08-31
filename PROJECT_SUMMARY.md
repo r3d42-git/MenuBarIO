@@ -6,7 +6,7 @@ PortGlance is a local-only macOS menu-bar app for showing connected USB,
 Thunderbolt/USB4 and Bluetooth devices. It targets macOS 13 or newer and does
 not contain telemetry, analytics, update checks or network client code.
 
-The current product version is `0.2.0` (build 5). Releases are prepared from a
+The current product version is `0.2.1` (build 6). Releases are prepared from a
 reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target, project and test target are named
 `PortGlance`. The legacy app bundle identifier `de.r3d.menubarusb.tb` remains
@@ -20,6 +20,86 @@ original author. There is no collaboration or affiliation with the original
 author, who is not involved in PortGlance development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
+
+On 2026-08-31, the configurable menu-bar symbol section was removed as a
+deliberate minimal-product change. The menu bar now always shows the fixed USB
+symbol with its decimal external-device count and the native Bluetooth symbol
+with its decimal connected-device count. The compact `99＋` cap and optional
+Ethernet indicator remain. The corresponding modern and legacy settings,
+stored preference keys, alternative numeral systems, tests and localization
+strings were removed. The complete local verification and launch smoke test
+passed; no new version or release was created.
+
+The configurable list section was removed on the same date. Device names now
+always use the larger type; vendor, connection details and the detected USB
+connection speed remain visible whenever the underlying data is available. The
+device list measures its rendered content and grows or shrinks when groups are
+expanded or collapsed. It uses the available screen height before falling back
+to scrolling without a forced indicator. The six obsolete list preferences and
+the separate speed preference, including their context-menu paths, defaults,
+tests and localization strings, were removed.
+
+The System Information button is now always available in the device-list
+footer, so its setting, stored preference, hide action and localization strings
+were removed as well. All remaining settings are presented in one flat view
+without category cards. The current menu uses the shared content-fitting scroll
+container, while the legacy window keeps its supported controls in one plain
+list. Obsolete category types, wrappers and localization strings were deleted;
+the window-width control remains directly available. The complete local
+verification and launch smoke test passed for this combined minimal-settings
+change; no new version or release was created.
+
+Appearance selection was simplified on 2026-08-31 as part of the same cleanup.
+A single segmented `System / Light / Dark` preference now replaces the two
+mutually exclusive force-mode checkboxes. This makes invalid combinations
+unrepresentable and removes the related warning state, hover timer, animation
+and dedicated warning color. A versioned local migration maps existing force
+mode preferences to the new value, preserving the former light-mode priority
+if both legacy flags were set.
+The complete local verification and launch smoke test passed; no new version or
+release was created.
+
+The forced light appearance initially changed only SwiftUI's local color-scheme
+environment, leaving the hosting `MenuBarExtra` material dark and producing
+dark text on a dark background. A first `preferredColorScheme` correction was
+also ignored by the menu-bar presentation and therefore did not fix the actual
+window. The final implementation uses a narrow `NSViewRepresentable` bridge to
+set the host `NSWindow.appearance` to Aqua, Dark Aqua or inherited system
+appearance while keeping SwiftUI's semantic colors aligned. A focused AppKit
+test exercises all three states on a real `NSWindow`.
+
+The remaining boolean settings now use native trailing macOS switches instead
+of low-contrast checkboxes. The app-specific Reduce Transparency preference,
+its stored value, custom ultra-thick background and the additional regular
+material overlay were removed. The `MenuBarExtra` host now owns the surface and
+therefore follows the platform's current material, accessibility behavior and
+newer system styling without a custom glass imitation. Migration version 4
+removes this and every other preference retired by the minimal-settings changes,
+including installations that had already recorded migration version 3 from a
+development build.
+
+A follow-up cleanup audit checked Swift declarations and references, source-file
+inclusion, asset-catalog use, localization references, retired preference keys,
+empty files and the complete build gate. No additional unreferenced production
+type, view, resource or localization key was confirmed. The remaining macOS
+13/14 legacy-settings window and the IOKit/AppKit callback paths are still live
+compatibility code. The complete local verification and launch smoke test
+passed; no new version or release was created.
+
+The three remaining toggle rows were simplified after the audit. Their former
+blue info buttons and expandable descriptions were replaced by complete,
+action-oriented labels: open automatically at login, show MacBook charging
+status in the device list and show a LAN icon for active wired connections.
+The always-visible app-language explanation was also removed because the
+`Automatic` picker value is self-explanatory. The shared disclosure state,
+description arguments and the now-unused Info color asset and localization keys
+were deleted. The complete local verification and launch smoke test passed; no
+new version or release was created.
+
+Version 0.2.1 collects these minimal-settings, appearance and cleanup changes
+into one maintenance release. The device-discovery services, hardware
+classification and privacy model are unchanged. The complete automated gate,
+Universal build, local launch smoke test and user visual inspection passed.
 
 The PortGlance rebrand was completed on 2026-08-30 and passed the complete
 local verification plus launch smoke test. The canonical repository is
@@ -84,7 +164,7 @@ angeschlossener USB-, Thunderbolt-/USB4- und Bluetooth-Geräte. Sie unterstützt
 macOS 13 oder neuer und enthält weder Telemetrie noch Analysen,
 Update-Abfragen oder Netzwerk-Client-Code.
 
-Die aktuelle Produktversion ist `0.2.0` (Build 5). Releases werden auf einem
+Die aktuelle Produktversion ist `0.2.1` (Build 6). Releases werden auf einem
 geprüften Branch vorbereitet und vor dem Tagging in den geschützten Branch
 `main` integriert.
 Produkt, Programmdatei, Target, Projekt und Test-Target heißen `PortGlance`.
@@ -99,6 +179,100 @@ Variante darzustellen. Es bestehen weder Zusammenarbeit noch Zugehörigkeit zum
 ursprünglichen Autor, der an Entwicklung, Pflege, Support und Releases von
 PortGlance nicht beteiligt ist. GitHub-Contributor-Einträge der Upstream-Autoren
 bilden ausschließlich die erhaltene Quellcodehistorie ab.
+
+Am 31.08.2026 wurde der konfigurierbare Menüleisten-Symbolblock als bewusste
+Minimalisierung vollständig entfernt. Die Menüleiste zeigt jetzt immer das
+feste USB-Symbol mit der dezimalen Anzahl externer Geräte und das native
+Bluetooth-Symbol mit der dezimalen Anzahl verbundener Geräte. Die kompakte
+Begrenzung auf `99＋` und die optionale Ethernet-Anzeige bleiben erhalten. Die
+zugehörigen modernen und klassischen Einstellungen, Speicherkeys, alternativen
+Zahlensysteme, Tests und Übersetzungen wurden entfernt. Die vollständige lokale
+Prüfung und der Starttest waren erfolgreich; es wurde keine neue Version und
+kein Release erstellt.
+
+Am selben Tag wurde auch der konfigurierbare Bereich „Liste“ entfernt.
+Gerätenamen werden nun immer größer dargestellt; Hersteller, Verbindungsdetails
+und die erkannte USB-Verbindungsgeschwindigkeit bleiben sichtbar, sofern die
+jeweiligen Daten verfügbar sind. Die Geräteliste misst ihren tatsächlich
+gerenderten Inhalt und wächst oder schrumpft beim Auf- und Zuklappen der Gruppen.
+Sie nutzt zunächst die verfügbare Bildschirmhöhe und wird erst danach ohne
+erzwungene Bildlaufleiste scrollbar. Die sechs überholten Listeneinstellungen
+und die eigenständige Geschwindigkeitsoption samt Kontextmenüpfaden,
+Standardwerten, Tests und Übersetzungen wurden entfernt.
+
+Die Schaltfläche für die Systeminformationen ist jetzt immer in der Fußzeile
+der Geräteliste verfügbar. Deshalb wurden auch ihre Einstellung, der
+gespeicherte Wert, die Ausblenden-Aktion und die zugehörigen Übersetzungen
+entfernt. Alle verbleibenden Einstellungen stehen ohne Kategorie-Karten in
+einer flachen Ansicht. Das aktuelle Menü verwendet dafür den gemeinsamen,
+inhaltsabhängig wachsenden Scroll-Container; das klassische Fenster führt seine
+unterstützten Bedienelemente in einer einfachen Liste. Überholte Kategorie-
+Typen, Wrapper und Übersetzungen wurden gelöscht; die Fensterbreite bleibt
+direkt verfügbar. Die vollständige lokale Prüfung und der Starttest waren für
+diese zusammengefasste Minimalisierung erfolgreich; es wurde keine neue Version
+und kein Release erstellt.
+
+Die Darstellungswahl wurde am 31.08.2026 im Zuge derselben Bereinigung
+vereinfacht. Eine einzige segmentierte Auswahl `System / Hell / Dunkel` ersetzt
+die zwei gegenseitig ausschließenden Erzwingen-Checkboxen. Ungültige
+Kombinationen sind damit nicht mehr darstellbar; der zugehörige Warnzustand,
+Hover-Timer, die Animation und die eigene Warnfarbe wurden entfernt. Eine
+versionierte lokale Migration überführt vorhandene Erzwingen-Einstellungen in
+den neuen Wert und erhält den bisherigen Vorrang des Hellmodus, falls beide
+alten Werte gesetzt waren.
+Die vollständige lokale Prüfung und der Starttest waren erfolgreich; es wurde
+keine neue Version und kein Release erstellt.
+
+Die erzwungene helle Darstellung änderte zunächst nur die lokale
+SwiftUI-Farbschema-Umgebung. Das Material des beherbergenden `MenuBarExtra`
+blieb dadurch dunkel und führte zu dunkler Schrift auf dunklem Hintergrund.
+Auch ein erster Korrekturversuch mit `preferredColorScheme` wurde von der
+Menüleisten-Präsentation ignoriert und reparierte das tatsächliche Fenster
+nicht. Die endgültige Umsetzung setzt über eine schmale
+`NSViewRepresentable`-Brücke die `NSWindow.appearance` des Hostfensters auf
+Aqua, Dark Aqua oder die geerbte Systemdarstellung und hält zugleich die
+semantischen SwiftUI-Farben synchron. Ein gezielter AppKit-Test prüft alle drei
+Zustände an einem echten `NSWindow`.
+
+Die verbleibenden booleschen Einstellungen verwenden nun native, rechts
+ausgerichtete macOS-Schalter anstelle kontrastarmer Checkboxen. Die app-eigene
+Option „Transparenz reduzieren“, ihr gespeicherter Wert, der benutzerdefinierte
+ultradicke Hintergrund und der zusätzliche reguläre Materialüberzug wurden
+entfernt. Damit besitzt wieder das `MenuBarExtra` selbst die Oberfläche und
+folgt ohne nachgebauten Glaseffekt dem aktuellen Systemmaterial, den
+Bedienungshilfen und der Gestaltung neuerer macOS-Versionen. Migration 4
+entfernt den überholten Einstellungswert zusammen mit allen weiteren durch die
+Minimalisierungen überholten Einstellungen, auch wenn ein Entwicklungsstand
+zuvor bereits Migrationsversion 3 gespeichert hatte.
+
+Ein anschließender Bereinigungs-Audit prüfte Swift-Deklarationen und Referenzen,
+die Aufnahme aller Quelldateien, die Asset-Katalog-Nutzung,
+Übersetzungsreferenzen, überholte Einstellungswerte, leere Dateien und die
+vollständige Prüfkette. Es wurde kein weiterer unreferenzierter Produktionstyp,
+keine View, Ressource oder Übersetzung bestätigt. Das klassische
+Einstellungsfenster für macOS 13/14 sowie die IOKit-/AppKit-Callback-Pfade sind
+weiterhin aktive Kompatibilitätslogik. Die vollständige lokale Prüfung und der
+Starttest waren erfolgreich; es wurde keine neue Version und kein Release
+erstellt.
+
+Die drei verbliebenen Schalterzeilen wurden nach dem Audit weiter vereinfacht.
+Ihre bisherigen blauen Info-Schaltflächen und aufklappbaren Beschreibungen
+wurden durch vollständige, handlungsorientierte Bezeichnungen ersetzt: „Beim
+Anmelden automatisch öffnen“, „MacBook-Ladestatus in der Geräteliste anzeigen“
+und „LAN-Symbol bei aktiver Kabelverbindung anzeigen“. Auch der dauerhaft
+sichtbare Erklärungssatz zur App-Sprache entfiel, weil die Auswahl
+„Automatisch“ bereits eindeutig ist. Der gemeinsame Aufklappzustand, die
+Beschreibungsparameter sowie das nun ungenutzte Info-Farbasset und die
+zugehörigen Übersetzungsschlüssel wurden gelöscht. Die vollständige lokale
+Prüfung und der Starttest waren erfolgreich; es wurde keine neue Version und
+kein Release erstellt.
+
+Version 0.2.1 fasst diese Minimalisierung der Einstellungen, die neue
+Darstellungswahl und die Bereinigung in einem Wartungsrelease zusammen. Die
+Dienste zur Geräteerkennung, die Hardwareklassifizierung und das
+Datenschutzmodell bleiben unverändert. Die vollständige automatische
+Prüfkette, der Universal-Build, der lokale Starttest und die Sichtprüfung des
+Benutzers waren erfolgreich.
 
 Das PortGlance-Rebranding wurde am 30.08.2026 abgeschlossen und hat die
 vollständige lokale Prüfkette sowie den Starttest bestanden. Das kanonische
