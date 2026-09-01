@@ -11,6 +11,11 @@ and stores settings exclusively in the user's local profile. The Ethernet
 indicator processes only the local link status; it does not inspect packets,
 destinations or traffic data.
 
+When the user explicitly exports a hardware report, the app receives write
+access only to the file selected in the native macOS save panel. It does not
+retain access to that file or its containing folder. The Markdown report is
+created locally and is not transmitted.
+
 ## Network access
 
 The app itself makes no network connections. The `script/privacy_audit.sh`
@@ -30,6 +35,12 @@ Die App liest USB-, Thunderbolt- und Ethernet-Metadaten über macOS-System-APIs
 und speichert Einstellungen ausschließlich lokal im Benutzerprofil. Die
 Ethernet-Anzeige verarbeitet ausschließlich den lokalen Link-Status; sie
 untersucht keine Pakete, Ziele oder Verkehrsdaten.
+
+Wenn der Benutzer ausdrücklich einen Hardwarebericht exportiert, erhält die
+App ausschließlich Schreibzugriff auf die im nativen macOS-Speicherdialog
+gewählte Datei. Sie behält keinen Zugriff auf diese Datei oder den
+übergeordneten Ordner. Der Markdown-Bericht wird lokal erstellt und nicht
+übertragen.
 
 ## Netzwerkzugriffe
 

@@ -4,6 +4,7 @@ import SwiftUI
 struct MenuBarIOApp: App {
     @StateObject private var deviceManager: USBDeviceManager
     @StateObject private var bluetoothManager: BluetoothDeviceManager
+    @StateObject private var refreshCoordinator: HardwareRefreshCoordinator
     @State private var currentWindow: AppWindow = .devices
 
     @AS(Key.appAppearance) private var appAppearance: AppAppearance = .system
@@ -16,11 +17,16 @@ struct MenuBarIOApp: App {
         let isRunningTests =
             ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
             || NSClassFromString("XCTestCase") != nil
-        _deviceManager = StateObject(
-            wrappedValue: USBDeviceManager(monitoringEnabled: !isRunningTests)
-        )
-        _bluetoothManager = StateObject(
-            wrappedValue: BluetoothDeviceManager(monitoringEnabled: !isRunningTests)
+        let deviceManager = USBDeviceManager(monitoringEnabled: !isRunningTests)
+        let bluetoothManager = BluetoothDeviceManager(monitoringEnabled: !isRunningTests)
+        _deviceManager = StateObject(wrappedValue: deviceManager)
+        _bluetoothManager = StateObject(wrappedValue: bluetoothManager)
+        _refreshCoordinator = StateObject(
+            wrappedValue: HardwareRefreshCoordinator(
+                deviceManager: deviceManager,
+                bluetoothManager: bluetoothManager,
+                monitoringEnabled: !isRunningTests
+            )
         )
     }
 
@@ -31,6 +37,7 @@ struct MenuBarIOApp: App {
                 .environment(\.locale, appLanguage.locale)
                 .environmentObject(deviceManager)
                 .environmentObject(bluetoothManager)
+                .environmentObject(refreshCoordinator)
                 .id(appLanguage.id)
         } label: {
             MenuBarLabel(

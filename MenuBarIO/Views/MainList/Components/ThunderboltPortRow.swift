@@ -40,6 +40,20 @@ struct ThunderboltPortRow: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
+        .contentShape(Rectangle())
+        .contextMenu {
+            Button {
+                SystemActions.copyToClipboard(
+                    DiagnosticReportBuilder().thunderboltPortDetails(
+                        port,
+                        isPowerSourceConnected: isPowerSourceConnected,
+                        powerSourceWatts: powerSourceWatts
+                    )
+                )
+            } label: {
+                Label("copy", systemImage: "square.on.square")
+            }
+        }
 
         Divider()
             .padding(.leading, 42)

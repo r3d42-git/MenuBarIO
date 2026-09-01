@@ -17,6 +17,17 @@ enum SystemActions {
         NSPasteboard.general.setString(content, forType: .string)
     }
 
+    static func announceForAccessibility(_ message: String) {
+        NSAccessibility.post(
+            element: NSApp as Any,
+            notification: .announcementRequested,
+            userInfo: [
+                .announcement: message,
+                .priority: NSAccessibilityPriorityLevel.medium.rawValue,
+            ]
+        )
+    }
+
     static func sanitizedDeviceField(_ value: String) -> String {
         value.unicodeScalars.map { scalar in
             switch scalar.value {
@@ -35,15 +46,19 @@ enum SystemActions {
     }
 
     static var isMacBook: Bool {
-        var size = 0
-        guard sysctlbyname("hw.model", nil, &size, nil, 0) == 0 else { return false }
-
-        var model = [CChar](repeating: 0, count: size)
-        guard sysctlbyname("hw.model", &model, &size, nil, 0) == 0 else { return false }
-
-        let identifier = String(cString: model).lowercased()
+        guard let identifier = modelIdentifier?.lowercased() else { return false }
         let desktopPrefixes = ["imac", "macmini", "macstudio", "macpro"]
         return identifier.hasPrefix("mac")
             && !desktopPrefixes.contains(where: identifier.hasPrefix)
+    }
+
+    static var modelIdentifier: String? {
+        var size = 0
+        guard sysctlbyname("hw.model", nil, &size, nil, 0) == 0, size > 0 else { return nil }
+
+        var model = [CChar](repeating: 0, count: size)
+        guard sysctlbyname("hw.model", &model, &size, nil, 0) == 0 else { return nil }
+
+        return String(cString: model)
     }
 }

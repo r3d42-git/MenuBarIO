@@ -35,6 +35,7 @@ struct BluetoothDevice: Identifiable, Equatable, Hashable {
 
     let id: String
     let name: String
+    let address: String?
     let icon: BluetoothDeviceIcon
 
     init?(snapshot: Snapshot) {
@@ -43,18 +44,20 @@ struct BluetoothDevice: Identifiable, Equatable, Hashable {
         let resolvedName = snapshot.name?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         guard !resolvedName.isEmpty else { return nil }
 
-        let resolvedIdentifier = snapshot.identifier?
+        let resolvedAddress = snapshot.identifier?
             .trimmingCharacters(in: .whitespacesAndNewlines)
-            .lowercased()
+        let resolvedIdentifier = resolvedAddress?.lowercased()
 
         if let resolvedIdentifier, !resolvedIdentifier.isEmpty {
             id = "bluetooth-\(resolvedIdentifier)"
+            address = resolvedAddress
         } else {
             let normalizedName = resolvedName.folding(
                 options: [.caseInsensitive, .diacriticInsensitive],
                 locale: .current
             )
             id = "bluetooth-name-\(normalizedName.lowercased())"
+            address = nil
         }
 
         name = resolvedName

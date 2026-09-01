@@ -31,6 +31,15 @@ struct BluetoothDeviceRow: View {
         .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .onHover(perform: onHover)
         .animation(.easeInOut(duration: 0.12), value: isHovered)
+        .contextMenu {
+            Button {
+                SystemActions.copyToClipboard(
+                    DiagnosticReportBuilder().bluetoothDeviceDetails(device)
+                )
+            } label: {
+                Label("copy", systemImage: "square.on.square")
+            }
+        }
 
         Divider()
             .padding(.leading, 42)

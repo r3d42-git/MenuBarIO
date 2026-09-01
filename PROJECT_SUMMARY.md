@@ -8,7 +8,7 @@ not contain telemetry, analytics, update checks or network client code.
 Its product subtitle is `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-The current product version is `0.5.0` (build 9). Releases are prepared from a
+The current product version is `0.6.0` (build 10). Releases are prepared from a
 reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target and project are named `MenuBarIO`; the test
 target is `MenuBarIOTests`. The legacy app bundle identifier
@@ -383,6 +383,27 @@ release asset is `PortGlance-0.2.0-mac.dmg` with SHA-256
 `c79e5a61dca6e6a160df23a8a2361f29121ce71ae402e4ecae9a131a55847709`; the
 publicly downloaded artifact passed the independent release verification.
 
+Version 0.6.0 keeps macOS 13 as the unified project, app and test deployment
+target and retains both Universal architectures plus
+the Ventura/Sonoma settings window. A central lifecycle coordinator refreshes
+USB/Thunderbolt, Bluetooth, power and Ethernet together from the footer and
+after wake or session activation, while coalescing adjacent lifecycle events.
+Discovery now distinguishes ready, refreshing, stale and unavailable states:
+a failed refresh preserves the last complete USB/Thunderbolt or Bluetooth
+snapshot, a legitimate empty result remains zero devices and a powered-off
+Bluetooth controller is identified explicitly. The footer exports a structured
+Markdown report in visible group order through the native save panel, without
+serial numbers, Bluetooth addresses, location IDs, stable internal IDs,
+usernames or paths. Its sandbox access is limited to the file explicitly chosen
+by the user and is not retained. The detailed USB copy remains unchanged, and
+Bluetooth rows plus Thunderbolt-port rows provide their own explicit
+context-menu copies. Automated verification covers 76 tests, static analysis,
+the macOS 13 deployment-target audit and both Universal slices. The integrated
+settings and Markdown save panel were checked on macOS 26. The explicitly
+approved release exception records that the macOS 13/14 legacy-settings smoke
+test and the new physical refresh, sleep/wake and failure-state cases on Apple
+Silicon and the supported Intel/T2 Mac were not repeated for this release.
+
 ## Code structure
 
 - `MenuBarIO/MenuBarIOApp.swift` registers defaults, runs the one-time legacy
@@ -442,7 +463,7 @@ Update-Abfragen oder Netzwerk-Client-Code.
 Ihr Produktuntertitel lautet `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-Die aktuelle Produktversion ist `0.5.0` (Build 9). Releases werden auf einem
+Die aktuelle Produktversion ist `0.6.0` (Build 10). Releases werden auf einem
 geprüften Branch vorbereitet und vor dem Tagging in den geschützten Branch
 `main` integriert.
 Produkt, Programmdatei, Target und Projekt heißen `MenuBarIO`; das Test-Target
@@ -845,6 +866,32 @@ notarisierter und gestapelter Universal-Release
 veröffentlicht. Das Release-Artefakt `PortGlance-0.2.0-mac.dmg` hat den SHA-256
 `c79e5a61dca6e6a160df23a8a2361f29121ce71ae402e4ecae9a131a55847709`; der
 öffentlich heruntergeladene Stand bestand die unabhängige Release-Prüfung.
+
+Version 0.6.0 behält macOS 13 als einheitliches Deployment Target für Projekt,
+App und Tests bei und erhält beide
+Universal-Architekturen sowie das separate Einstellungsfenster für Ventura und
+Sonoma. Eine zentrale Lebenszyklus-Koordination aktualisiert USB/Thunderbolt,
+Bluetooth, Stromversorgung und Ethernet gemeinsam aus der Fußzeile sowie nach
+dem Aufwachen oder Aktivieren einer Sitzung; unmittelbar aufeinanderfolgende
+Lebenszyklusereignisse werden zusammengeführt. Die Erkennung unterscheidet nun
+zwischen bereit, wird aktualisiert, möglicherweise veraltet und nicht
+verfügbar: Eine fehlgeschlagene Aktualisierung erhält den letzten vollständigen
+USB-/Thunderbolt- oder Bluetooth-Stand, ein gültiges leeres Ergebnis bleibt bei
+null Geräten und ein ausgeschalteter Bluetooth-Controller wird ausdrücklich
+benannt. Aus der Fußzeile lässt sich über den nativen Speicherdialog ein
+strukturierter Markdown-Bericht in der sichtbaren Gruppenreihenfolge
+exportieren, ohne Seriennummern, Bluetooth-Adressen, Location-IDs, stabile
+interne IDs, Benutzernamen oder Pfade. Der Sandbox-Zugriff ist auf die vom
+Benutzer ausdrücklich gewählte Datei beschränkt und wird nicht gespeichert.
+Die detaillierte USB-Einzelkopie bleibt unverändert; Bluetooth-Zeilen und
+Thunderbolt-Port-Zeilen besitzen eigene ausdrückliche Kontextmenü-Kopien. Die
+automatische Prüfung umfasst 76 Tests, die statische Analyse, den Audit des
+macOS-13-Deployment-Targets und beide Universal-Slices. Die integrierten
+Einstellungen und der Markdown-Speicherdialog wurden unter macOS 26 geprüft.
+Die ausdrücklich genehmigte Release-Ausnahme hält fest, dass der Starttest der
+klassischen Einstellungen unter macOS 13/14 sowie die neuen physischen
+Aktualisierungs-, Sleep/Wake- und Fehlerzustandsfälle auf Apple Silicon und dem
+unterstützten Intel-/T2-Mac für diesen Release nicht wiederholt wurden.
 
 ## Codestruktur
 
