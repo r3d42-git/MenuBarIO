@@ -73,6 +73,8 @@ struct MainListView: View {
             Divider()
 
             VStack(alignment: .leading, spacing: 6) {
+                HardwareStatusRow()
+
                 if isTrulyEmpty {
                     MainListEmptyListMessage()
                 } else {

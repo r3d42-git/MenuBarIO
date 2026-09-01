@@ -8,6 +8,8 @@
 
 The command uses an isolated DerivedData directory and runs:
 
+- the deployment-target audit: every project, app and test configuration must
+  declare macOS 13.0;
 - the privacy audit: no telemetry, update checks or network client code;
 - the localization audit for valid syntax, matching locale keys, duplicate keys
   and unused literal keys;
@@ -22,6 +24,12 @@ The unit tests intentionally run without a debug signature: they test pure
 model and data logic, and the unsigned local test host avoids a Gatekeeper
 dialog. This does not affect the signed and notarized product delivered to
 users, which is verified separately by the release script.
+
+The current Xcode toolchain reports that its bundled XCTest support libraries
+were built for macOS 14 when the test bundle declares macOS 13. This toolchain
+warning concerns only Apple's non-shipping test runtime. The application target
+still builds for macOS 13, and runtime compatibility remains covered by the
+separate macOS 13/14 smoke test below.
 
 For an app-launch smoke test only:
 
@@ -93,6 +101,47 @@ After every change to IOKit discovery, check them once:
    At full charge or during an intentional charging pause, it must not claim a
    live charging wattage. Missing measurements must disappear without hiding
    the remaining valid values.
+13. With a USB device, a Thunderbolt dock and a Bluetooth device connected,
+    use the footer refresh button. It must show a compact progress state, avoid
+    overlapping work and update USB/Thunderbolt, Bluetooth, power and Ethernet
+    together. Put the Mac to sleep and wake it again; the same refresh must run
+    without restarting the app. Repeat the physical sleep/wake case on Apple
+    Silicon and the supported Intel/T2 Mac.
+14. Temporarily make one discovery source unavailable. The last successfully
+    discovered devices must remain visible with a stale-data notice; a valid
+    empty result must still show zero devices. Turning Bluetooth off must show
+    the explicit Bluetooth-off notice rather than presenting the controller as
+    a successful empty scan.
+15. Export the Markdown report from the footer and confirm that the native save
+    panel proposes a `.md` file. Open the saved file and compare its heading
+    hierarchy with the visible order: host ports, external ports, other USB
+    devices, Bluetooth devices, internal devices and USB hubs. Names, vendors,
+    protocols, negotiated speeds, port maxima and unknown hub assignments must
+    be clearly labelled, while serial numbers, Bluetooth addresses, location
+    IDs, stable internal IDs, usernames and paths must be absent. Check the
+    separate USB, Bluetooth and Thunderbolt-port context-menu copies as well.
+
+### Compatibility smoke tests
+
+- On macOS 15 or newer, verify the integrated settings view, the menu-bar
+  presentation, language switching, launch at login and device refresh.
+- On macOS 13 or 14, verify the separate legacy settings window, the legacy
+  menu-bar presentation, language switching, launch at login and device
+  refresh. No control may look active when its function is unavailable.
+- The declared deployment target and Universal slices are automated checks;
+  these runtime smoke tests remain required because current SDK testing cannot
+  emulate the complete menu-bar, login-item and physical-hardware behavior of
+  an older macOS installation.
+
+### Approved MenuBarIO 0.6.0 release exception — 2026-09-01
+
+The complete automated gate passed with 76 tests, static analysis, the macOS 13
+deployment-target audit and both Universal slices. The integrated settings view
+and native Markdown save panel were checked on macOS 26. The macOS 13/14 legacy
+settings smoke test and the new physical coordinated-refresh, sleep/wake and
+failure-state cases on Apple Silicon and the supported Intel/T2 Mac were not
+repeated for 0.6.0. Their absence was explicitly approved as a release exception
+and is not presented as physical acceptance.
 
 ### Recorded M4 Pro Mac mini topology validation — 2026-08-31
 
@@ -215,6 +264,8 @@ license in the freshly mounted DMG.
 
 Der Befehl verwendet ein isoliertes DerivedData-Verzeichnis und führt aus:
 
+- die Deployment-Target-Prüfung: jede Projekt-, App- und Testkonfiguration muss
+  macOS 13.0 deklarieren;
 - die Datenschutzprüfung: keine Telemetrie, Update-Abfragen oder
   Netzwerk-Client-Code;
 - die Lokalisierungsprüfung auf gültige Syntax, identische Schlüssel je
@@ -230,6 +281,13 @@ Die Unit-Tests laufen bewusst ohne Debug-Signatur: Sie prüfen reine
 Modell- und Datenlogik, und der unsignierte lokale Test-Host vermeidet einen
 Gatekeeper-Dialog. Das signierte, notarisiert ausgelieferte Produkt wird davon
 nicht berührt und wird im Release-Skript separat geprüft.
+
+Die aktuelle Xcode-Toolchain weist darauf hin, dass ihre mitgelieferten
+XCTest-Unterstützungsbibliotheken für macOS 14 gebaut wurden, obwohl das
+Test-Bundle macOS 13 deklariert. Diese Toolchain-Warnung betrifft nur Apples
+nicht ausgelieferte Testlaufzeit. Das App-Target wird weiterhin für macOS 13
+gebaut; die Laufzeitkompatibilität deckt zusätzlich der separate
+macOS-13-/14-Starttest weiter unten ab.
 
 Zum reinen Starttest der App:
 
@@ -307,6 +365,55 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
    vollem Akku oder einer beabsichtigten Ladepause darf keine aktuelle
    Ladeleistung behauptet werden. Fehlende Messwerte müssen verschwinden, ohne
    die übrigen gültigen Angaben auszublenden.
+13. Bei angeschlossenem USB-Gerät, Thunderbolt-Dock und Bluetooth-Gerät den
+    Aktualisieren-Button in der Fußzeile verwenden. Er muss einen kompakten
+    Aktivitätszustand zeigen, überlappende Arbeit vermeiden und
+    USB/Thunderbolt, Bluetooth, Stromversorgung und Ethernet gemeinsam
+    aktualisieren. Den Mac anschließend in den Ruhezustand versetzen und wieder
+    aufwecken; dieselbe Aktualisierung muss ohne App-Neustart erfolgen. Diesen
+    physischen Sleep/Wake-Fall auf Apple Silicon und dem unterstützten
+    Intel-/T2-Mac wiederholen.
+14. Eine Erkennungsquelle vorübergehend nicht verfügbar machen. Die zuletzt
+    erfolgreich erkannten Geräte müssen mit einem Hinweis auf möglicherweise
+    veraltete Daten sichtbar bleiben; ein gültiges leeres Ergebnis zeigt
+    weiterhin null Geräte. Wird Bluetooth ausgeschaltet, muss der ausdrückliche
+    Bluetooth-aus-Hinweis statt eines erfolgreichen leeren Scans erscheinen.
+15. Den Markdown-Bericht aus der Fußzeile exportieren und prüfen, dass der
+    native Speicherdialog eine `.md`-Datei vorschlägt. Die gespeicherte Datei
+    öffnen und ihre Überschriftenhierarchie mit der sichtbaren Reihenfolge
+    vergleichen: Hostports, externe Ports, weitere USB-Geräte,
+    Bluetooth-Geräte, interne Geräte und USB-Hubs. Namen, Anbieter, Protokolle,
+    ausgehandelte Geschwindigkeiten, Port-Maxima und unbekannte Hub-Zuordnungen
+    müssen klar beschriftet sein; Seriennummern, Bluetooth-Adressen,
+    Location-IDs, stabile interne IDs, Benutzernamen und Pfade dürfen nicht
+    enthalten sein. Zusätzlich die getrennten Kontextmenü-Kopien für USB,
+    Bluetooth und Thunderbolt-Ports prüfen.
+
+### Kompatibilitäts-Starttests
+
+- Unter macOS 15 oder neuer die integrierte Einstellungsansicht, die
+  Menüleistendarstellung, Sprachumschaltung, Start bei Anmeldung und
+  Geräteaktualisierung prüfen.
+- Unter macOS 13 oder 14 das separate klassische Einstellungsfenster, die
+  ältere Menüleistendarstellung, Sprachumschaltung, Start bei Anmeldung und
+  Geräteaktualisierung prüfen. Kein Bedienelement darf aktiv wirken, wenn
+  seine Funktion nicht verfügbar ist.
+- Das deklarierte Deployment Target und die Universal-Slices werden
+  automatisiert geprüft. Die Laufzeit-Starttests bleiben nötig, weil das
+  aktuelle SDK das vollständige Verhalten von Menüleiste, Anmeldeobjekt und
+  physischer Hardware unter einer älteren macOS-Installation nicht emuliert.
+
+### Genehmigte Release-Ausnahme für MenuBarIO 0.6.0 — 01.09.2026
+
+Die vollständige automatische Prüfkette war mit 76 Tests, statischer Analyse,
+dem Audit des macOS-13-Deployment-Targets und beiden Universal-Slices
+erfolgreich. Die integrierte Einstellungsansicht und der native
+Markdown-Speicherdialog wurden unter macOS 26 geprüft. Der Starttest der
+klassischen Einstellungen unter macOS 13/14 sowie die neuen physischen Fälle
+für koordinierte Aktualisierung, Sleep/Wake und Fehlerzustände auf Apple
+Silicon und dem unterstützten Intel-/T2-Mac wurden für 0.6.0 nicht wiederholt.
+Diese Auslassung wurde ausdrücklich als Release-Ausnahme genehmigt und wird
+nicht als physische Abnahme dargestellt.
 
 ### Dokumentierte Topologie-Abnahme am M4-Pro-Mac-mini — 31.08.2026
 

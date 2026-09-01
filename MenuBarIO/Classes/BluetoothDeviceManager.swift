@@ -8,6 +8,7 @@ import IOBluetooth
 
 final class BluetoothDeviceManager: NSObject, ObservableObject {
     @Published private(set) var devices: [BluetoothDevice] = []
+    @Published private(set) var sourceStatus: HardwareSourceStatus = .refreshing(lastUpdated: nil)
 
     var count: Int {
         devices.count
@@ -15,8 +16,21 @@ final class BluetoothDeviceManager: NSObject, ObservableObject {
 
     private var connectNotification: IOBluetoothUserNotification?
     private var disconnectNotifications: [String: IOBluetoothUserNotification] = [:]
+    private var controllerObservers: [NSObjectProtocol] = []
 
-    init(monitoringEnabled: Bool = true) {
+    private let reader: BluetoothDeviceReading
+    private let notificationCenter: NotificationCenter
+    private let now: () -> Date
+
+    init(
+        monitoringEnabled: Bool = true,
+        reader: BluetoothDeviceReading = SystemBluetoothDeviceReader(),
+        notificationCenter: NotificationCenter = .default,
+        now: @escaping () -> Date = Date.init
+    ) {
+        self.reader = reader
+        self.notificationCenter = notificationCenter
+        self.now = now
         super.init()
 
         guard monitoringEnabled else { return }
@@ -37,27 +51,29 @@ final class BluetoothDeviceManager: NSObject, ObservableObject {
             return
         }
 
-        let pairedDevices = IOBluetoothDevice.pairedDevices() as? [IOBluetoothDevice] ?? []
-        var connectedSystemDevices: [String: IOBluetoothDevice] = [:]
-        let snapshots = pairedDevices.map { device -> BluetoothDevice.Snapshot in
-            let snapshot = BluetoothDevice.Snapshot(
-                identifier: device.addressString,
-                name: device.nameOrAddress,
-                isConnected: device.isConnected(),
-                deviceClassMajor: device.deviceClassMajor,
-                deviceClassMinor: device.deviceClassMinor
+        sourceStatus = .refreshing(lastUpdated: sourceStatus.lastUpdated)
+        let result = reader.read()
+
+        switch result.availability {
+        case .available:
+            let connectedDevices = BluetoothDevice.connectedDevices(from: result.snapshots)
+            devices = connectedDevices
+            replaceDisconnectNotifications(
+                for: connectedDevices,
+                systemDevices: result.connectedSystemDevices
             )
-
-            if let connectedDevice = BluetoothDevice(snapshot: snapshot) {
-                connectedSystemDevices[connectedDevice.id] = device
+            sourceStatus = .ready(lastUpdated: now())
+        case .poweredOff:
+            devices = []
+            unregisterDisconnectNotifications()
+            sourceStatus = .unavailable(.bluetoothPoweredOff)
+        case .unavailable:
+            if let lastUpdated = sourceStatus.lastUpdated {
+                sourceStatus = .stale(lastUpdated: lastUpdated)
+            } else {
+                sourceStatus = .unavailable(.bluetoothUnavailable)
             }
-
-            return snapshot
         }
-
-        let connectedDevices = BluetoothDevice.connectedDevices(from: snapshots)
-        devices = connectedDevices
-        replaceDisconnectNotifications(for: connectedDevices, systemDevices: connectedSystemDevices)
     }
 
     private func startMonitoring() {
@@ -65,11 +81,29 @@ final class BluetoothDeviceManager: NSObject, ObservableObject {
             forConnectNotifications: self,
             selector: #selector(deviceConnected(_:device:))
         )
+
+        let names: [Notification.Name] = [
+            .IOBluetoothHostControllerPoweredOn,
+            .IOBluetoothHostControllerPoweredOff,
+        ]
+        controllerObservers = names.map { name in
+            notificationCenter.addObserver(
+                forName: name,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                self?.refresh()
+            }
+        }
     }
 
     private func stopMonitoring() {
         connectNotification?.unregister()
         connectNotification = nil
+        for observer in controllerObservers {
+            notificationCenter.removeObserver(observer)
+        }
+        controllerObservers.removeAll()
         unregisterDisconnectNotifications()
     }
 

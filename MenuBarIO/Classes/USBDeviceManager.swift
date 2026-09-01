@@ -46,6 +46,7 @@ final class USBDeviceManager: ObservableObject {
     @Published private(set) var adapterPowerWatts: Int?
     @Published private(set) var powerSourceConnectorNumber: Int?
     @Published private(set) var ethernetCableConnected = false
+    @Published private(set) var sourceStatus: HardwareSourceStatus = .refreshing(lastUpdated: nil)
 
     var deviceGroups: USBDeviceGroups {
         USBDeviceGroups(
@@ -66,6 +67,7 @@ final class USBDeviceManager: ObservableObject {
     private let defaults: UserDefaults
     private let discovery: USBDeviceDiscovering
     private let ethernetReader: EthernetLinkReading
+    private let now: () -> Date
     private let refreshQueue = DispatchQueue(
         label: "de.r3d.menubario.device-refresh",
         qos: .utility
@@ -82,11 +84,13 @@ final class USBDeviceManager: ObservableObject {
         monitoringEnabled: Bool = true,
         defaults: UserDefaults = .standard,
         discovery: USBDeviceDiscovering = USBDeviceDiscovery(),
-        ethernetReader: EthernetLinkReading = EthernetLinkReader()
+        ethernetReader: EthernetLinkReading = EthernetLinkReader(),
+        now: @escaping () -> Date = Date.init
     ) {
         self.defaults = defaults
         self.discovery = discovery
         self.ethernetReader = ethernetReader
+        self.now = now
         connectionMonitor = USBConnectionMonitor { [weak self] in
             self?.refresh()
         }
@@ -127,6 +131,8 @@ final class USBDeviceManager: ObservableObject {
             }
             return
         }
+
+        sourceStatus = .refreshing(lastUpdated: sourceStatus.lastUpdated)
 
         if isPowerSourceInfoEnabled {
             powerSourceMonitor?.refresh()
@@ -173,7 +179,8 @@ final class USBDeviceManager: ObservableObject {
                     devices: devices,
                     thunderboltPorts: thunderboltPorts,
                     externalThunderboltPortGroups: externalThunderboltPortGroups,
-                    ethernetConnected: ethernetConnected
+                    ethernetConnected: ethernetConnected,
+                    discoveryIsComplete: topology.isComplete
                 )
             }
         }
@@ -191,15 +198,23 @@ final class USBDeviceManager: ObservableObject {
         devices: [USBDevice],
         thunderboltPorts: [ThunderboltPort],
         externalThunderboltPortGroups: [ExternalThunderboltPortGroup],
-        ethernetConnected: Bool?
+        ethernetConnected: Bool?,
+        discoveryIsComplete: Bool
     ) {
         switch refreshCoordinator.completeRefresh(generation) {
         case .refresh(let nextGeneration):
             startRefresh(generation: nextGeneration, options: latestRefreshOptions)
         case .publish:
-            self.devices = devices
-            self.thunderboltPorts = thunderboltPorts
-            self.externalThunderboltPortGroups = externalThunderboltPortGroups
+            if discoveryIsComplete {
+                self.devices = devices
+                self.thunderboltPorts = thunderboltPorts
+                self.externalThunderboltPortGroups = externalThunderboltPortGroups
+                sourceStatus = .ready(lastUpdated: now())
+            } else if let lastUpdated = sourceStatus.lastUpdated {
+                sourceStatus = .stale(lastUpdated: lastUpdated)
+            } else {
+                sourceStatus = .unavailable(.discoveryFailed)
+            }
             publishEthernetStatus(
                 ethernetConnected,
                 generation: generation,

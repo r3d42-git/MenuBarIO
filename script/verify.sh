@@ -21,6 +21,16 @@ else
 fi
 
 cd "$ROOT_DIR"
+
+DEPLOYMENT_TARGETS="$(
+  sed -nE 's/.*MACOSX_DEPLOYMENT_TARGET = ([0-9.]+);/\1/p' MenuBarIO.xcodeproj/project.pbxproj \
+    | sort -u
+)"
+if [[ "$DEPLOYMENT_TARGETS" != "13.0" ]]; then
+  echo "Deployment-target audit failed: expected only macOS 13.0, found: $DEPLOYMENT_TARGETS" >&2
+  exit 1
+fi
+
 ./script/privacy_audit.sh
 ./script/localization_audit.sh
 swiftc -typecheck script/generate_dmg_background.swift

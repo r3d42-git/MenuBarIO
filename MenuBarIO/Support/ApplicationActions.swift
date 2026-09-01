@@ -6,6 +6,10 @@ enum ApplicationActions {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
     }
 
+    static var build: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "N/A"
+    }
+
     static func exit() {
         NSApp.terminate(nil)
     }

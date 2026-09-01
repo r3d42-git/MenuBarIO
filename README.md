@@ -38,6 +38,13 @@ maintained independently.
   watts, adapter capacity and a power-only occupied USB-C port when available
 - USB-C Billboard interfaces are identified as companion interfaces, so compatible Thunderbolt docks are not listed twice
 - Optional local Ethernet-link indicator; network traffic monitoring is not included
+- One coordinated refresh updates USB/Thunderbolt, Bluetooth, power and
+  Ethernet after a manual request, wake or session activation; failed discovery
+  keeps the last valid hardware snapshot visible and labels it as stale
+- A structured Markdown report follows the visible group order and can be
+  exported through the native save panel without serial numbers, Bluetooth
+  addresses or internal identifiers; detailed per-device copy actions remain
+  available from context menus
 - Compact device-first view without saved per-device customizations
 - No bundled audio, custom hardware sound or donation functionality
 - No telemetry, analytics, crash reporting or network requests; see
@@ -45,7 +52,7 @@ maintained independently.
 
 ## Compatibility
 
-The current release, **MenuBarIO 0.5.0**, is a **Universal** app for Apple
+The current release, **MenuBarIO 0.6.0**, is a **Universal** app for Apple
 Silicon (`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. Automated
 checks run natively on both architectures. The physical Intel-Mac observations
 and the hardware cases that still apply after discovery changes are documented
@@ -117,6 +124,14 @@ MenuBarIO selbst wird unabhängig entwickelt und gepflegt.
   sodass kompatible Thunderbolt-Docks nicht doppelt erscheinen
 - Optionale lokale Ethernet-Link-Anzeige; eine Überwachung des Netzwerkverkehrs
   ist nicht enthalten
+- Eine koordinierte Aktualisierung erfasst USB/Thunderbolt, Bluetooth,
+  Stromversorgung und Ethernet nach manueller Anforderung, Ruhezustand oder
+  Sitzungsaktivierung gemeinsam; bei einem Fehler bleibt der letzte gültige
+  Hardwarestand sichtbar und wird als möglicherweise veraltet gekennzeichnet
+- Ein strukturierter Markdown-Bericht folgt der sichtbaren Gruppenreihenfolge
+  und lässt sich über den nativen Speicherdialog ohne Seriennummern,
+  Bluetooth-Adressen oder interne Kennungen exportieren; detaillierte
+  Einzelkopien bleiben in den Kontextmenüs verfügbar
 - Kompakte, geräteorientierte Ansicht ohne gespeicherte Anpassungen je Gerät
 - Keine eingebundenen Audiodateien, eigenen Hardware-Sounds oder
   Spendenfunktionen
@@ -125,7 +140,7 @@ MenuBarIO selbst wird unabhängig entwickelt und gepflegt.
 
 ## Kompatibilität
 
-Der aktuelle Release **MenuBarIO 0.5.0** ist eine **Universal-App** für
+Der aktuelle Release **MenuBarIO 0.6.0** ist eine **Universal-App** für
 Apple-Silicon- (`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die
 automatischen Prüfungen laufen nativ auf beiden Architekturen. Die physischen
 Beobachtungen auf einem Intel-Mac und die nach Änderungen an der

@@ -6,8 +6,8 @@ cd "$ROOT_DIR"
 
 bash "$ROOT_DIR/script/verify_entitlements.sh" "$ROOT_DIR/MenuBarIO/MenuBarIO.entitlements"
 
-if rg -n 'ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;|ENABLE_USER_SELECTED_FILES = (readonly|readwrite);' MenuBarIO.xcodeproj/project.pbxproj; then
-  echo "Privacy audit failed: Xcode still enables network or user-selected file access." >&2
+if rg -n 'ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;' MenuBarIO.xcodeproj/project.pbxproj; then
+  echo "Privacy audit failed: Xcode still enables outgoing network access." >&2
   exit 1
 fi
 
@@ -39,4 +39,4 @@ for update_feed_key in PortGlanceUpdateFeedURL MenuBarIOUpdateFeedURL; do
   fi
 done
 
-echo "Privacy audit passed: sandbox with USB and Bluetooth entitlements; no telemetry, network client code, or Ethernet traffic monitor."
+echo "Privacy audit passed: sandbox with USB, Bluetooth, and user-selected export access; no telemetry, network client code, or Ethernet traffic monitor."

@@ -16,7 +16,8 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
     static let usbDeviceClassNames = [kIOUSBHostDeviceClassName, kIOUSBDeviceClassName]
 
     func connectedTopology() -> USBTopologySnapshot {
-        let discoveredUSBDevices = fetchUSBDevices()
+        let usbRecords = fetchUSBDevices()
+        let discoveredUSBDevices = usbRecords.devices
         let thunderboltTopology = fetchThunderboltTopology(usbDevices: discoveredUSBDevices)
         let thunderboltDevices = thunderboltTopology.devices
         var devices = discoveredUSBDevices.filter { usbDevice in
@@ -33,30 +34,35 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
         return USBTopologySnapshot(
             devices: devices,
             thunderboltPorts: thunderboltTopology.ports,
-            externalThunderboltPortGroups: thunderboltTopology.externalPortGroups
+            externalThunderboltPortGroups: thunderboltTopology.externalPortGroups,
+            isComplete: usbRecords.isComplete && thunderboltTopology.isComplete
         )
     }
 
-    private func fetchUSBDevices() -> [USBDevice] {
+    private func fetchUSBDevices() -> USBDeviceDiscoveryRecords {
         var devices: [USBDevice] = []
         var seenDeviceIDs = Set<String>()
+        var isComplete = true
 
         for className in Self.usbDeviceClassNames {
-            for device in fetchMatchingDevices(className: className)
+            let records = fetchMatchingDevices(className: className)
+            isComplete = isComplete && records.isComplete
+
+            for device in records.devices
             where seenDeviceIDs.insert(device.id).inserted {
                 devices.append(device)
             }
         }
 
-        return devices
+        return USBDeviceDiscoveryRecords(devices: devices, isComplete: isComplete)
     }
 
-    private func fetchMatchingDevices(className: String) -> [USBDevice] {
+    private func fetchMatchingDevices(className: String) -> USBDeviceDiscoveryRecords {
         let matching = IOServiceMatching(className)
         var iterator: io_iterator_t = 0
 
         guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else {
-            return []
+            return USBDeviceDiscoveryRecords(devices: [], isComplete: false)
         }
         defer { IOObjectRelease(iterator) }
 
@@ -67,7 +73,7 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
             }
             IOObjectRelease(entry)
         }
-        return devices
+        return USBDeviceDiscoveryRecords(devices: devices, isComplete: true)
     }
 
     private func fetchThunderboltTopology(
@@ -80,7 +86,8 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
             return ThunderboltTopologyRecords(
                 devices: [],
                 ports: [],
-                externalPortGroups: []
+                externalPortGroups: [],
+                isComplete: false
             )
         }
         defer { IOObjectRelease(iterator) }
@@ -130,7 +137,8 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
         return ThunderboltTopologyRecords(
             devices: devices,
             ports: ports,
-            externalPortGroups: externalPortGroups
+            externalPortGroups: externalPortGroups,
+            isComplete: true
         )
     }
 
@@ -775,12 +783,31 @@ struct USBTopologySnapshot: Equatable {
     let devices: [USBDevice]
     let thunderboltPorts: [ThunderboltPort]
     let externalThunderboltPortGroups: [ExternalThunderboltPortGroup]
+    let isComplete: Bool
+
+    init(
+        devices: [USBDevice],
+        thunderboltPorts: [ThunderboltPort],
+        externalThunderboltPortGroups: [ExternalThunderboltPortGroup],
+        isComplete: Bool = true
+    ) {
+        self.devices = devices
+        self.thunderboltPorts = thunderboltPorts
+        self.externalThunderboltPortGroups = externalThunderboltPortGroups
+        self.isComplete = isComplete
+    }
+}
+
+private struct USBDeviceDiscoveryRecords {
+    let devices: [USBDevice]
+    let isComplete: Bool
 }
 
 private struct ThunderboltTopologyRecords {
     let devices: [USBDevice]
     let ports: [ThunderboltPort]
     let externalPortGroups: [ExternalThunderboltPortGroup]
+    let isComplete: Bool
 }
 
 private struct ThunderboltHostRouterRecord {
