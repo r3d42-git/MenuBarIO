@@ -402,7 +402,25 @@ the macOS 13 deployment-target audit and both Universal slices. The integrated
 settings and Markdown save panel were checked on macOS 26. The explicitly
 approved release exception records that the macOS 13/14 legacy-settings smoke
 test and the new physical refresh, sleep/wake and failure-state cases on Apple
-Silicon and the supported Intel/T2 Mac were not repeated for this release.
+Silicon and the supported Intel/T2 Mac were not repeated for this release. It
+was published on 2026-09-01 as the signed, notarized and stapled Universal
+release [`v0.6.0`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.6.0)
+from merged pull request
+[`#22`](https://github.com/r3d42-git/MenuBarIO/pull/22) and merge commit
+`6c2f10b63f5de12be6e1a7fb866b60530a6457db`. Apple accepted the separately
+submitted app under `df885c77-14e4-44cc-b931-59d120f670a7` and the DMG under
+`6d72c7ac-dddd-41f3-8e34-72baa5416431`. The public
+`MenuBarIO-0.6.0-mac.dmg` is 2,984,052 bytes and has SHA-256
+`8ffbced9b240d2d3cfd39d689322971e3b12ff80761c81df15b966f7f08ba84c`,
+matching GitHub's asset digest. Both native jobs passed in pull-request CI run
+[`33509359572`](https://github.com/r3d42-git/MenuBarIO/actions/runs/33509359572)
+and main CI run
+[`33509796189`](https://github.com/r3d42-git/MenuBarIO/actions/runs/33509796189);
+the main Pages build and public-route verification also passed in run
+[`33509796257`](https://github.com/r3d42-git/MenuBarIO/actions/runs/33509796257).
+A fresh GitHub download passed checksum, DMG integrity, Gatekeeper, both staple
+checks, enclosed-app signature, version/build, Universal slices and installer
+layout verification.
 
 ## Code structure
 
@@ -891,7 +909,28 @@ Einstellungen und der Markdown-Speicherdialog wurden unter macOS 26 geprüft.
 Die ausdrücklich genehmigte Release-Ausnahme hält fest, dass der Starttest der
 klassischen Einstellungen unter macOS 13/14 sowie die neuen physischen
 Aktualisierungs-, Sleep/Wake- und Fehlerzustandsfälle auf Apple Silicon und dem
-unterstützten Intel-/T2-Mac für diesen Release nicht wiederholt wurden.
+unterstützten Intel-/T2-Mac für diesen Release nicht wiederholt wurden. Er
+wurde am 01.09.2026 als signierter, notarisierter und gestapelter
+Universal-Release
+[`v0.6.0`](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.6.0) aus dem
+gemergten Pull Request
+[`#22`](https://github.com/r3d42-git/MenuBarIO/pull/22) und dem Merge-Commit
+`6c2f10b63f5de12be6e1a7fb866b60530a6457db` veröffentlicht. Apple akzeptierte
+die separat eingereichte App unter `df885c77-14e4-44cc-b931-59d120f670a7` und
+das DMG unter `6d72c7ac-dddd-41f3-8e34-72baa5416431`. Das öffentliche
+`MenuBarIO-0.6.0-mac.dmg` ist 2.984.052 Bytes groß und hat den SHA-256
+`8ffbced9b240d2d3cfd39d689322971e3b12ff80761c81df15b966f7f08ba84c`,
+passend zu GitHubs Asset-Digest. Beide nativen Jobs waren sowohl im
+Pull-Request-CI-Lauf
+[`33509359572`](https://github.com/r3d42-git/MenuBarIO/actions/runs/33509359572)
+als auch im `main`-CI-Lauf
+[`33509796189`](https://github.com/r3d42-git/MenuBarIO/actions/runs/33509796189)
+erfolgreich; auch der Pages-Build und die Prüfung der öffentlichen Routen waren
+im Lauf
+[`33509796257`](https://github.com/r3d42-git/MenuBarIO/actions/runs/33509796257)
+erfolgreich. Ein frischer GitHub-Download bestand die Prüfung von Prüfsumme,
+DMG-Integrität, Gatekeeper, beiden Staple-Tickets, Signatur, Version/Build und
+Universal-Slices der enthaltenen App sowie des Installer-Layouts.
 
 ## Codestruktur
 
