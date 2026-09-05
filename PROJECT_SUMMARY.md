@@ -89,6 +89,10 @@ and CI gate now creates and verifies an ad-hoc Universal archive, catching this
 class of packaging failure before Developer ID signing. The corrected local
 gate passed; the failed attempt never reached Apple or GitHub publication.
 
+The DMG window and background are 760 x 560 points/pixels so the four license
+and source files remain visible below the app/Applications row. The original
+420-point window clipped those files during the final read-only Finder check.
+
 The bilingual project-history website is maintained as a curated static site
 in `website/` and published from protected `main` through GitHub Pages at
 [`r3d42-git.github.io/MenuBarIO`](https://r3d42-git.github.io/MenuBarIO/).
