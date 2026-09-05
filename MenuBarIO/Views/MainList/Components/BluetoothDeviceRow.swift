@@ -6,31 +6,47 @@ struct BluetoothDeviceRow: View {
     let isHovered: Bool
     let onHover: (Bool) -> Void
 
+    let onSelect: () -> Void
+
     var body: some View {
-        HStack(spacing: 10) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .fill(.primary.opacity(0.08))
-                    .frame(width: 32, height: 32)
-                deviceIcon
+        Button(action: onSelect) {
+            HStack(spacing: 10) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(.primary.opacity(0.08))
+                        .frame(width: 32, height: 32)
+                        .accessibilityHidden(true)
+                    deviceIcon.accessibilityHidden(true)
+                }
+
+                Text(device.name)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(.primary)
+                    .lineLimit(1)
+
+                Spacer(minLength: 12)
+
+                if let level = device.batteryLevel {
+                    Label("\(level)%", systemImage: batteryIcon(level))
+                        .font(.caption.weight(.medium))
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel(Text("\("battery_level".localized): \(level)%"))
+                }
             }
-
-            Text(device.name)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(.primary)
-                .lineLimit(1)
-
-            Spacer(minLength: 12)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(
+                isHovered ? Color.primary.opacity(0.07) : Color.clear,
+                in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .onHover(perform: onHover)
+            .animation(.easeInOut(duration: 0.12), value: isHovered)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(
-            isHovered ? Color.primary.opacity(0.07) : Color.clear,
-            in: RoundedRectangle(cornerRadius: 8, style: .continuous)
-        )
-        .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .onHover(perform: onHover)
-        .animation(.easeInOut(duration: 0.12), value: isHovered)
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityHint(Text("open_device_details"))
         .contextMenu {
             Button {
                 SystemActions.copyToClipboard(
@@ -43,6 +59,16 @@ struct BluetoothDeviceRow: View {
 
         Divider()
             .padding(.leading, 42)
+    }
+
+    private func batteryIcon(_ level: Int) -> String {
+        switch level {
+        case 0..<10: "battery.0percent"
+        case 10..<38: "battery.25percent"
+        case 38..<63: "battery.50percent"
+        case 63..<88: "battery.75percent"
+        default: "battery.100percent"
+        }
     }
 
     @ViewBuilder

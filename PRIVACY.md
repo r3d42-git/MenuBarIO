@@ -11,6 +11,13 @@ and stores settings exclusively in the user's local profile. The Ethernet
 indicator processes only the local link status; it does not inspect packets,
 destinations or traffic data.
 
+Bluetooth battery values are read from local macOS HID metadata or the standard
+Bluetooth LE Battery Service on devices already connected to macOS. Devices are
+matched only by exact system identifiers; the app does not scan, pair devices
+or write Bluetooth characteristics. Battery samples stay in memory, expire
+after 15 minutes and are removed when a device disconnects. Background battery
+reads run at most every five minutes.
+
 When the user explicitly exports a hardware report, the app receives write
 access only to the file selected in the native macOS save panel. It does not
 retain access to that file or its containing folder. The Markdown report is
@@ -35,6 +42,13 @@ Die App liest USB-, Thunderbolt- und Ethernet-Metadaten über macOS-System-APIs
 und speichert Einstellungen ausschließlich lokal im Benutzerprofil. Die
 Ethernet-Anzeige verarbeitet ausschließlich den lokalen Link-Status; sie
 untersucht keine Pakete, Ziele oder Verkehrsdaten.
+
+Bluetooth-Akkustände werden aus lokalen macOS-HID-Metadaten oder dem
+standardisierten Bluetooth-LE-Akkudienst bereits mit macOS verbundener Geräte
+gelesen. Die Zuordnung verwendet ausschließlich eindeutige Systemkennungen;
+die App sucht und koppelt keine Geräte und schreibt keine Bluetooth-Merkmale.
+Akkumessungen bleiben im Arbeitsspeicher, verfallen nach 15 Minuten und werden
+beim Trennen entfernt. Hintergrundabfragen erfolgen höchstens alle fünf Minuten.
 
 Wenn der Benutzer ausdrücklich einen Hardwarebericht exportiert, erhält die
 App ausschließlich Schreibzugriff auf die im nativen macOS-Speicherdialog

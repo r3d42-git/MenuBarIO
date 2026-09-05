@@ -57,6 +57,18 @@ if ! git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; t
   exit 1
 fi
 
+if [[ "$(git branch --show-current)" != "main" ]]; then
+  echo "Publish only from the reviewed main branch." >&2
+  exit 1
+fi
+LOCAL_COMMIT="$(git rev-parse HEAD)"
+TAG_COMMIT="$(git rev-parse "$TAG^{commit}")"
+REMOTE_TAG_COMMIT="$(git ls-remote --tags origin "refs/tags/$TAG^{}" | awk '{print $1}')"
+if [[ "$LOCAL_COMMIT" != "$TAG_COMMIT" || "$TAG_COMMIT" != "$REMOTE_TAG_COMMIT" ]]; then
+  echo "Local source, annotated tag and remote release tag must identify the same commit." >&2
+  exit 1
+fi
+
 LOCAL_SHA256="$(shasum -a 256 "$DMG_PATH" | awk '{print $1}')"
 CHECKSUM_SHA256="$(awk 'NF { print $1; exit }' "$CHECKSUM_PATH")"
 if [[ "$CHECKSUM_SHA256" != "$LOCAL_SHA256" ]]; then

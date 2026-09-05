@@ -21,7 +21,7 @@
 "no_devices_found" = "未找到设备";
 "version" = "版本：%@";
 "unknown_speed" = "未知速度";
-"port_max" = "最大端口:";
+"port_max" = "端口容量：";
 "serial_number" = "SN:";
 "usb_version" = "USB 版本:";
 "low_speed" = "慢的";
@@ -81,3 +81,19 @@
 "bluetooth_address" = "蓝牙地址：";
 "controller_id" = "控制器 ID：";
 "negotiated_speed" = "协商速度：";
+
+"device_details" = "设备详情";
+"open_device_details" = "打开设备详情";
+"technical_identifiers" = "技术标识符";
+"hardware_identifier" = "硬件标识符";
+"connection_path" = "连接路径";
+"connection_path_unknown" = "无法可靠地确定物理连接路径。";
+"link_speed_explanation" = "链路速率由设备协商确定，并非实际文件传输速度的测量值。";
+"bandwidth_boost" = "带宽增强";
+"bandwidth_boost_explanation" = "Thunderbolt 5 / USB4 v2 支持双向各 80 Gbit/s。带宽增强可为高带宽显示需求提供一个方向 120 Gbit/s、另一个方向 40 Gbit/s。80 Gbit/s 链路属于正常情况。";
+"details_copied" = "详情已复制";
+"device_no_longer_available" = "此设备或端口已不可用。";
+"group_expanded" = "已展开";
+"group_collapsed" = "已折叠";
+"last_successful_update" = "上次成功更新：%@";
+"battery_level" = "电池电量";

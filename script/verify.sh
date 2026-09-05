@@ -31,6 +31,9 @@ if [[ "$DEPLOYMENT_TARGETS" != "13.0" ]]; then
   exit 1
 fi
 
+PRODUCT_VERSION="$(sed -nE 's/.*MARKETING_VERSION = ([0-9.]+);/\1/p' MenuBarIO.xcodeproj/project.pbxproj | sort -u)"
+./script/verify_license_material.sh "$ROOT_DIR" "$PRODUCT_VERSION"
+
 ./script/privacy_audit.sh
 ./script/localization_audit.sh
 swiftc -typecheck script/generate_dmg_background.swift
@@ -41,7 +44,8 @@ bash -n \
   script/release.sh \
   script/publish_release.sh \
   script/verify_release.sh \
-  script/verify_entitlements.sh
+  script/verify_entitlements.sh \
+  script/verify_license_material.sh
 
 xcodebuild test -quiet \
   -project MenuBarIO.xcodeproj \
@@ -79,6 +83,7 @@ if [[ ! -d "$APP_PATH" ]]; then
   exit 1
 fi
 
+./script/verify_license_material.sh "$APP_PATH/Contents/Resources/Licenses" "$PRODUCT_VERSION"
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
 for architecture in $UNIVERSAL_ARCHITECTURES; do
   lipo "$APP_PATH/Contents/MacOS/$APP_NAME" -verify_arch "$architecture"

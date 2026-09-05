@@ -5,6 +5,6 @@
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>MenuBarIO uses Bluetooth only to list devices currently connected to this Mac.</string>
+	<string>MenuBarIO uses Bluetooth to list devices currently connected to this Mac and read their battery levels when available.</string>
 </dict>
 </plist>

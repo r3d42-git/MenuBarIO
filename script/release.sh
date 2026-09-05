@@ -88,7 +88,9 @@ spctl --assess --type execute --verbose=4 "$APP_PATH"
 
 mkdir -p "$STAGING_DIR"
 ditto "$APP_PATH" "$STAGING_DIR/$PRODUCT_NAME.app"
-ditto "$ROOT_DIR/LICENSE" "$STAGING_DIR/LICENSE"
+for name in LICENSE LICENSE.upstream NOTICE SOURCE.md; do
+  ditto "$ROOT_DIR/$name" "$STAGING_DIR/$name"
+done
 "$ROOT_DIR/script/create_installer_dmg.sh" \
   "$STAGING_DIR" \
   "$DMG_PATH" \

@@ -12,6 +12,8 @@ struct MainListView: View {
     @EnvironmentObject var manager: USBDeviceManager
     @EnvironmentObject var bluetoothManager: BluetoothDeviceManager
 
+    @State private var selectedDevice: DeviceDetailSelection?
+
     @Binding var currentWindow: AppWindow
 
     @AS(Key.windowWidth) private var windowWidth: WindowWidth = .normal
@@ -68,6 +70,17 @@ struct MainListView: View {
     }
 
     var body: some View {
+        Group {
+            if let selectedDevice {
+                DeviceDetailsView(selection: selectedDevice, onBack: { self.selectedDevice = nil })
+            } else {
+                deviceList
+            }
+        }
+        .frame(width: CGFloat(windowWidth.rawValue))
+    }
+
+    private var deviceList: some View {
         VStack(spacing: 0) {
             header
             Divider()
@@ -84,7 +97,8 @@ struct MainListView: View {
                         internalGroupExpanded: $internalGroupExpanded,
                         bluetoothGroupExpanded: $bluetoothGroupExpanded,
                         thunderboltPortGroupExpanded: $thunderboltPortGroupExpanded,
-                        externalThunderboltPortGroupExpanded: $externalThunderboltPortGroupExpanded
+                        externalThunderboltPortGroupExpanded: $externalThunderboltPortGroupExpanded,
+                        onSelect: { selectedDevice = $0 }
                     )
                 }
             }

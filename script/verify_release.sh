@@ -91,4 +91,7 @@ if [[ ! -f "$MOUNT_DIR/.background/installer-background.png" || ! -f "$MOUNT_DIR
   exit 1
 fi
 
+"$ROOT_DIR/script/verify_license_material.sh" "$MOUNT_DIR" "$VERSION"
+"$ROOT_DIR/script/verify_license_material.sh" "$APP_PATH/Contents/Resources/Licenses" "$VERSION"
+
 echo "Verified release DMG and enclosed app: $DMG_PATH"

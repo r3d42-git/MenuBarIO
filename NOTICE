@@ -1,0 +1,22 @@
+MenuBarIO
+SPDX-License-Identifier: GPL-3.0-or-later
+
+MenuBarIO version 0.7.0 and later is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version. The complete terms are in LICENSE.
+MenuBarIO is distributed without any warranty; see LICENSE for details.
+
+MenuBarIO began with the MIT-licensed MenuBarUSB source by
+Rafael Neuwirth Swierczynski, copyright (c) 2025. The original copyright
+and permission notice is preserved verbatim in LICENSE.upstream.
+Upstream: https://github.com/rafaelSwi/MenuBarUSB
+
+MenuBarIO is independently developed and maintained. It is not an official
+successor, official continuation or endorsed version of MenuBarUSB.
+The original author is not involved in MenuBarIO development, maintenance,
+support or releases. Preserved Git history records original contributions.
+
+Previously published releases through 0.6.0 retain their MIT licensing.
+This change does not retrospectively change those releases.
+See SOURCE.md for the exact corresponding public source of this release.

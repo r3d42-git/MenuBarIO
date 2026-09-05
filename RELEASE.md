@@ -6,8 +6,10 @@ packaging, independently notarizes the DMG, then mounts that exact DMG read-only
 and verifies both tickets with `script/verify_release.sh`. The delivered image
 opens as a small installer window:
 the app can be dragged onto the visible **Programme** alias, which points to
-`/Applications`. `LICENSE` and the installer background stay included in the
-image and are verified during the release.
+`/Applications`. `LICENSE`, `LICENSE.upstream`, `NOTICE`, `SOURCE.md` and the installer background
+are included in the image. The four license/source files are also bundled
+inside the app before signing. Verification compares both delivered copies
+with the release source and checks the exact public source tag.
 
 ## DMG design rule
 
@@ -53,7 +55,7 @@ The release script always archives **both** executable slices: Apple Silicon
 (`arm64`) and Intel (`x86_64`). It verifies each slice before packaging, and
 the CI workflow runs the XCTest suite natively on both architectures. Version
 0.1.1 was Apple-Silicon-only; releases from 0.1.2 onward, including the current
-MenuBarIO 0.6.0 release, are Universal. When a release changes device discovery,
+MenuBarIO 0.7.0 release, are Universal. When a release changes device discovery,
 complete
 the applicable hardware acceptance cases in [`TESTING.md`](TESTING.md),
 including the Intel-Mac cases, or record an explicit release exception if a
@@ -134,7 +136,7 @@ Das Release-Skript archiviert immer **beide** ausführbaren Slices: Apple
 Silicon (`arm64`) und Intel (`x86_64`). Es prüft jeden Slice vor dem Paketbau;
 der CI-Ablauf führt die XCTest-Suite nativ auf beiden Architekturen aus.
 Version 0.1.1 war ausschließlich für Apple Silicon bestimmt; die Releases ab
-0.1.2 einschließlich des aktuellen Releases MenuBarIO 0.6.0 sind
+0.1.2 einschließlich des aktuellen Releases MenuBarIO 0.7.0 sind
 Universal-Versionen.
 Wenn ein Release die Geräteerkennung ändert, die zutreffenden
 Hardware-Abnahmefälle in [`TESTING.md`](TESTING.md) einschließlich der

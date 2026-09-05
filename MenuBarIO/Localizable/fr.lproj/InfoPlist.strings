@@ -1,1 +1,1 @@
-"NSBluetoothAlwaysUsageDescription" = "MenuBarIO utilise Bluetooth uniquement pour afficher les appareils actuellement connectés à ce Mac.";
+"NSBluetoothAlwaysUsageDescription" = "MenuBarIO utilise Bluetooth pour afficher les appareils actuellement connectés à ce Mac et lire leur niveau de batterie lorsqu’il est disponible.";

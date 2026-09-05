@@ -17,19 +17,22 @@ struct BluetoothDevice: Identifiable, Equatable, Hashable {
         let isConnected: Bool
         let deviceClassMajor: UInt32
         let deviceClassMinor: UInt32
+        let batteryLevel: Int?
 
         init(
             identifier: String?,
             name: String?,
             isConnected: Bool,
             deviceClassMajor: UInt32 = 0,
-            deviceClassMinor: UInt32 = 0
+            deviceClassMinor: UInt32 = 0,
+            batteryLevel: Int? = nil
         ) {
             self.identifier = identifier
             self.name = name
             self.isConnected = isConnected
             self.deviceClassMajor = deviceClassMajor
             self.deviceClassMinor = deviceClassMinor
+            self.batteryLevel = batteryLevel
         }
     }
 
@@ -37,6 +40,7 @@ struct BluetoothDevice: Identifiable, Equatable, Hashable {
     let name: String
     let address: String?
     let icon: BluetoothDeviceIcon
+    private(set) var batteryLevel: Int?
 
     init?(snapshot: Snapshot) {
         guard snapshot.isConnected else { return nil }
@@ -61,11 +65,18 @@ struct BluetoothDevice: Identifiable, Equatable, Hashable {
         }
 
         name = resolvedName
+        batteryLevel = snapshot.batteryLevel.flatMap { (0...100).contains($0) ? $0 : nil }
         icon = Self.icon(
             for: resolvedName,
             deviceClassMajor: snapshot.deviceClassMajor,
             deviceClassMinor: snapshot.deviceClassMinor
         )
+    }
+
+    func updatingBatteryLevel(_ level: Int?) -> BluetoothDevice {
+        var updated = self
+        updated.batteryLevel = level.flatMap { (0...100).contains($0) ? $0 : nil }
+        return updated
     }
 
     static func connectedDevices(from snapshots: [Snapshot]) -> [BluetoothDevice] {

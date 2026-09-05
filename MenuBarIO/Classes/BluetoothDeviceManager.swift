@@ -17,21 +17,26 @@ final class BluetoothDeviceManager: NSObject, ObservableObject {
     private var connectNotification: IOBluetoothUserNotification?
     private var disconnectNotifications: [String: IOBluetoothUserNotification] = [:]
     private var controllerObservers: [NSObjectProtocol] = []
+    private var batteryRefreshTimer: Timer?
 
     private let reader: BluetoothDeviceReading
+    private let batteryReader: BluetoothBatteryReading
     private let notificationCenter: NotificationCenter
     private let now: () -> Date
 
     init(
         monitoringEnabled: Bool = true,
         reader: BluetoothDeviceReading = SystemBluetoothDeviceReader(),
+        batteryReader: BluetoothBatteryReading = SystemBluetoothBatteryReader(),
         notificationCenter: NotificationCenter = .default,
         now: @escaping () -> Date = Date.init
     ) {
         self.reader = reader
+        self.batteryReader = batteryReader
         self.notificationCenter = notificationCenter
         self.now = now
         super.init()
+        batteryReader.onChange = { [weak self] in self?.updateBatteryLevels() }
 
         guard monitoringEnabled else { return }
 
@@ -58,6 +63,8 @@ final class BluetoothDeviceManager: NSObject, ObservableObject {
         case .available:
             let connectedDevices = BluetoothDevice.connectedDevices(from: result.snapshots)
             devices = connectedDevices
+            batteryReader.refresh(connectedAddresses: Set(connectedDevices.compactMap(\.address)))
+            updateBatteryLevels()
             replaceDisconnectNotifications(
                 for: connectedDevices,
                 systemDevices: result.connectedSystemDevices
@@ -65,9 +72,11 @@ final class BluetoothDeviceManager: NSObject, ObservableObject {
             sourceStatus = .ready(lastUpdated: now())
         case .poweredOff:
             devices = []
+            batteryReader.stop()
             unregisterDisconnectNotifications()
             sourceStatus = .unavailable(.bluetoothPoweredOff)
         case .unavailable:
+            batteryReader.stop()
             if let lastUpdated = sourceStatus.lastUpdated {
                 sourceStatus = .stale(lastUpdated: lastUpdated)
             } else {
@@ -95,9 +104,20 @@ final class BluetoothDeviceManager: NSObject, ObservableObject {
                 self?.refresh()
             }
         }
+        let timer = Timer(timeInterval: 300, repeats: true) { [weak self] _ in
+            guard let self, case .ready = self.sourceStatus else { return }
+            self.batteryReader.refresh(connectedAddresses: Set(self.devices.compactMap(\.address)))
+        }
+        timer.tolerance = 30
+        RunLoop.main.add(timer, forMode: .common)
+        batteryRefreshTimer = timer
     }
 
     private func stopMonitoring() {
+        batteryRefreshTimer?.invalidate()
+        batteryRefreshTimer = nil
+        batteryReader.onChange = nil
+        batteryReader.stop()
         connectNotification?.unregister()
         connectNotification = nil
         for observer in controllerObservers {
@@ -105,6 +125,13 @@ final class BluetoothDeviceManager: NSObject, ObservableObject {
         }
         controllerObservers.removeAll()
         unregisterDisconnectNotifications()
+    }
+
+    private func updateBatteryLevels() {
+        let updated = devices.map { device in
+            device.updatingBatteryLevel(device.address.flatMap(batteryReader.batteryLevel(for:)))
+        }
+        if devices != updated { devices = updated }
     }
 
     private func replaceDisconnectNotifications(

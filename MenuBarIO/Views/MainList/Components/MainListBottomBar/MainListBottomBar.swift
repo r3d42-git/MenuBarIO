@@ -82,6 +82,7 @@ struct MainListBottomBar: View {
                     .help("open_profiler")
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(Text("open_profiler"))
 
             Button(action: exportReport) {
                 Image(systemName: exportFeedbackToken == nil ? "square.and.arrow.down" : "checkmark")
@@ -113,6 +114,8 @@ struct MainListBottomBar: View {
                     }
                 }
                 .help("refresh")
+                .accessibilityLabel(Text("refresh"))
+                .keyboardShortcut("r")
                 .disabled(isRefreshing)
 
                 Button {
@@ -121,6 +124,7 @@ struct MainListBottomBar: View {
                     Image(systemName: "power")
                 }
                 .help("exit")
+                .accessibilityLabel(Text("exit"))
                 .contextMenu {
                     MainListBottomBarContextMenuExit()
                 }

@@ -147,7 +147,20 @@ final class DiagnosticReportBuilderTests: XCTestCase {
 
         XCTAssertTrue(builder.usbDeviceDetails(usbDevice).contains("SERIAL-123"))
         XCTAssertTrue(builder.usbDeviceDetails(usbDevice).contains(usbDevice.uniqueId))
+        XCTAssertTrue(builder.usbDeviceDetails(usbDevice).contains("negotiated_speed 480 Mbps"))
         XCTAssertTrue(builder.bluetoothDeviceDetails(bluetooth).contains("AA:BB"))
+    }
+
+    func testThunderboltBoostIsSeparateFromBidirectionalCapacity() {
+        let port = ThunderboltPort(
+            id: "host", controllerID: 0, connectorNumber: 1, protocolVersion: 64,
+            maximumSpeedMbps: 120_000, connectedDevice: nil
+        )
+        let text = DiagnosticReportBuilder(localize: { $0 }).thunderboltPortDetails(port)
+        XCTAssertTrue(text.contains("port_max 80.0 Gbps"))
+        XCTAssertTrue(text.contains("bandwidth_boost: 120.0 Gbps"))
+        XCTAssertTrue(text.contains("bandwidth_boost_explanation"))
+        XCTAssertFalse(text.contains("negotiated_speed"))
     }
 
     func testOverviewIncludesStaleAndPoweredOffStatus() {

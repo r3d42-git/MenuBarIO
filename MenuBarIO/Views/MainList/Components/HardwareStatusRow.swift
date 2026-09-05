@@ -25,12 +25,21 @@ struct HardwareStatusRow: View {
         }
     }
 
+    private func staleMessage(_ key: String, status: HardwareSourceStatus) -> String {
+        guard let date = status.lastUpdated else { return key.localized }
+        let formatter = DateFormatter()
+        formatter.locale = AppLanguage.current.locale
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return key.localized + "\n" + String(format: "last_successful_update".localized, formatter.string(from: date))
+    }
+
     private var messages: [String] {
         var messages: [String] = []
 
         switch manager.sourceStatus {
         case .stale:
-            messages.append("hardware_data_stale".localized)
+            messages.append(staleMessage("hardware_data_stale", status: manager.sourceStatus))
         case .unavailable:
             messages.append("hardware_data_unavailable".localized)
         case .ready, .refreshing:
@@ -39,7 +48,7 @@ struct HardwareStatusRow: View {
 
         switch bluetoothManager.sourceStatus {
         case .stale:
-            messages.append("bluetooth_data_stale".localized)
+            messages.append(staleMessage("bluetooth_data_stale", status: bluetoothManager.sourceStatus))
         case .unavailable(.bluetoothPoweredOff):
             messages.append("bluetooth_off".localized)
         case .unavailable:

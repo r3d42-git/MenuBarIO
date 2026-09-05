@@ -8,7 +8,7 @@ not contain telemetry, analytics, update checks or network client code.
 Its product subtitle is `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-The current product version is `0.6.0` (build 10). Releases are prepared from a
+The current product version is `0.7.0` (build 11). Releases are prepared from a
 reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target and project are named `MenuBarIO`; the test
 target is `MenuBarIOTests`. The legacy app bundle identifier
@@ -23,6 +23,63 @@ original author. There is no collaboration or affiliation with the original
 author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
+
+## MenuBarIO 0.7.0 compact improvements — 2026-09-05
+
+The user approved device details, clearer link rates, Ethernet/copy fixes,
+keyboard/accessibility improvements and Bluetooth battery display. These are
+prepared for release as 0.7.0 (build 11). On 2026-09-05 the user confirmed
+Apple Silicon hardware acceptance and explicitly authorized publication while
+physical Intel acceptance remains pending. The previously scheduled GPL
+transition is included in this release.
+
+- Clicking a USB, Bluetooth or port row opens a live detail view inside the
+  existing menu. Exact known host/dock assignments form a connection path;
+  unresolved/ambiguous/cyclic paths remain unknown. Identifier fields are
+  collapsed. Command-C copies details, Command-R refreshes, Escape goes back.
+- USB list subtitles are compact; full generation names remain in details and
+  reports. TB5/USB4-v2 120 Gbps capability is separated into standard 80 Gbps
+  bidirectional capacity and asymmetric 120 Gbps Bandwidth Boost. USB occupants
+  retain their own USB companion-port maximum rather than inheriting a TB rate.
+  USB detail copies now include negotiated rate and protocol.
+- EthernetLinkMonitor observes SystemConfiguration link/interface notifications.
+  USBDeviceManager refreshes Ethernet independently, stops monitoring when the
+  indicator is disabled and rejects obsolete asynchronous results.
+- Bluetooth battery values come from local HID BatteryPercent or standard BLE
+  service 180F / characteristic 2A19. A same-record IORegistry UUID/address
+  mapping ties a currently connected peripheral to the existing device model.
+  No name matching, scans, pairing, HID input access or GATT writes are used.
+  Reads need existing Bluetooth authorization, time out after 10 seconds and
+  are limited to a five-minute cadence; in-memory values expire after 15
+  minutes and clear on disconnect, errors or invalid values. Unknown is omitted;
+  0 percent is valid. The app does not initiate a new permission prompt solely
+  for optional battery enrichment.
+- Decorative icons no longer announce Disconnect; rows are native buttons,
+  group expansion state is accessible and stale-data notices include the last
+  successful timestamp. New UI and permission text covers all seven locales.
+
+Verification: the full local gate passed 99 tests, static analysis and a
+Universal arm64/x86_64 build. The sandboxed Debug app launched through the
+repository wrapper. Visual/AX checks confirmed the actual Logi M650 L at 45%,
+its detail view, the Mac Port 3 -> Anker Dock Port 2 -> ASM1352R-Fast path,
+free-TB5 80/120 Gbps explanation and Command-C/Command-R/Escape. A native save
+panel export to `/private/tmp/MenuBarIO-GPT6-Pruefbericht.md` contains 45% and
+separate standard/boost fields without Bluetooth addresses or identifier labels.
+The user subsequently confirmed Apple Silicon testing. Physical Intel
+acceptance will follow later; publishing before it is explicitly approved.
+Other Bluetooth models, macOS 13/14 and a fresh clean-machine installation
+remain outside the directly observed checks; CI does not replace those tests.
+Build/test artifacts are under `/private/tmp/menubario-gpt6-check`.
+
+## Licensing from 0.7.0
+
+MenuBarIO 0.7.0 and later uses GPL-3.0-or-later. LICENSE contains the full GPL,
+LICENSE.upstream preserves the original MenuBarUSB MIT text verbatim, and
+NOTICE records the origin and forward-only transition. SOURCE.md points to
+https://github.com/r3d42-git/MenuBarIO/tree/v0.7.0 and its source archive.
+All four files are bundled in the app before signing and in the DMG; the
+release verifier checks the enclosed copies. Earlier MIT releases and their
+tags remain unchanged.
 
 The bilingual project-history website is maintained as a curated static site
 in `website/` and published from protected `main` through GitHub Pages at
@@ -472,6 +529,25 @@ steps governed by `RELEASE.md`; do not infer them from a code change.
 
 # Projektübersicht
 
+## Lokale Weiterentwicklung — 05.09.2026
+
+Die freigegebenen Punkte 1–4 und Bluetooth-Akkustände sind lokal umgesetzt:
+Gerätedetails mit sicher zugeordnetem Verbindungsweg, kurze USB-Zeilen und
+getrennte TB5-Standard-/Boost-Kapazität, ereignisgesteuerter Ethernet-Status,
+vollständigere Detailkopien, Tastaturkürzel, verbesserte Bedienungshilfen und
+Akkustände bereits verbundener Geräte über macOS-HID beziehungsweise den
+standardisierten BLE-Akkudienst. Die Logi M650 L zeigte im gestarteten,
+sandboxed Build 45 %. Der vollständige lokale Prüflauf bestand 99 Tests,
+statische Analyse und Universal-Build; Detailansichten, Kürzel und nativer
+Berichtsexport wurden geprüft. Die nachfolgend bestätigte Apple-Silicon-Abnahme
+ist berücksichtigt; Intel-/macOS-13/14- und weitere Bluetooth-Gerätefälle bleiben
+offen. Die englische Sektion „MenuBarIO 0.7.0 compact improvements“ enthält die
+Prüfpfade. Version 0.7.0 (Build 11) enthält die geplante Umstellung auf GPL-3.0-or-later
+mit erhaltenem MIT-Herkunftshinweis und exaktem Quellcode-Tag in App und DMG.
+Der Benutzer hat am 05.09.2026 die Apple-Silicon-Abnahme bestätigt und die
+Veröffentlichung trotz noch ausstehender physischer Intel-Abnahme freigegeben.
+
+
 ## Zweck und Umfang
 
 MenuBarIO ist eine rein lokal arbeitende macOS-Menüleisten-App zur Anzeige
@@ -481,7 +557,7 @@ Update-Abfragen oder Netzwerk-Client-Code.
 Ihr Produktuntertitel lautet `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-Die aktuelle Produktversion ist `0.6.0` (Build 10). Releases werden auf einem
+Die aktuelle Produktversion ist `0.7.0` (Build 11). Releases werden auf einem
 geprüften Branch vorbereitet und vor dem Tagging in den geschützten Branch
 `main` integriert.
 Produkt, Programmdatei, Target und Projekt heißen `MenuBarIO`; das Test-Target

@@ -31,10 +31,6 @@ struct DeviceRefreshCoordinator {
     }
 }
 
-private struct DeviceRefreshOptions {
-    let showEthernet: Bool
-}
-
 final class USBDeviceManager: ObservableObject {
     @Published private(set) var devices: [USBDevice] = []
     @Published private(set) var thunderboltPorts: [ThunderboltPort] = []
@@ -67,6 +63,8 @@ final class USBDeviceManager: ObservableObject {
     private let defaults: UserDefaults
     private let discovery: USBDeviceDiscovering
     private let ethernetReader: EthernetLinkReading
+    private let ethernetMonitor: EthernetLinkMonitoring
+    private let monitoringEnabled: Bool
     private let now: () -> Date
     private let refreshQueue = DispatchQueue(
         label: "de.r3d.menubario.device-refresh",
@@ -74,7 +72,12 @@ final class USBDeviceManager: ObservableObject {
     )
 
     private var refreshCoordinator = DeviceRefreshCoordinator()
-    private var latestRefreshOptions = DeviceRefreshOptions(showEthernet: false)
+    private let ethernetRefreshQueue = DispatchQueue(
+        label: "de.r3d.menubario.ethernet-refresh",
+        qos: .utility
+    )
+    private var ethernetGeneration = 0
+    private var isEthernetMonitoring = false
     private var ethernetRetry: DispatchWorkItem?
 
     private var connectionMonitor: USBConnectionMonitor?
@@ -85,11 +88,14 @@ final class USBDeviceManager: ObservableObject {
         defaults: UserDefaults = .standard,
         discovery: USBDeviceDiscovering = USBDeviceDiscovery(),
         ethernetReader: EthernetLinkReading = EthernetLinkReader(),
+        ethernetMonitor: EthernetLinkMonitoring = EthernetLinkMonitor(),
         now: @escaping () -> Date = Date.init
     ) {
         self.defaults = defaults
         self.discovery = discovery
         self.ethernetReader = ethernetReader
+        self.ethernetMonitor = ethernetMonitor
+        self.monitoringEnabled = monitoringEnabled
         self.now = now
         connectionMonitor = USBConnectionMonitor { [weak self] in
             self?.refresh()
@@ -109,6 +115,7 @@ final class USBDeviceManager: ObservableObject {
 
     deinit {
         ethernetRetry?.cancel()
+        ethernetMonitor.stop()
         connectionMonitor?.stop()
         powerSourceMonitor?.stop()
     }
@@ -122,6 +129,11 @@ final class USBDeviceManager: ObservableObject {
             powerSourceMonitor?.stop()
             applyPowerSourceState(.disconnected)
         }
+    }
+
+    func setEthernetIndicatorEnabled(_ isEnabled: Bool) {
+        defaults.set(isEnabled, forKey: StorageKeys.showEthernet)
+        refreshEthernetStatus()
     }
 
     func refresh() {
@@ -138,12 +150,10 @@ final class USBDeviceManager: ObservableObject {
             powerSourceMonitor?.refresh()
         }
 
-        latestRefreshOptions = DeviceRefreshOptions(showEthernet: isEthernetIndicatorEnabled)
-        ethernetRetry?.cancel()
-        ethernetRetry = nil
+        refreshEthernetStatus()
 
         guard let generation = refreshCoordinator.requestRefresh() else { return }
-        startRefresh(generation: generation, options: latestRefreshOptions)
+        startRefresh(generation: generation)
     }
 
     private var isPowerSourceInfoEnabled: Bool {
@@ -154,7 +164,7 @@ final class USBDeviceManager: ObservableObject {
         defaults.bool(forKey: StorageKeys.showEthernet)
     }
 
-    private func startRefresh(generation: Int, options: DeviceRefreshOptions) {
+    private func startRefresh(generation: Int) {
         refreshQueue.async { [weak self] in
             guard let self else { return }
 
@@ -167,19 +177,12 @@ final class USBDeviceManager: ObservableObject {
                 $0.connectorNumber < $1.connectorNumber
             }
             let externalThunderboltPortGroups = topology.externalThunderboltPortGroups
-            let ethernetConnected =
-                options.showEthernet
-                ? self.ethernetReader.isConnected()
-                : nil
-
             DispatchQueue.main.async { [weak self] in
                 self?.completeRefresh(
                     generation: generation,
-                    options: options,
                     devices: devices,
                     thunderboltPorts: thunderboltPorts,
                     externalThunderboltPortGroups: externalThunderboltPortGroups,
-                    ethernetConnected: ethernetConnected,
                     discoveryIsComplete: topology.isComplete
                 )
             }
@@ -194,16 +197,14 @@ final class USBDeviceManager: ObservableObject {
 
     private func completeRefresh(
         generation: Int,
-        options: DeviceRefreshOptions,
         devices: [USBDevice],
         thunderboltPorts: [ThunderboltPort],
         externalThunderboltPortGroups: [ExternalThunderboltPortGroup],
-        ethernetConnected: Bool?,
         discoveryIsComplete: Bool
     ) {
         switch refreshCoordinator.completeRefresh(generation) {
         case .refresh(let nextGeneration):
-            startRefresh(generation: nextGeneration, options: latestRefreshOptions)
+            startRefresh(generation: nextGeneration)
         case .publish:
             if discoveryIsComplete {
                 self.devices = devices
@@ -215,57 +216,65 @@ final class USBDeviceManager: ObservableObject {
             } else {
                 sourceStatus = .unavailable(.discoveryFailed)
             }
-            publishEthernetStatus(
-                ethernetConnected,
-                generation: generation,
-                options: options
-            )
         }
     }
 
-    private func publishEthernetStatus(
-        _ isConnected: Bool?,
-        generation: Int,
-        options: DeviceRefreshOptions
-    ) {
-        guard options.showEthernet,
-            isEthernetIndicatorEnabled,
-            let isConnected
-        else {
-            if !isEthernetIndicatorEnabled {
-                ethernetCableConnected = false
+    private func refreshEthernetStatus() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in
+                self?.refreshEthernetStatus()
             }
             return
         }
 
-        ethernetCableConnected = isConnected
-        if !isConnected {
-            scheduleEthernetRetry(for: generation)
+        ethernetGeneration &+= 1
+        ethernetRetry?.cancel()
+        ethernetRetry = nil
+
+        guard isEthernetIndicatorEnabled else {
+            ethernetMonitor.stop()
+            isEthernetMonitoring = false
+            ethernetCableConnected = false
+            return
+        }
+
+        if monitoringEnabled, !isEthernetMonitoring {
+            isEthernetMonitoring = ethernetMonitor.start { [weak self] in
+                self?.refreshEthernetStatus()
+            }
+        }
+
+        readEthernetStatus(generation: ethernetGeneration, retryIfDisconnected: true)
+    }
+
+    private func readEthernetStatus(generation: Int, retryIfDisconnected: Bool) {
+        let reader = ethernetReader
+        ethernetRefreshQueue.async { [weak self] in
+            let isConnected = reader.isConnected()
+            DispatchQueue.main.async { [weak self] in
+                guard let self,
+                    self.ethernetGeneration == generation,
+                    self.isEthernetIndicatorEnabled
+                else { return }
+
+                self.ethernetCableConnected = isConnected
+                if !isConnected, retryIfDisconnected {
+                    self.scheduleEthernetRetry(for: generation)
+                }
+            }
         }
     }
 
     private func scheduleEthernetRetry(for generation: Int) {
         let retry = DispatchWorkItem { [weak self] in
             guard let self,
-                self.refreshCoordinator.isCurrent(generation),
+                self.ethernetGeneration == generation,
                 self.isEthernetIndicatorEnabled
             else {
                 return
             }
 
-            self.refreshQueue.async { [weak self] in
-                guard let self else { return }
-                let isConnected = self.ethernetReader.isConnected()
-
-                DispatchQueue.main.async {
-                    guard self.refreshCoordinator.isCurrent(generation),
-                        self.isEthernetIndicatorEnabled
-                    else {
-                        return
-                    }
-                    self.ethernetCableConnected = isConnected
-                }
-            }
+            self.readEthernetStatus(generation: generation, retryIfDisconnected: false)
         }
 
         ethernetRetry = retry
