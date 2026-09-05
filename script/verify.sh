@@ -65,21 +65,24 @@ xcodebuild analyze -quiet \
   CODE_SIGN_STYLE=Manual \
   DEVELOPMENT_TEAM=''
 
-xcodebuild build -quiet \
+# Exercise archive-specific installation paths before Developer ID signing.
+ARCHIVE_PATH="$DERIVED_DATA_PATH/$APP_NAME-verification.xcarchive"
+xcodebuild archive -quiet \
   -project MenuBarIO.xcodeproj \
   -scheme MenuBarIO \
   -configuration Release \
   -destination 'generic/platform=macOS' \
   -derivedDataPath "$DERIVED_DATA_PATH" \
+  -archivePath "$ARCHIVE_PATH" \
   ARCHS="$UNIVERSAL_ARCHITECTURES" \
   ONLY_ACTIVE_ARCH=NO \
   CODE_SIGN_IDENTITY=- \
   CODE_SIGN_STYLE=Manual \
   DEVELOPMENT_TEAM=''
 
-APP_PATH="$DERIVED_DATA_PATH/Build/Products/Release/$APP_NAME.app"
+APP_PATH="$ARCHIVE_PATH/Products/Applications/$APP_NAME.app"
 if [[ ! -d "$APP_PATH" ]]; then
-  echo "Universal build did not create the expected app bundle: $APP_PATH" >&2
+  echo "Universal archive did not create the expected app bundle: $APP_PATH" >&2
   exit 1
 fi
 
@@ -89,4 +92,4 @@ for architecture in $UNIVERSAL_ARCHITECTURES; do
   lipo "$APP_PATH/Contents/MacOS/$APP_NAME" -verify_arch "$architecture"
 done
 
-echo "Tests, static analysis, and the Universal build passed."
+echo "Tests, static analysis, and the Universal archive passed."

@@ -194,7 +194,12 @@
 			files = ();
 			inputPaths = ("$(SRCROOT)/LICENSE", "$(SRCROOT)/LICENSE.upstream", "$(SRCROOT)/NOTICE", "$(SRCROOT)/SOURCE.md");
 			name = "Bundle license notices";
-			outputPaths = ("$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Licenses");
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Licenses/LICENSE",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Licenses/LICENSE.upstream",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Licenses/NOTICE",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Licenses/SOURCE.md",
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -eu\nlicense_dir=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Licenses\"\nmkdir -p \"$license_dir\"\nfor name in LICENSE LICENSE.upstream NOTICE SOURCE.md; do\n  cp \"$SRCROOT/$name\" \"$license_dir/$name\"\ndone\n";
