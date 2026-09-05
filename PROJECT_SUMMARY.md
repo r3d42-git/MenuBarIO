@@ -81,6 +81,14 @@ All four files are bundled in the app before signing and in the DMG; the
 release verifier checks the enclosed copies. Earlier MIT releases and their
 tags remain unchanged.
 
+The first local 0.7.0 archive exposed an Xcode user-script sandbox denial when
+copying LICENSE: declaring only the output directory passed ordinary builds
+but failed for archive installation paths. Each of the four output files is
+now declared explicitly, with script sandboxing retained. The regular local
+and CI gate now creates and verifies an ad-hoc Universal archive, catching this
+class of packaging failure before Developer ID signing. The corrected local
+gate passed; the failed attempt never reached Apple or GitHub publication.
+
 The bilingual project-history website is maintained as a curated static site
 in `website/` and published from protected `main` through GitHub Pages at
 [`r3d42-git.github.io/MenuBarIO`](https://r3d42-git.github.io/MenuBarIO/).
