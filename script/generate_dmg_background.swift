@@ -9,7 +9,7 @@ guard CommandLine.arguments.count == 2 else {
 }
 
 let outputURL = URL(fileURLWithPath: CommandLine.arguments[1])
-let size = NSSize(width: 760, height: 420)
+let size = NSSize(width: 760, height: 560)
 guard let bitmapContext = CGContext(
     data: nil,
     width: Int(size.width),
@@ -50,50 +50,50 @@ NSGradient(
 )?.draw(in: bounds, angle: 90)
 
 color(121, 196, 255, 0.12).setFill()
-NSBezierPath(ovalIn: NSRect(x: -110, y: 230, width: 340, height: 340)).fill()
+NSBezierPath(ovalIn: NSRect(x: -110, y: 370, width: 340, height: 340)).fill()
 color(70, 128, 175, 0.10).setFill()
 NSBezierPath(ovalIn: NSRect(x: 535, y: -105, width: 330, height: 330)).fill()
 
 let divider = NSBezierPath()
-divider.move(to: NSPoint(x: 128, y: 299))
-divider.line(to: NSPoint(x: 632, y: 299))
+divider.move(to: NSPoint(x: 128, y: 439))
+divider.line(to: NSPoint(x: 632, y: 439))
 divider.lineWidth = 1
 color(255, 255, 255, 0.13).setStroke()
 divider.stroke()
 
 drawCentered(
     "MenuBarIO installieren",
-    y: 352,
+    y: 492,
     font: .systemFont(ofSize: 22, weight: .semibold),
     color: color(244, 247, 250)
 )
 drawCentered(
     "Ziehe die App nach Programme",
-    y: 324,
+    y: 464,
     font: .systemFont(ofSize: 14, weight: .regular),
     color: color(184, 197, 207)
 )
 
 let arrow = NSBezierPath()
-arrow.move(to: NSPoint(x: 329, y: 205))
-arrow.line(to: NSPoint(x: 438, y: 205))
+arrow.move(to: NSPoint(x: 329, y: 345))
+arrow.line(to: NSPoint(x: 438, y: 345))
 arrow.lineWidth = 4
 arrow.lineCapStyle = .round
 color(121, 196, 255, 0.86).setStroke()
 arrow.stroke()
 
 let arrowHead = NSBezierPath()
-arrowHead.move(to: NSPoint(x: 438, y: 205))
-arrowHead.line(to: NSPoint(x: 417, y: 218))
-arrowHead.move(to: NSPoint(x: 438, y: 205))
-arrowHead.line(to: NSPoint(x: 417, y: 192))
+arrowHead.move(to: NSPoint(x: 438, y: 345))
+arrowHead.line(to: NSPoint(x: 417, y: 358))
+arrowHead.move(to: NSPoint(x: 438, y: 345))
+arrowHead.line(to: NSPoint(x: 417, y: 332))
 arrowHead.lineWidth = 4
 arrowHead.lineCapStyle = .round
 arrowHead.lineJoinStyle = .round
 arrowHead.stroke()
 
 for x in [329, 438] {
-    let circle = NSBezierPath(ovalIn: NSRect(x: CGFloat(x) - 5, y: 200, width: 10, height: 10))
+    let circle = NSBezierPath(ovalIn: NSRect(x: CGFloat(x) - 5, y: 340, width: 10, height: 10))
     color(121, 196, 255, 0.95).setFill()
     circle.fill()
 }
