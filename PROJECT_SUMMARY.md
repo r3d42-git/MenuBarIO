@@ -30,7 +30,8 @@ The user approved device details, clearer link rates, Ethernet/copy fixes,
 keyboard/accessibility improvements and Bluetooth battery display. These are
 published as 0.7.0 (build 11). On 2026-09-05 the user confirmed
 Apple Silicon hardware acceptance and explicitly authorized publication while
-physical Intel acceptance remains pending. The previously scheduled GPL
+physical Intel acceptance was still pending. The subsequent Intel and MacBook
+tests were also confirmed successful by the user on 2026-09-05. The scheduled GPL
 transition is included in this release.
 
 - Clicking a USB, Bluetooth or port row opens a live detail view inside the
@@ -65,8 +66,9 @@ its detail view, the Mac Port 3 -> Anker Dock Port 2 -> ASM1352R-Fast path,
 free-TB5 80/120 Gbps explanation and Command-C/Command-R/Escape. A native save
 panel export to `/private/tmp/MenuBarIO-GPT6-Pruefbericht.md` contains 45% and
 separate standard/boost fields without Bluetooth addresses or identifier labels.
-The user subsequently confirmed Apple Silicon testing. Physical Intel
-acceptance will follow later; publishing before it is explicitly approved.
+The user confirmed Apple Silicon testing and subsequently reported successful
+physical Intel and MacBook tests on 2026-09-05. The Intel acceptance deferred
+at publication is now complete.
 Other Bluetooth models, macOS 13/14 and a fresh clean-machine installation
 remain outside the directly observed checks; CI does not replace those tests.
 Build/test artifacts are under `/private/tmp/menubario-gpt6-check`.
@@ -102,8 +104,9 @@ was published from the immutable annotated tag at release commit
   [run 33961965054](https://github.com/r3d42-git/MenuBarIO/actions/runs/33961965054);
   Pages passed in [run 33961965050](https://github.com/r3d42-git/MenuBarIO/actions/runs/33961965050).
   All three PRs also passed their required checks and the native Intel job.
-- Apple Silicon hardware acceptance was confirmed by the maintainer. Physical
-  Intel acceptance remains deferred with explicit publication approval. A fresh
+- Apple Silicon hardware acceptance was confirmed by the maintainer. On
+  2026-09-05 the maintainer also confirmed successful physical Intel and MacBook
+  tests, completing the Intel acceptance deferred at publication. A fresh
   clean-Mac installation, other Bluetooth models and macOS 13/14 hardware were
   not newly tested; CI and Gatekeeper do not replace those acceptance checks.
 
@@ -595,13 +598,16 @@ Akkustände bereits verbundener Geräte über macOS-HID beziehungsweise den
 standardisierten BLE-Akkudienst. Die Logi M650 L zeigte im gestarteten,
 sandboxed Build 45 %. Der vollständige lokale Prüflauf bestand 99 Tests,
 statische Analyse und Universal-Build; Detailansichten, Kürzel und nativer
-Berichtsexport wurden geprüft. Die nachfolgend bestätigte Apple-Silicon-Abnahme
-ist berücksichtigt; Intel-/macOS-13/14- und weitere Bluetooth-Gerätefälle bleiben
-offen. Die englische Sektion „MenuBarIO 0.7.0 compact improvements“ enthält die
+Berichtsexport wurden geprüft. Der Benutzer hat sowohl die Apple-Silicon-Abnahme
+als auch die nachfolgenden Intel- und MacBook-Tests erfolgreich bestätigt.
+macOS-13/14- und weitere Bluetooth-Gerätefälle bleiben außerhalb der neu
+beobachteten Abnahme. Die englische Sektion „MenuBarIO 0.7.0 compact improvements“ enthält die
 Prüfpfade. Version 0.7.0 (Build 11) enthält die geplante Umstellung auf GPL-3.0-or-later
 mit erhaltenem MIT-Herkunftshinweis und exaktem Quellcode-Tag in App und DMG.
 Der Benutzer hat am 05.09.2026 die Apple-Silicon-Abnahme bestätigt und die
 Veröffentlichung trotz noch ausstehender physischer Intel-Abnahme freigegeben.
+Die anschließend am selben Tag bestätigten erfolgreichen Intel- und
+MacBook-Tests schließen diese zunächst offene Abnahme ab.
 
 [Version 0.7.0](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.7.0)
 ist als signierte, separat für App und DMG notarisierte Universal-Version
