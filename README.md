@@ -30,7 +30,8 @@ maintained independently.
   physical ports
 - Thunderbolt and USB4 devices, including negotiated link speed and protocol
 - Physical Thunderbolt/USB4 host ports with occupancy, attached device and
-  negotiated or maximum link speed
+  negotiated or maximum link speed; direct USB peripherals appear at their
+  host socket when macOS supplies an explicit assignment
 - External Thunderbolt/USB4 ports are detected from dock topology and grouped
   by their owning device; USB devices are shown on those ports when the
   physical topology identifies the connection unambiguously
@@ -61,7 +62,7 @@ maintained independently.
 
 ## Compatibility
 
-The current release, **MenuBarIO 0.7.0**, is a **Universal** app for Apple
+The current release, **MenuBarIO 0.7.1**, is a **Universal** app for Apple
 Silicon (`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. Automated
 checks run natively on both architectures. The physical Intel-Mac observations
 and the hardware cases that still apply after discovery changes are documented
@@ -123,7 +124,8 @@ MenuBarIO selbst wird unabhängig entwickelt und gepflegt.
 - Thunderbolt- und USB4-Geräte einschließlich ausgehandelter Link-Geschwindigkeit
   und Protokoll
 - Physische Thunderbolt-/USB4-Host-Ports mit Belegung, angeschlossenem Gerät
-  und ausgehandelter beziehungsweise maximaler Link-Geschwindigkeit
+  und ausgehandelter beziehungsweise maximaler Link-Geschwindigkeit; direkte
+  USB-Geräte erscheinen bei expliziter macOS-Zuordnung an ihrem Hostanschluss
 - Externe Thunderbolt-/USB4-Ports werden aus der Dock-Topologie erkannt und
   nach ihrem Gerät gruppiert; USB-Geräte erscheinen dort an ihrem Port, wenn
   die physische Topologie die Verbindung eindeutig bestimmt
@@ -160,7 +162,7 @@ MenuBarIO selbst wird unabhängig entwickelt und gepflegt.
 
 ## Kompatibilität
 
-Der aktuelle Release **MenuBarIO 0.7.0** ist eine **Universal-App** für
+Der aktuelle Release **MenuBarIO 0.7.1** ist eine **Universal-App** für
 Apple-Silicon- (`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die
 automatischen Prüfungen laufen nativ auf beiden Architekturen. Die physischen
 Beobachtungen auf einem Intel-Mac und die nach Änderungen an der

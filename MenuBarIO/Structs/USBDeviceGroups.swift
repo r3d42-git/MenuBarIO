@@ -19,8 +19,7 @@ struct USBDeviceGroups: Equatable {
             $0.countsTowardUSBDeviceTotal && $0.transport == .usb
         }
         let attachedDeviceIDs = Set(
-            externalThunderboltPortGroups
-                .flatMap(\.ports)
+            (thunderboltPorts + externalThunderboltPortGroups.flatMap(\.ports))
                 .compactMap(\.connectedDevice)
                 .filter { $0.transport == .usb }
                 .map(\.id)
@@ -78,7 +77,7 @@ struct USBDeviceGroups: Equatable {
                 )
             } else if let controllerID = hub.usbControllerID,
                 let port = thunderboltPorts.first(where: {
-                    $0.controllerID == controllerID && $0.connectedDevice != nil
+                    $0.controllerID == controllerID && $0.connectedDevice?.transport == .thunderbolt
                 }),
                 let device = port.connectedDevice
             {

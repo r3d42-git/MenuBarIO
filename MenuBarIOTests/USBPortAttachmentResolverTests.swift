@@ -3,6 +3,124 @@ import XCTest
 @testable import MenuBarIO
 
 final class USBPortAttachmentResolverTests: XCTestCase {
+    func testDirectUSBStickOccupiesHostPortAndIsCountedOnceWithItsUSBRate() throws {
+        let stick = makeUSBDevice(
+            name: "Ultra USB 3.0", productID: 1, locationID: 0x0020_0000,
+            speedMbps: 5_000, hostConnectorNumber: 1
+        )
+        let keyboard = makeUSBDevice(name: "Keyboard", productID: 2, locationID: 0x0312_0000)
+        let ports = USBPortAttachmentResolver.attachingDirectUSBDevices(
+            to: makePorts(), usbDevices: [stick, keyboard]
+        )
+        let occupied = try XCTUnwrap(ports.first)
+        let groups = USBDeviceGroups(devices: [stick, keyboard], thunderboltPorts: ports)
+
+        XCTAssertEqual(occupied.connectedDevice, stick)
+        XCTAssertEqual(occupied.negotiatedSpeedMbps, 5_000)
+        XCTAssertNil(occupied.connectionMaximumSpeedMbps)
+        XCTAssertEqual(occupied.connectedDevice?.transport, .usb)
+        XCTAssertEqual(groups.portAttachedUSBDevices, [stick])
+        XCTAssertEqual(groups.usbDevices, [keyboard])
+        XCTAssertEqual(groups.countedExternalDeviceCount, 2)
+
+        let path = ConnectionPathResolver(
+            devices: [stick, keyboard], hostPorts: ports, externalGroups: [], localize: { $0 }
+        ).path(to: stick)
+        XCTAssertEqual(path, "this_mac → thunderbolt_port 1 → Ultra USB 3.0")
+    }
+
+    func testUSB2AndUSB3UseExplicitSocketsOnSharedHostController() {
+        // Intel hosts can expose multiple sockets on one controller. Neither
+        // its ID nor the USB location-ID byte defines the visible socket.
+        let usb2 = makeUSBDevice(
+            name: "USB2", productID: 1, locationID: 0x1410_0000,
+            speedMbps: 480, hostConnectorNumber: 2
+        )
+        let usb3 = makeUSBDevice(
+            name: "USB3", productID: 2, locationID: 0x1460_0000,
+            speedMbps: 5_000, hostConnectorNumber: 1
+        )
+        let ports = USBPortAttachmentResolver.attachingDirectUSBDevices(
+            to: makePorts(), usbDevices: [usb2, usb3]
+        )
+        XCTAssertEqual(ports.compactMap(\.connectedDevice), [usb3, usb2])
+        XCTAssertNil(ports.last?.connectedDevice)
+    }
+
+    func testDirectUSBReplugAndDisconnectClearPreviousAssignment() {
+        let first = makeUSBDevice(
+            name: "Stick", productID: 1, locationID: 0x0020_0000, hostConnectorNumber: 1
+        )
+        let moved = makeUSBDevice(
+            name: "Stick", productID: 1, locationID: 0x0120_0000, hostConnectorNumber: 2
+        )
+        let original = USBPortAttachmentResolver.attachingDirectUSBDevices(to: makePorts(), usbDevices: [first])
+        let replugged = USBPortAttachmentResolver.attachingDirectUSBDevices(to: makePorts(), usbDevices: [moved])
+        let disconnected = USBPortAttachmentResolver.attachingDirectUSBDevices(to: makePorts(), usbDevices: [])
+        XCTAssertEqual(original[0].connectedDevice, first)
+        XCTAssertNil(replugged[0].connectedDevice)
+        XCTAssertEqual(replugged[1].connectedDevice, moved)
+        XCTAssertTrue(disconnected.allSatisfy { $0.connectedDevice == nil })
+    }
+
+    func testDirectUSBLeavesNativeThunderboltAttachmentAndHubOwnerIntact() {
+        let dock = makeThunderboltDevice()
+        let nativePort = ThunderboltPort(
+            id: "native", controllerID: 2, connectorNumber: 1,
+            protocolVersion: 32, maximumSpeedMbps: 40_000, connectedDevice: dock
+        )
+        let stick = makeUSBDevice(
+            name: "Stick", productID: 1, locationID: 0x0220_0000, hostConnectorNumber: 1
+        )
+        let ports = USBPortAttachmentResolver.attachingDirectUSBDevices(to: [nativePort], usbDevices: [stick])
+        XCTAssertEqual(ports, [nativePort])
+
+        let hub = makeUSBDevice(name: "Direct hub", productID: 2, locationID: 0x0210_0000, deviceClass: 9)
+        let usbPorts = USBPortAttachmentResolver.attachingDirectUSBDevices(to: makePorts(), usbDevices: [stick])
+        let groups = USBDeviceGroups(devices: [hub, stick], thunderboltPorts: usbPorts)
+        XCTAssertEqual(groups.hubGroups.first?.owner, .direct)
+    }
+
+    func testDirectUSBRejectsUnknownSocketsAndAmbiguousDevicesOrHostPorts() {
+        let first = makeUSBDevice(name: "First", productID: 1, locationID: 1, hostConnectorNumber: 1)
+        let second = makeUSBDevice(name: "Second", productID: 2, locationID: 2, hostConnectorNumber: 1)
+        let unknown = makeUSBDevice(name: "Unknown", productID: 3, locationID: 3)
+        let usbOnlySocket = makeUSBDevice(name: "Front USB-C", productID: 4, locationID: 4, hostConnectorNumber: 6)
+        let ambiguous = USBPortAttachmentResolver.attachingDirectUSBDevices(
+            to: makePorts(), usbDevices: [first, second, unknown, usbOnlySocket]
+        )
+        XCTAssertTrue(ambiguous.allSatisfy { $0.connectedDevice == nil })
+        let duplicateSocket = ThunderboltPort(
+            id: "duplicate", controllerID: 99, connectorNumber: 1,
+            protocolVersion: 32, maximumSpeedMbps: 40_000, connectedDevice: nil
+        )
+        let duplicatePorts = USBPortAttachmentResolver.attachingDirectUSBDevices(
+            to: makePorts() + [duplicateSocket], usbDevices: [first]
+        )
+        XCTAssertTrue(duplicatePorts.allSatisfy { $0.connectedDevice == nil })
+    }
+
+    func testDirectUSBDoesNotPromoteDockDescendantsOrInternalFunctionsToHostSocket() {
+        let devices = [
+            makeUSBDevice(
+                name: "Dock USB", productID: 1, locationID: 1,
+                isThunderboltTunneledUSB: true, hostConnectorNumber: 1),
+            makeUSBDevice(
+                name: "Hub child", productID: 2, locationID: 2,
+                parentHubLocationID: 0x0210_0000, parentHubPortNumber: 1, hostConnectorNumber: 1),
+            makeUSBDevice(
+                name: "Internal", productID: 3, locationID: 3,
+                hostConnectorNumber: 1, usbPortType: 2),
+            makeUSBDevice(
+                name: "Billboard", productID: 4, locationID: 4,
+                hostConnectorNumber: 1, isThunderboltBillboard: true),
+        ]
+        for device in devices {
+            let ports = USBPortAttachmentResolver.attachingDirectUSBDevices(to: makePorts(), usbDevices: [device])
+            XCTAssertTrue(ports.allSatisfy { $0.connectedDevice == nil }, device.name)
+        }
+    }
+
     func testParsesCompanionHubPortsAndSkipsUSBOnlySocket() {
         let map = ThunderboltUSBPortMapEntry.entries(
             from: Data([0x01, 0x81, 0x91, 0x02, 0x82, 0x92, 0x03, 0x83, 0x93, 0x04, 0x00, 0x00])
@@ -241,7 +359,10 @@ final class USBPortAttachmentResolverTests: XCTestCase {
         deviceClass: Int? = nil,
         isThunderboltTunneledUSB: Bool = false,
         parentHubLocationID: UInt32? = nil,
-        parentHubPortNumber: Int? = nil
+        parentHubPortNumber: Int? = nil,
+        hostConnectorNumber: Int? = nil,
+        usbPortType: Int? = nil,
+        isThunderboltBillboard: Bool = false
     ) -> USBDevice {
         USBDevice(
             name: name,
@@ -254,10 +375,13 @@ final class USBPortAttachmentResolverTests: XCTestCase {
             portMaxSpeedMbps: nil,
             usbVersionBCD: nil,
             isExternalStorage: false,
+            usbPortType: usbPortType,
             deviceClass: deviceClass,
+            isThunderboltBillboard: isThunderboltBillboard,
             isThunderboltTunneledUSB: isThunderboltTunneledUSB,
             parentHubLocationId: parentHubLocationID,
-            parentHubPortNumber: parentHubPortNumber
+            parentHubPortNumber: parentHubPortNumber,
+            hostConnectorNumber: hostConnectorNumber
         )
     }
 

@@ -124,9 +124,9 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
             IOObjectRelease(entry)
         }
 
-        let ports = makeThunderboltPorts(
-            hostRouters: hostRouters,
-            attachments: attachments
+        let ports = USBPortAttachmentResolver.attachingDirectUSBDevices(
+            to: makeThunderboltPorts(hostRouters: hostRouters, attachments: attachments),
+            usbDevices: usbDevices
         )
         let externalPortGroups = makeExternalThunderboltPortGroups(
             deviceRouters: deviceRouters,
@@ -302,8 +302,32 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
             thunderboltOwnerID: topologyContext.thunderboltOwnerID,
             isThunderboltTunneledUSB: isThunderboltTunneled,
             parentHubLocationId: parentHubContext?.locationId,
-            parentHubPortNumber: parentHubContext?.portNumber
+            parentHubPortNumber: parentHubContext?.portNumber,
+            hostConnectorNumber: directUSBHostConnectorNumber(for: entry)
         )
+    }
+
+    private func directUSBHostConnectorNumber(for entry: io_registry_entry_t) -> Int? {
+        var parent: io_registry_entry_t = 0
+        guard IORegistryEntryGetParentEntry(entry, kIOServicePlane, &parent) == KERN_SUCCESS else {
+            return nil
+        }
+        defer { IOObjectRelease(parent) }
+
+        // Read only the immediate port. Walking to a root port would assign
+        // downstream dock peripherals to the Mac's socket instead of the dock.
+        return Self.directUSBHostConnectorNumber(
+            portProperties: registryProperties(for: parent)?.values ?? [:]
+        )
+    }
+
+    static func directUSBHostConnectorNumber(portProperties: [String: Any]) -> Int? {
+        // UsbCPortNumber is the physical socket ordinal, unlike PortNumber,
+        // the USB location ID or a Thunderbolt router's controller number.
+        guard let number = (portProperties[kUSBHostPortPropertyUsbCPortNumber] as? NSNumber)?.intValue,
+            number > 0
+        else { return nil }
+        return number
     }
 
     private func usbParentHubContext(

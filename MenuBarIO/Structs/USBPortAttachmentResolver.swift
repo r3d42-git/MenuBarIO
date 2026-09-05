@@ -38,6 +38,36 @@ struct ThunderboltUSBPortMapEntry: Equatable {
 }
 
 enum USBPortAttachmentResolver {
+    static func attachingDirectUSBDevices(
+        to ports: [ThunderboltPort],
+        usbDevices: [USBDevice]
+    ) -> [ThunderboltPort] {
+        let candidates = usbDevices.filter {
+            $0.transport == .usb && $0.countsTowardUSBDeviceTotal
+                && !$0.isThunderboltBillboard && !$0.isThunderboltTunneledUSB
+                && $0.thunderboltOwnerID == nil && $0.parentHubLocationId == nil
+                && $0.hostConnectorNumber != nil
+        }
+
+        return ports.map { port in
+            guard port.connectedDevice == nil,
+                ports.filter({ $0.connectorNumber == port.connectorNumber }).count == 1
+            else { return port }
+
+            let matches = candidates.filter { $0.hostConnectorNumber == port.connectorNumber }
+            guard matches.count == 1, let device = matches.first else { return port }
+
+            return ThunderboltPort(
+                id: port.id,
+                controllerID: port.controllerID,
+                connectorNumber: port.connectorNumber,
+                protocolVersion: port.protocolVersion,
+                maximumSpeedMbps: port.maximumSpeedMbps,
+                connectedDevice: device
+            )
+        }
+    }
+
     static func attachingUSBDevices(
         to ports: [ThunderboltPort],
         ownerID: String,

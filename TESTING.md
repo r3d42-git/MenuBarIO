@@ -72,6 +72,13 @@ After every change to IOKit discovery, check them once:
 4. Expand **Thunderbolt/USB4 Ports**. Every physical host receptacle must appear
    once. Occupied ports show the attached device, actual protocol and negotiated
    speed; an empty port shows its maximum capability instead.
+   Connect a USB2 device and a USB3 stick directly to each host socket on Apple
+   Silicon and Intel. With an explicit `UsbCPortNumber`, each must occupy that
+   socket with its USB rate, disappear from Other USB Devices and count once.
+   Check the detail path, then unplug/move it and verify that the previous port
+   clears. Native Thunderbolt/dock assignments must retain priority. If the
+   socket property is absent, capture the immediate USB parent-port properties
+   and Thunderbolt Socket IDs; do not infer a port from the controller byte.
 5. Expand **External TB/USB4 Ports**. Every downstream Thunderbolt connector of
    a connected dock must appear once below that dock. Connect a native
    Thunderbolt device to one of them and verify that the port shows that device,
@@ -120,6 +127,18 @@ After every change to IOKit discovery, check them once:
     be clearly labelled, while serial numbers, Bluetooth addresses, location
     IDs, stable internal IDs, usernames and paths must be absent. Check the
     separate USB, Bluetooth and Thunderbolt-port context-menu copies as well.
+
+### MenuBarIO 0.7.1 acceptance and release exception — 2026-09-05
+
+The local gate passed 106 tests, static analysis and the Universal archive.
+The exact sandboxed Debug build showed SanDisk Ultra USB 3.0 at Mac mini
+Port 1 with 5 Gbps and its correct detail path. The residual USB count changed
+from three to two, the total stayed ten, and D1 plus all three Anker downstream
+assignments remained correct. Physical replug, USB2 and repeat Intel-MacBook
+checks remain pending. The maintainer requested publication after these open
+checks were stated; this is the approved 0.7.1 release exception. Automated
+Intel checks, macOS 13/14 and a fresh clean-Mac installation are separate
+acceptance boundaries.
 
 ### MenuBarIO 0.7.0 acceptance — 2026-09-05
 
@@ -366,6 +385,14 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
    genau einmal erscheinen. Belegte Ports zeigen Gerät, tatsächliches Protokoll
    und ausgehandelte Geschwindigkeit; ein freier Port stattdessen seine
    maximale Fähigkeit.
+   Auf Apple Silicon und Intel ein USB2-Gerät und einen USB3-Stick direkt an
+   jedem Hostanschluss prüfen. Bei expliziter `UsbCPortNumber` muss das Gerät
+   dort mit seiner USB-Rate erscheinen, aus **Weitere USB-Geräte** verschwinden
+   und genau einmal zählen. Detailpfad kontrollieren, dann ab-/umstecken: Die
+   alte Portbelegung muss verschwinden. Native Thunderbolt-/Dock-Belegungen
+   behalten Vorrang. Fehlt die Portangabe, die unmittelbaren USB-Elternport-
+   Eigenschaften und Thunderbolt-Socket-IDs erfassen; keine Portnummer aus dem
+   Controllerbyte ableiten.
 5. **Externe TB-/USB4-Ports** aufklappen. Jeder nachgelagerte
    Thunderbolt-Anschluss eines verbundenen Docks muss genau einmal unter diesem
    Dock erscheinen. Ein natives Thunderbolt-Gerät anschließen und prüfen, dass
@@ -421,6 +448,18 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
     Location-IDs, stabile interne IDs, Benutzernamen und Pfade dürfen nicht
     enthalten sein. Zusätzlich die getrennten Kontextmenü-Kopien für USB,
     Bluetooth und Thunderbolt-Ports prüfen.
+
+### Abnahme und Release-Ausnahme für MenuBarIO 0.7.1 — 05.09.2026
+
+Die lokale Prüfkette bestand 106 Tests, statische Analyse und Universal-Archiv.
+Der exakte sandboxed Debug-Build zeigte SanDisk Ultra USB 3.0 an Mac-mini-Port 1
+mit 5 Gbit/s und korrektem Detailpfad. Der USB-Restzähler sank von drei auf zwei,
+der Gesamtzähler blieb zehn; D1 und alle drei Anker-Portzuordnungen blieben
+korrekt. Physisches Umstecken, USB2 und die erneute Intel-MacBook-Prüfung stehen
+noch aus. Nach Nennung dieser offenen Prüfungen hat der Maintainer die
+Veröffentlichung freigegeben; dies ist die genehmigte Release-Ausnahme für
+0.7.1. Automatische Intel-Prüfungen, macOS 13/14 und eine Neuinstallation auf
+einem frischen Mac bleiben getrennte Abnahmegrenzen.
 
 ### Abnahme von MenuBarIO 0.7.0 — 05.09.2026
 
