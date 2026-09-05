@@ -144,7 +144,8 @@ struct DiagnosticReportBuilder {
         } else {
             lines.append(
                 contentsOf: snapshot.bluetoothDevices.map {
-                    "- \(markdownText($0.name))"
+                    let battery = $0.batteryLevel.map { " (\(markdownText(localize("battery_level"))): \($0)%)" } ?? ""
+                    return "- \(markdownText($0.name))\(battery)"
                 })
         }
 
@@ -196,6 +197,10 @@ struct DiagnosticReportBuilder {
             parts.append(sanitize(vendor))
         }
 
+        parts.append("\(localize("protocol")): \(sanitize(deviceProtocolDescription(device)))")
+        if let speed = device.speedMbps {
+            parts.append("\(localize("negotiated_speed")) \(USBFormatting.transferRate(speed))")
+        }
         parts.append(sanitize(device.uniqueId))
         parts.append(device.hardwareIdentifier)
 
@@ -220,6 +225,9 @@ struct DiagnosticReportBuilder {
 
     func bluetoothDeviceDetails(_ device: BluetoothDevice) -> String {
         var parts = [sanitize(device.name), "Bluetooth"]
+        if let level = device.batteryLevel {
+            parts.append("\(localize("battery_level")): \(level)%")
+        }
         if let address = device.address {
             parts.append("\(localize("bluetooth_address")) \(sanitize(address))")
         }
@@ -238,10 +246,7 @@ struct DiagnosticReportBuilder {
 
         if let device = port.connectedDevice {
             parts.append(port.protocolDescription)
-            if let speed = port.negotiatedSpeedMbps {
-                parts.append("\(localize("negotiated_speed")) \(USBFormatting.transferRate(speed))")
-            }
-            if let maximum = port.maximumSpeedMbps {
+            if let maximum = port.connectionMaximumSpeedMbps {
                 parts.append("\(localize("port_max")) \(USBFormatting.transferRate(maximum))")
             }
             parts.append(usbDeviceDetails(device))
@@ -250,16 +255,20 @@ struct DiagnosticReportBuilder {
             if let powerSourceWatts {
                 parts.append(String(format: localize("power_adapter_watts_format"), powerSourceWatts))
             }
-            if let maximum = port.maximumSpeedMbps {
+            if let maximum = port.connectionMaximumSpeedMbps {
                 parts.append("\(localize("port_max")) \(USBFormatting.transferRate(maximum))")
             }
         } else {
             parts.append(localize("port_free"))
-            if let maximum = port.maximumSpeedMbps {
+            if let maximum = port.connectionMaximumSpeedMbps {
                 parts.append("\(localize("port_max")) \(USBFormatting.transferRate(maximum))")
             }
         }
 
+        if port.connectedDevice?.transport != .usb, let boost = port.bandwidthBoostSpeedMbps {
+            parts.append("\(localize("bandwidth_boost")): \(USBFormatting.transferRate(boost))")
+            parts.append(localize("bandwidth_boost_explanation"))
+        }
         return parts.joined(separator: "\n")
     }
 
@@ -328,7 +337,7 @@ struct DiagnosticReportBuilder {
             if let speed = port.negotiatedSpeedMbps {
                 lines.append(fieldLine("negotiated_speed", USBFormatting.transferRate(speed)))
             }
-            if let maximum = port.maximumSpeedMbps {
+            if let maximum = port.connectionMaximumSpeedMbps {
                 lines.append(fieldLine("port_max", USBFormatting.transferRate(maximum)))
             }
         } else if isPowerSourceConnected {
@@ -336,14 +345,18 @@ struct DiagnosticReportBuilder {
             if let powerSourceWatts {
                 lines.append(fieldLine("adapter_power", "\(powerSourceWatts) W"))
             }
-            if let maximum = port.maximumSpeedMbps {
+            if let maximum = port.connectionMaximumSpeedMbps {
                 lines.append(fieldLine("port_max", USBFormatting.transferRate(maximum)))
             }
         } else {
             lines.append(fieldLine("protocol", port.protocolDescription))
-            if let maximum = port.maximumSpeedMbps {
+            if let maximum = port.connectionMaximumSpeedMbps {
                 lines.append(fieldLine("port_max", USBFormatting.transferRate(maximum)))
             }
+        }
+        if port.connectedDevice?.transport != .usb, let boost = port.bandwidthBoostSpeedMbps {
+            lines.append(fieldLine("bandwidth_boost", USBFormatting.transferRate(boost)))
+            lines.append(markdownText(localize("bandwidth_boost_explanation")))
         }
         lines.append("")
     }

@@ -121,6 +121,37 @@ After every change to IOKit discovery, check them once:
     IDs, stable internal IDs, usernames and paths must be absent. Check the
     separate USB, Bluetooth and Thunderbolt-port context-menu copies as well.
 
+### MenuBarIO 0.7.0 acceptance — 2026-09-05
+
+The local 99-test gate, analyzer and Universal build passed. The sandboxed
+Debug UI on the M4 Pro Mac mini showed Logi M650 L battery **45%**, device/port
+navigation, the Anker Port 2 storage path, and separate TB5 80/120 Gbps fields.
+Command-C, Command-R, Escape and a native Markdown save were checked. Battery
+matching uses exact OS identifiers; no percentage is inferred from a name.
+
+The user confirmed Apple Silicon hardware tests on 2026-09-05 and explicitly
+authorized this release with physical Intel testing deferred. The cases below
+remain the regression checklist for Intel and future changes; they do not
+retract that reported Apple Silicon acceptance. macOS 13/14 and other Bluetooth
+models were not newly observed by the agent.
+
+Regression checklist:
+
+- Disconnect/reconnect a selected device and swap the occupant of a selected
+  port. The detail view must reflect the current snapshot, with stale status
+  when discovery fails; a missing item must not remain presented as connected.
+- Pull only the Ethernet cable from a still-connected dock or built-in Ethernet
+  port. The indicator must follow the link without manual USB refresh. Repeat
+  with the indicator disabled/re-enabled and after wake.
+- On supported Bluetooth hardware check battery updates, zero/unknown values,
+  disconnect/reconnect and permission-denied behavior. The currently connected
+  Logi M650 L is physically verified; other hardware remains unverified.
+- With macOS keyboard navigation enabled, reach device rows with Tab and open
+  them with the native button action. Verify VoiceOver announces rows as detail
+  buttons, expansion state and battery percentage, never as a Disconnect action.
+- Check long names and all supported menu widths/languages, plus macOS 13/14
+  and Intel runtime. Apple Silicon acceptance is maintainer-reported; Intel remains pending.
+
 ### Compatibility smoke tests
 
 - On macOS 15 or newer, verify the integrated settings view, the menu-bar
@@ -388,6 +419,20 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
     Location-IDs, stabile interne IDs, Benutzernamen und Pfade dürfen nicht
     enthalten sein. Zusätzlich die getrennten Kontextmenü-Kopien für USB,
     Bluetooth und Thunderbolt-Ports prüfen.
+
+### Abnahme von MenuBarIO 0.7.0 — 05.09.2026
+
+99 lokale Tests, statische Analyse und Universal-Build sind erfolgreich.
+Im sandboxed Debug-Build wurden Logi M650 L mit 45 %, Gerätedetails,
+Anker-Verbindungsweg, TB5-80/120-Gbit/s-Erklärung, ⌘C/⌘R/Esc und nativer
+Markdown-Export geprüft. Der Benutzer hat die Apple-Silicon-Tests am 05.09.2026
+bestätigt und den Release vor der später folgenden physischen Intel-Abnahme
+ausdrücklich freigegeben. Die obige Prüfliste gilt weiterhin für Intel und
+künftige Änderungen; zusätzliche Bluetooth-Modelle sowie macOS 13/14 bleiben
+außerhalb der neu beobachteten Abnahme. Mit aktivierter
+macOS-Tastaturnavigation zusätzlich Tab und die native Tastenaktivierung der
+Gerätezeilen sowie VoiceOver kontrollieren. Die vollständigen neuen Fälle
+stehen oben unter „MenuBarIO 0.7.0 acceptance“.
 
 ### Kompatibilitäts-Starttests
 

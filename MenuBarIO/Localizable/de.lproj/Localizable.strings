@@ -1,5 +1,5 @@
 "exit" = "Beenden";
-"refresh" = "Aktual.";
+"refresh" = "Aktualisieren";
 "open_on_startup" = "Beim Anmelden automatisch öffnen";
 "usb_device" = "USB-Gerät";
 "usb_devices" = "Weitere USB-Geräte";
@@ -21,7 +21,7 @@
 "no_devices_found" = "Nichts gefunden";
 "version" = "Version: %@";
 "unknown_speed" = "Unbekannte Geschwindigkeit";
-"port_max" = "Maximaler Port:";
+"port_max" = "Port-Kapazität:";
 "serial_number" = "SN:";
 "usb_version" = "USB-Version:";
 "low_speed" = "Low-Speed";
@@ -30,7 +30,7 @@
 "supports_up_to" = "unterstützt bis zu";
 "supports" = "unterstützt";
 "unknown" = "Unbekannt"; 
-"settings" = "Konfig";
+"settings" = "Einstellungen";
 "copy" = "Kopieren";
 "back" = "Zurück";
 "appearance" = "Darstellung";
@@ -81,3 +81,19 @@
 "bluetooth_address" = "Bluetooth-Adresse:";
 "controller_id" = "Controller-ID:";
 "negotiated_speed" = "Ausgehandelte Geschwindigkeit:";
+
+"device_details" = "Gerätedetails";
+"open_device_details" = "Gerätedetails öffnen";
+"technical_identifiers" = "Technische Kennungen";
+"hardware_identifier" = "Hardware-ID";
+"connection_path" = "Verbindungsweg";
+"connection_path_unknown" = "Der physische Verbindungsweg lässt sich nicht zuverlässig bestimmen.";
+"link_speed_explanation" = "Die Linkrate wird zwischen den Geräten ausgehandelt. Sie ist keine Messung der Dateiübertragung.";
+"bandwidth_boost" = "Bandwidth Boost";
+"bandwidth_boost_explanation" = "Thunderbolt 5 / USB4 v2 unterstützt 80 Gbit/s in beide Richtungen. Bandwidth Boost ermöglicht für hohe Display-Bandbreite 120 Gbit/s in eine und 40 Gbit/s in die andere Richtung. Eine Verbindung mit 80 Gbit/s ist regulär.";
+"details_copied" = "Details kopiert";
+"device_no_longer_available" = "Dieses Gerät oder dieser Port ist nicht mehr verfügbar.";
+"group_expanded" = "Ausgeklappt";
+"group_collapsed" = "Eingeklappt";
+"last_successful_update" = "Letzte erfolgreiche Aktualisierung: %@";
+"battery_level" = "Akkustand";

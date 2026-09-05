@@ -20,10 +20,11 @@ struct DeviceGroupHeader: View {
         } label: {
             HStack(spacing: 8) {
                 Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                    .accessibilityHidden(true)
                     .font(.system(size: 10, weight: .bold))
                     .frame(width: 12)
 
-                groupIcon
+                groupIcon.accessibilityHidden(true)
                     .frame(width: 14, height: 15)
                     .foregroundStyle(.secondary)
 
@@ -45,6 +46,7 @@ struct DeviceGroupHeader: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityValue(Text(isExpanded ? "group_expanded" : "group_collapsed"))
     }
 
     @ViewBuilder

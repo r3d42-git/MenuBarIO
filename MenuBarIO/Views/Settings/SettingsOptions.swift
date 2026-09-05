@@ -23,7 +23,7 @@ struct SettingsOptions: View {
             ToggleRow(
                 label: "ethernet_connected_icon",
                 binding: $showEthernet,
-                onToggle: { _ in manager.refresh() }
+                onToggle: { manager.setEthernetIndicatorEnabled($0) }
             )
 
             if #available(macOS 27, *) {

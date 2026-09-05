@@ -62,4 +62,19 @@ final class USBFormattingTests: XCTestCase {
         XCTAssertEqual(DeviceCountFormatter.string(for: 7), "7")
         XCTAssertEqual(DeviceCountFormatter.string(for: 100), "99＋")
     }
+
+    func testBoostNormalizationRequiresBothKnownProtocolAndAsymmetricMaximum() {
+        func port(_ protocolVersion: Int?, _ maximum: Int?) -> ThunderboltPort {
+            ThunderboltPort(
+                id: "host", controllerID: 0, connectorNumber: 1,
+                protocolVersion: protocolVersion, maximumSpeedMbps: maximum, connectedDevice: nil)
+        }
+        XCTAssertEqual(port(64, 120_000).standardMaximumSpeedMbps, 80_000)
+        XCTAssertEqual(port(64, 120_000).bandwidthBoostSpeedMbps, 120_000)
+        XCTAssertEqual(port(64, 80_000).standardMaximumSpeedMbps, 80_000)
+        XCTAssertNil(port(64, 80_000).bandwidthBoostSpeedMbps)
+        XCTAssertEqual(port(nil, 120_000).standardMaximumSpeedMbps, 120_000)
+        XCTAssertNil(port(nil, 120_000).bandwidthBoostSpeedMbps)
+        XCTAssertNil(port(64, nil).standardMaximumSpeedMbps)
+    }
 }

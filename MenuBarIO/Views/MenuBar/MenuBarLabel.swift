@@ -10,6 +10,7 @@ struct MenuBarLabel: View {
     var body: some View {
         Image(nsImage: labelImage)
             .id(labelID)
+            .accessibilityLabel(Text("MenuBarIO, USB \(deviceManager.count), Bluetooth \(bluetoothManager.count)"))
     }
 
     private var labelImage: NSImage {

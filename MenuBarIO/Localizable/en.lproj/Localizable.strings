@@ -21,7 +21,7 @@
 "no_devices_found" = "No devices found";
 "version" ="Version: %@";
 "unknown_speed" = "Unknown Speed";
-"port_max" = "Port max:";
+"port_max" = "Port capacity:";
 "serial_number" = "SN:";
 "usb_version" = "USB Version:";
 "low_speed" = "Low-speed";
@@ -81,3 +81,19 @@
 "bluetooth_address" = "Bluetooth Address:";
 "controller_id" = "Controller ID:";
 "negotiated_speed" = "Negotiated speed:";
+
+"device_details" = "Device details";
+"open_device_details" = "Open device details";
+"technical_identifiers" = "Technical identifiers";
+"hardware_identifier" = "Hardware ID";
+"connection_path" = "Connection path";
+"connection_path_unknown" = "The physical connection path could not be determined reliably.";
+"link_speed_explanation" = "The link rate is negotiated between devices. It is not a measurement of file transfer speed.";
+"bandwidth_boost" = "Bandwidth Boost";
+"bandwidth_boost_explanation" = "Thunderbolt 5 / USB4 v2 supports 80 Gbps in both directions. Bandwidth Boost can provide 120 Gbps in one direction and 40 Gbps in the other for high display bandwidth. An 80 Gbps link is normal.";
+"details_copied" = "Details copied";
+"device_no_longer_available" = "This device or port is no longer available.";
+"group_expanded" = "Expanded";
+"group_collapsed" = "Collapsed";
+"last_successful_update" = "Last successful update: %@";
+"battery_level" = "Battery level";

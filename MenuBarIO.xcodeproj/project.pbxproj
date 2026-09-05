@@ -82,6 +82,7 @@
 				8061FDF62E60BBDB00A07182 /* Sources */,
 				8061FDF72E60BBDB00A07182 /* Frameworks */,
 				8061FDF82E60BBDB00A07182 /* Resources */,
+				A00700000000000000000001 /* Bundle license notices */,
 			);
 			buildRules = (
 			);
@@ -185,6 +186,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A00700000000000000000001 /* Bundle license notices */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = ("$(SRCROOT)/LICENSE", "$(SRCROOT)/LICENSE.upstream", "$(SRCROOT)/NOTICE", "$(SRCROOT)/SOURCE.md");
+			name = "Bundle license notices";
+			outputPaths = ("$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Licenses");
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nlicense_dir=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Licenses\"\nmkdir -p \"$license_dir\"\nfor name in LICENSE LICENSE.upstream NOTICE SOURCE.md; do\n  cp \"$SRCROOT/$name\" \"$license_dir/$name\"\ndone\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8061FDF62E60BBDB00A07182 /* Sources */ = {
@@ -333,7 +348,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
@@ -359,7 +374,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-Xfrontend -warn-long-expression-type-checking=100";
 				PRODUCT_BUNDLE_IDENTIFIER = de.r3d.menubarusb.tb;
 				PRODUCT_MODULE_NAME = MenuBarIO;
@@ -379,7 +394,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_APP_SANDBOX = YES;
@@ -406,7 +421,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = de.r3d.menubarusb.tb;
 				PRODUCT_MODULE_NAME = MenuBarIO;
 				PRODUCT_NAME = "MenuBarIO";

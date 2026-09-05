@@ -21,7 +21,7 @@
 "no_devices_found" = "デバイスが見つかりません";
 "version" = "バージョン: %@";
 "unknown_speed" = "不明な速度";
-"port_max" = "最大ポート:";
+"port_max" = "ポートの容量：";
 "serial_number" = "SN:";
 "usb_version" = "USB バージョン:";
 "low_speed" = "Low Speed";
@@ -81,3 +81,19 @@
 "bluetooth_address" = "Bluetoothアドレス：";
 "controller_id" = "コントローラID：";
 "negotiated_speed" = "ネゴシエート速度：";
+
+"device_details" = "デバイスの詳細";
+"open_device_details" = "デバイスの詳細を開く";
+"technical_identifiers" = "技術識別情報";
+"hardware_identifier" = "ハードウェアID";
+"connection_path" = "接続経路";
+"connection_path_unknown" = "物理的な接続経路を確実に特定できません。";
+"link_speed_explanation" = "リンク速度はデバイス間で交渉されます。実際のファイル転送速度の測定値ではありません。";
+"bandwidth_boost" = "帯域幅ブースト";
+"bandwidth_boost_explanation" = "Thunderbolt 5 / USB4 v2 は双方向に各80 Gbit/sをサポートします。帯域幅ブーストでは、高帯域幅のディスプレイ向けに一方向120 Gbit/s、逆方向40 Gbit/sが可能です。80 Gbit/sの接続は正常です。";
+"details_copied" = "詳細をコピーしました";
+"device_no_longer_available" = "このデバイスまたはポートは利用できなくなりました。";
+"group_expanded" = "展開済み";
+"group_collapsed" = "折りたたみ済み";
+"last_successful_update" = "最終更新成功：%@";
+"battery_level" = "バッテリー残量";

@@ -12,7 +12,7 @@ Thunderbolt, USB4 and Bluetooth hardware.
 MenuBarIO began with the MIT-licensed source of
 [rafaelSwi/MenuBarUSB](https://github.com/rafaelSwi/MenuBarUSB). That original
 idea and source authorship remain explicitly credited, and the original
-copyright notice remains in the license. MenuBarIO itself is developed and
+copyright notice remains in LICENSE.upstream. MenuBarIO itself is developed and
 maintained independently.
 
 > [!IMPORTANT]
@@ -45,6 +45,15 @@ maintained independently.
   exported through the native save panel without serial numbers, Bluetooth
   addresses or internal identifiers; detailed per-device copy actions remain
   available from context menus
+- Click any device or port for readable details, the reliably resolved connection
+  path and technical identifiers; Command-C copies details, Command-R refreshes
+  and Escape returns to the device list
+- Bluetooth battery levels appear when available from macOS or the standard
+  BLE Battery Service on an already connected, exactly identified device
+- Compact USB labels keep protocol-generation details in the detail view;
+  Thunderbolt 5 distinguishes 80 Gbps bidirectional capacity from 120 Gbps
+  Bandwidth Boost, and explains that link rates are not file-transfer benchmarks
+- Ethernet link changes update the indicator independently of USB discovery
 - Compact device-first view without saved per-device customizations
 - No bundled audio, custom hardware sound or donation functionality
 - No telemetry, analytics, crash reporting or network requests; see
@@ -52,7 +61,7 @@ maintained independently.
 
 ## Compatibility
 
-The current release, **MenuBarIO 0.6.0**, is a **Universal** app for Apple
+The current release, **MenuBarIO 0.7.0**, is a **Universal** app for Apple
 Silicon (`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. Automated
 checks run natively on both architectures. The physical Intel-Mac observations
 and the hardware cases that still apply after discovery changes are documented
@@ -75,10 +84,11 @@ Hardware acceptance cases and the release workflow are documented in
 
 ## License and origin
 
-MenuBarIO is distributed under the [MIT License](LICENSE). The original
-copyright notice and license terms are preserved. This credits the licensed
-source origin and does not imply collaboration, endorsement or successor
-status.
+MenuBarIO 0.7.0 and later is distributed under [GPL-3.0-or-later](LICENSE).
+The original MIT copyright and permission notice is preserved in
+[LICENSE.upstream](LICENSE.upstream); [NOTICE](NOTICE) explains the origin.
+Earlier published releases retain their MIT license. [SOURCE.md](SOURCE.md)
+links to the exact corresponding public source tag for this release.
 
 ---
 
@@ -132,6 +142,16 @@ MenuBarIO selbst wird unabhängig entwickelt und gepflegt.
   und lässt sich über den nativen Speicherdialog ohne Seriennummern,
   Bluetooth-Adressen oder interne Kennungen exportieren; detaillierte
   Einzelkopien bleiben in den Kontextmenüs verfügbar
+- Ein Klick auf ein Gerät oder einen Port öffnet lesbare Details mit dem
+  zuverlässig ermittelten Verbindungsweg und technischen Kennungen; ⌘C kopiert
+  die Details, ⌘R aktualisiert und Esc führt zur Geräteliste zurück
+- Bluetooth-Akkustände erscheinen, wenn macOS oder der standardisierte
+  BLE-Akkudienst eines bereits verbundenen, eindeutig zugeordneten Geräts
+  entsprechende Daten liefern
+- Kurze USB-Angaben halten Protokollgenerationen in der Detailansicht;
+  Thunderbolt 5 unterscheidet 80 Gbit/s bidirektionale Kapazität und 120 Gbit/s
+  Bandwidth Boost und erklärt den Unterschied zwischen Linkrate und Dateitransfer
+- Ethernet-Linkwechsel aktualisieren das Symbol unabhängig von der USB-Erkennung
 - Kompakte, geräteorientierte Ansicht ohne gespeicherte Anpassungen je Gerät
 - Keine eingebundenen Audiodateien, eigenen Hardware-Sounds oder
   Spendenfunktionen
@@ -140,7 +160,7 @@ MenuBarIO selbst wird unabhängig entwickelt und gepflegt.
 
 ## Kompatibilität
 
-Der aktuelle Release **MenuBarIO 0.6.0** ist eine **Universal-App** für
+Der aktuelle Release **MenuBarIO 0.7.0** ist eine **Universal-App** für
 Apple-Silicon- (`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die
 automatischen Prüfungen laufen nativ auf beiden Architekturen. Die physischen
 Beobachtungen auf einem Intel-Mac und die nach Änderungen an der
@@ -165,7 +185,8 @@ Hardware-Abnahmefälle und der Release-Ablauf sind in
 
 ## Lizenz und Herkunft
 
-MenuBarIO wird unter der [MIT-Lizenz](LICENSE) vertrieben. Der ursprüngliche
-Copyright-Hinweis und die Lizenzbedingungen bleiben erhalten. Damit wird die
-lizenzierte Herkunft des Ausgangscodes gewürdigt; eine Zusammenarbeit,
-Bestätigung oder Nachfolgestellung ist damit nicht verbunden.
+MenuBarIO ab Version 0.7.0 wird unter [GPL-3.0-or-later](LICENSE) vertrieben.
+Der ursprüngliche MIT-Copyright- und Erlaubnishinweis bleibt in
+[LICENSE.upstream](LICENSE.upstream) erhalten; [NOTICE](NOTICE) erläutert die
+Herkunft. Frühere veröffentlichte Releases behalten ihre MIT-Lizenz.
+[SOURCE.md](SOURCE.md) verlinkt den exakten öffentlichen Quellcode-Tag dieses Releases.

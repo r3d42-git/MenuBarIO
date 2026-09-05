@@ -12,6 +12,7 @@ struct MainListDeviceList: View {
     @Binding var bluetoothGroupExpanded: Bool
     @Binding var thunderboltPortGroupExpanded: Bool
     @Binding var externalThunderboltPortGroupExpanded: Bool
+    let onSelect: (DeviceDetailSelection) -> Void
 
     var body: some View {
         let groups = manager.deviceGroups
@@ -60,7 +61,7 @@ struct MainListDeviceList: View {
                 ThunderboltPortOwnerHeader(group: group)
 
                 ForEach(group.ports) { port in
-                    ThunderboltPortRow(port: port)
+                    ThunderboltPortRow(port: port, onSelect: { onSelect(.port(port.id)) })
                 }
             }
         }
@@ -82,7 +83,8 @@ struct MainListDeviceList: View {
                     isPowerSourceConnected:
                         port.connectedDevice == nil
                         && manager.powerSourceConnectorNumber == port.connectorNumber,
-                    powerSourceWatts: manager.adapterPowerWatts
+                    powerSourceWatts: manager.adapterPowerWatts,
+                    onSelect: { onSelect(.port(port.id)) }
                 )
             }
         }
@@ -107,7 +109,8 @@ struct MainListDeviceList: View {
                     USBDeviceRow(
                         device: device,
                         isHovered: isHovered,
-                        onHover: { updateHoveredDevice(device.id, isHovering: $0) }
+                        onHover: { updateHoveredDevice(device.id, isHovering: $0) },
+                        onSelect: { onSelect(.usb(device.id)) }
                     )
                 }
             }
@@ -135,7 +138,8 @@ struct MainListDeviceList: View {
                 USBDeviceRow(
                     device: device,
                     isHovered: isHovered,
-                    onHover: { updateHoveredDevice(device.id, isHovering: $0) }
+                    onHover: { updateHoveredDevice(device.id, isHovering: $0) },
+                    onSelect: { onSelect(.usb(device.id)) }
                 )
             }
         }
@@ -155,7 +159,8 @@ struct MainListDeviceList: View {
                 BluetoothDeviceRow(
                     device: device,
                     isHovered: hoveredDeviceID == device.id,
-                    onHover: { updateHoveredDevice(device.id, isHovering: $0) }
+                    onHover: { updateHoveredDevice(device.id, isHovering: $0) },
+                    onSelect: { onSelect(.bluetooth(device.id)) }
                 )
             }
         }

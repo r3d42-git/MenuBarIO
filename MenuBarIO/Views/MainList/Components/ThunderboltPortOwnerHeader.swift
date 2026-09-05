@@ -6,6 +6,7 @@ struct ThunderboltPortOwnerHeader: View {
     var body: some View {
         HStack(spacing: 7) {
             Image(systemName: "bolt.horizontal.circle")
+                .accessibilityHidden(true)
                 .font(.system(size: 11, weight: .semibold))
                 .frame(width: 14)
                 .foregroundStyle(.secondary)

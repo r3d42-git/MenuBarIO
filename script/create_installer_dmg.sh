@@ -82,6 +82,9 @@ tell application "Finder"
     set position of item "$APP_NAME" of container window to {190, 220}
     set position of item "$APPLICATIONS_LINK_NAME" of container window to {570, 220}
     set position of item "LICENSE" of container window to {78, 360}
+    set position of item "LICENSE.upstream" of container window to {275, 360}
+    set position of item "NOTICE" of container window to {470, 360}
+    set position of item "SOURCE.md" of container window to {665, 360}
     update without registering applications
     delay 1
     close
