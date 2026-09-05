@@ -130,10 +130,11 @@ Command-C, Command-R, Escape and a native Markdown save were checked. Battery
 matching uses exact OS identifiers; no percentage is inferred from a name.
 
 The user confirmed Apple Silicon hardware tests on 2026-09-05 and explicitly
-authorized this release with physical Intel testing deferred. The cases below
-remain the regression checklist for Intel and future changes; they do not
-retract that reported Apple Silicon acceptance. macOS 13/14 and other Bluetooth
-models were not newly observed by the agent.
+authorized this release with physical Intel testing deferred. Later on the
+same day the user confirmed that the physical Intel and MacBook tests had
+also completed successfully. This closes the deferred Intel acceptance.
+The cases below remain the regression checklist for future changes.
+macOS 13/14 and other Bluetooth models were not newly observed by the agent.
 
 Regression checklist:
 
@@ -150,7 +151,8 @@ Regression checklist:
   them with the native button action. Verify VoiceOver announces rows as detail
   buttons, expansion state and battery percentage, never as a Disconnect action.
 - Check long names and all supported menu widths/languages, plus macOS 13/14
-  and Intel runtime. Apple Silicon acceptance is maintainer-reported; Intel remains pending.
+  and Intel runtime. Apple Silicon, Intel and MacBook hardware acceptance is
+  maintainer-reported and complete for 0.7.0.
 
 ### Compatibility smoke tests
 
@@ -426,9 +428,11 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
 Im sandboxed Debug-Build wurden Logi M650 L mit 45 %, Gerätedetails,
 Anker-Verbindungsweg, TB5-80/120-Gbit/s-Erklärung, ⌘C/⌘R/Esc und nativer
 Markdown-Export geprüft. Der Benutzer hat die Apple-Silicon-Tests am 05.09.2026
-bestätigt und den Release vor der später folgenden physischen Intel-Abnahme
-ausdrücklich freigegeben. Die obige Prüfliste gilt weiterhin für Intel und
-künftige Änderungen; zusätzliche Bluetooth-Modelle sowie macOS 13/14 bleiben
+bestätigt und den Release zunächst vor der physischen Intel-Abnahme
+ausdrücklich freigegeben. Im Anschluss hat er am selben Tag auch die Intel-
+und MacBook-Tests als erfolgreich bestätigt. Damit ist die zurückgestellte
+Intel-Abnahme abgeschlossen. Die obige Prüfliste gilt für künftige Änderungen;
+zusätzliche Bluetooth-Modelle sowie macOS 13/14 bleiben
 außerhalb der neu beobachteten Abnahme. Mit aktivierter
 macOS-Tastaturnavigation zusätzlich Tab und die native Tastenaktivierung der
 Gerätezeilen sowie VoiceOver kontrollieren. Die vollständigen neuen Fälle
