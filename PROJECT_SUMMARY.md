@@ -28,7 +28,7 @@ the preserved source history.
 
 The user approved device details, clearer link rates, Ethernet/copy fixes,
 keyboard/accessibility improvements and Bluetooth battery display. These are
-prepared for release as 0.7.0 (build 11). On 2026-09-05 the user confirmed
+published as 0.7.0 (build 11). On 2026-09-05 the user confirmed
 Apple Silicon hardware acceptance and explicitly authorized publication while
 physical Intel acceptance remains pending. The previously scheduled GPL
 transition is included in this release.
@@ -70,6 +70,50 @@ acceptance will follow later; publishing before it is explicitly approved.
 Other Bluetooth models, macOS 13/14 and a fresh clean-machine installation
 remain outside the directly observed checks; CI does not replace those tests.
 Build/test artifacts are under `/private/tmp/menubario-gpt6-check`.
+
+### Published release evidence — 2026-09-05
+
+[MenuBarIO v0.7.0](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.7.0)
+was published from the immutable annotated tag at release commit
+`05d641c8abb85cb81c0cdad43b76ef33d84b38fb`, after PRs
+[#24](https://github.com/r3d42-git/MenuBarIO/pull/24),
+[#25](https://github.com/r3d42-git/MenuBarIO/pull/25) and
+[#26](https://github.com/r3d42-git/MenuBarIO/pull/26).
+
+- Public asset: [MenuBarIO-0.7.0-mac.dmg](https://github.com/r3d42-git/MenuBarIO/releases/download/v0.7.0/MenuBarIO-0.7.0-mac.dmg),
+  3,181,432 bytes, with a published `.dmg.sha256` sidecar.
+- SHA-256: `7125c9386664c5c425eafad82c7e9ee7289ab55c3493b88c225dfaf8aa802bcc`.
+  Local bytes, fresh public download and GitHub's asset digest agree; the
+  checksum sidecar's digest was independently compared as well.
+- Universal `arm64 x86_64`, macOS 13+, version 0.7.0 (build 11), bundle
+  `de.r3d.menubarusb.tb`, Hardened Runtime. Signing authority:
+  `Developer ID Application: Philipp John Hild (G6JH37W285)`.
+- Apple accepted the app submission `a0c04520-d80b-46f3-8994-00e0a292c5aa`.
+  Its ticket was stapled and validated before packaging. Apple separately
+  accepted the final DMG submission `03fcedfb-5817-4e88-8397-d2037dc42876`;
+  the DMG ticket was also stapled and validated.
+- The repository-native release and publication wrappers passed. The freshly
+  downloaded DMG was mounted read-only; its integrity, signature, Gatekeeper
+  acceptance, enclosed-app signature/ticket/Gatekeeper, both architectures,
+  bundle/version, entitlements, and exact GPL/upstream/source files passed.
+  A read-only Finder inspection of the final local DMG confirmed that the
+  installer shows all six items with the complete license/source row.
+- Both native macOS jobs passed on the release commit in
+  [run 33961965054](https://github.com/r3d42-git/MenuBarIO/actions/runs/33961965054);
+  Pages passed in [run 33961965050](https://github.com/r3d42-git/MenuBarIO/actions/runs/33961965050).
+  All three PRs also passed their required checks and the native Intel job.
+- Apple Silicon hardware acceptance was confirmed by the maintainer. Physical
+  Intel acceptance remains deferred with explicit publication approval. A fresh
+  clean-Mac installation, other Bluetooth models and macOS 13/14 hardware were
+  not newly tested; CI and Gatekeeper do not replace those acceptance checks.
+
+The existing notary profile briefly became unreadable while the Mac was
+reported locked, including in the permitted local execution context. On the
+user-requested retry the same profile worked; no credentials, Keychain items
+or system security settings were changed. Final logs are
+`/private/tmp/menubario-070-delivery.log` and
+`/private/tmp/menubario-070-publish.log`. This documentation update follows
+publication and must not move the release tag.
 
 ## Licensing from 0.7.0
 
@@ -541,9 +585,9 @@ steps governed by `RELEASE.md`; do not infer them from a code change.
 
 # Projektübersicht
 
-## Lokale Weiterentwicklung — 05.09.2026
+## Veröffentlichung 0.7.0 — 05.09.2026
 
-Die freigegebenen Punkte 1–4 und Bluetooth-Akkustände sind lokal umgesetzt:
+Die freigegebenen Punkte 1–4 und Bluetooth-Akkustände sind veröffentlicht:
 Gerätedetails mit sicher zugeordnetem Verbindungsweg, kurze USB-Zeilen und
 getrennte TB5-Standard-/Boost-Kapazität, ereignisgesteuerter Ethernet-Status,
 vollständigere Detailkopien, Tastaturkürzel, verbesserte Bedienungshilfen und
@@ -558,6 +602,14 @@ Prüfpfade. Version 0.7.0 (Build 11) enthält die geplante Umstellung auf GPL-3.
 mit erhaltenem MIT-Herkunftshinweis und exaktem Quellcode-Tag in App und DMG.
 Der Benutzer hat am 05.09.2026 die Apple-Silicon-Abnahme bestätigt und die
 Veröffentlichung trotz noch ausstehender physischer Intel-Abnahme freigegeben.
+
+[Version 0.7.0](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.7.0)
+ist als signierte, separat für App und DMG notarisierte Universal-Version
+öffentlich verfügbar. Der frische GitHub-Download bestand alle Prüfungen;
+seine SHA-256 stimmt mit dem lokalen Artefakt und GitHubs Dateidigest überein.
+Release-Commit ist `05d641c8abb85cb81c0cdad43b76ef33d84b38fb`. Beide nativen
+CI-Jobs und Pages sind grün. Exakte Prüfsumme, Download, Apple-Vorgangsnummern
+und verbleibende Hardwaregrenzen stehen oben unter „Published release evidence“.
 
 
 ## Zweck und Umfang
