@@ -60,6 +60,9 @@ struct USBDevice: Identifiable, Equatable, Hashable {
     /// Downstream port number relative to `parentHubLocationId`. Unlike the
     /// USB controller byte, this identifies the actual socket on that hub.
     let parentHubPortNumber: Int?
+    /// Physical USB-C socket reported by the immediate host USB port. Never
+    /// inferred from a controller byte or inherited through an external hub.
+    let hostConnectorNumber: Int?
 
     var id: String { uniqueId }
 
@@ -83,7 +86,8 @@ struct USBDevice: Identifiable, Equatable, Hashable {
         thunderboltOwnerID: String? = nil,
         isThunderboltTunneledUSB: Bool = false,
         parentHubLocationId: UInt32? = nil,
-        parentHubPortNumber: Int? = nil
+        parentHubPortNumber: Int? = nil,
+        hostConnectorNumber: Int? = nil
     ) {
         self.name = name
         self.vendor = vendor
@@ -105,6 +109,7 @@ struct USBDevice: Identifiable, Equatable, Hashable {
         self.isThunderboltTunneledUSB = isThunderboltTunneledUSB
         self.parentHubLocationId = parentHubLocationId
         self.parentHubPortNumber = parentHubPortNumber
+        self.hostConnectorNumber = hostConnectorNumber
     }
 
     var uniqueId: String {

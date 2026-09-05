@@ -163,6 +163,15 @@ final class EthernetLinkMonitoringTests: XCTestCase {
         XCTAssertNotNil(monitor.onChange)
         weak var weakManager = manager
         manager = nil
+
+        // Publishing .ready on the main queue can precede the background
+        // discovery closure returning and releasing its temporary strong self.
+        // Wait for that asynchronous release; a retained notification callback
+        // still fails this bounded expectation and the teardown assertions.
+        let released = XCTNSPredicateExpectation(
+            predicate: NSPredicate { _, _ in weakManager == nil }, object: nil
+        )
+        wait(for: [released], timeout: 2)
         XCTAssertNil(weakManager)
         XCTAssertEqual(monitor.stopCount, 1)
         XCTAssertNil(monitor.onChange)

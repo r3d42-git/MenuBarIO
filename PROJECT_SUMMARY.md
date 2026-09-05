@@ -8,7 +8,7 @@ not contain telemetry, analytics, update checks or network client code.
 Its product subtitle is `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-The current product version is `0.7.0` (build 11). Releases are prepared from a
+The current product version is `0.7.1` (build 12). Releases are prepared from a
 reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target and project are named `MenuBarIO`; the test
 target is `MenuBarIOTests`. The legacy app bundle identifier
@@ -23,6 +23,45 @@ original author. There is no collaboration or affiliation with the original
 author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
+
+## MenuBarIO 0.7.1: direct USB devices on host ports — 2026-09-05
+
+After the 0.7.0 hardware tests, the user found that a USB stick connected to a
+Mac Thunderbolt-capable socket appeared in Other USB Devices while the socket
+still said Free, on both Intel MacBook and Mac mini. Host-port discovery had
+only attached native Thunderbolt devices; the dock DROM resolver did not cover
+direct host USB connections.
+
+The local fix reads the immediate USB parent port's explicit `UsbCPortNumber`
+and attaches a single eligible direct USB peripheral to the uniquely matching
+host connector. It does not derive socket numbers from USB location IDs or
+controller IDs, walk through hubs, or override native Thunderbolt attachments.
+Missing/ambiguous evidence and tunneled USB remain unassigned by this resolver.
+Host-assigned USB devices leave the residual list but retain their USB transport,
+rate, detail path and single contribution to the total. USB occupants cannot
+become inferred Thunderbolt owners of unrelated hubs.
+
+Verification: all 106 tests passed, with no failures or skips, followed by
+static analysis and the Universal arm64/x86_64 archive. The sandboxed Debug app
+launched through `script/build_and_run.sh --verify`. On the current Mac mini,
+the exact build visibly showed **Port 1 · Ultra USB 3.0**, **SanDisk · USB**,
+**5.0 Gbps**, and **This Mac → Port 1 → Ultra USB 3.0** in details. Other USB
+Devices decreased from three to two; the total stayed ten, and the D1 and all
+three Anker downstream USB assignments remained correct. Evidence is under
+`/private/tmp/menubario-host-usb-check`, with the running test app under
+`/private/tmp/menubario-host-usb-debug/Build/Products/Debug/MenuBarIO.app`.
+Physical replug/USB2 checks and a repeat on the Intel MacBook remain pending;
+systems that omit the explicit socket property need actual Registry evidence.
+The maintainer requested publication after these remaining checks were stated,
+authorizing the 0.7.1 release exception. This fix is prepared as 0.7.1 (build
+12); exact signing, publication and download evidence will follow below.
+
+The release preflight exposed a timing assumption in the existing Ethernet
+deallocation test: `.ready` can reach the main queue before the background
+USB-discovery closure releases its temporary strong reference. The test now
+uses a bounded deallocation expectation before asserting monitor teardown,
+preserving leak detection without requiring synchronous background completion.
+No Ethernet runtime code changed.
 
 ## MenuBarIO 0.7.0 compact improvements — 2026-09-05
 
@@ -123,7 +162,7 @@ publication and must not move the release tag.
 MenuBarIO 0.7.0 and later uses GPL-3.0-or-later. LICENSE contains the full GPL,
 LICENSE.upstream preserves the original MenuBarUSB MIT text verbatim, and
 NOTICE records the origin and forward-only transition. SOURCE.md points to
-https://github.com/r3d42-git/MenuBarIO/tree/v0.7.0 and its source archive.
+https://github.com/r3d42-git/MenuBarIO/tree/v0.7.1 and its source archive.
 All four files are bundled in the app before signing and in the DMG; the
 release verifier checks the enclosed copies. Earlier MIT releases and their
 tags remain unchanged.
@@ -561,8 +600,8 @@ USB and Thunderbolt identities must remain stable across refreshes. Internal
 devices and USB hubs do not count toward the external-device total. Thunderbolt
 devices remain in that total but are rendered only in the physical port group,
 not in Other USB Devices. Safely mapped USB devices likewise remain counted but
-are rendered at the external multi-protocol port instead of in the residual
-list. Bluetooth devices count separately. The visible group order is
+are rendered at their host or external multi-protocol port instead of in the
+residual list. Bluetooth devices count separately. The visible group order is
 Thunderbolt/USB4 host ports, external Thunderbolt/USB4 ports, Other USB Devices,
 Bluetooth devices, internal devices, then USB hubs.
 
@@ -587,6 +626,40 @@ steps governed by `RELEASE.md`; do not infer them from a code change.
 ---
 
 # Projektübersicht
+
+## MenuBarIO 0.7.1: direkte USB-Geräte an Hostports — 05.09.2026
+
+Nach den 0.7.0-Tests meldete der Benutzer auf Intel-MacBook und Mac mini einen
+USB-Stick unter **Weitere USB-Geräte**, obwohl sein belegter Hostport weiter
+**Frei** anzeigte. Die Host-Erkennung berücksichtigte nur native
+Thunderbolt-Geräte; die vorhandene Dock-Portzuordnung deckte direkte
+USB-Verbindungen am Mac nicht ab.
+
+Die lokale Korrektur liest `UsbCPortNumber` ausschließlich am unmittelbaren
+USB-Elternport und ordnet genau einen passenden direkten USB-Teilnehmer einem
+eindeutigen Hostanschluss zu. Controller- und Location-IDs werden nicht als
+Portnummern interpretiert. Native Thunderbolt-Belegungen haben Vorrang;
+fehlende oder mehrdeutige Angaben und getunnelte USB-Geräte erhalten keine
+geratene Hostzuordnung. Zugeordnete Geräte bleiben USB-Geräte und werden genau
+einmal gezählt. Ihr Eintrag entfällt unter **Weitere USB-Geräte**.
+
+106 Tests ohne Fehler oder übersprungene Fälle, statische Analyse und das
+Universal-Archiv für arm64/x86_64 waren erfolgreich. Die über den Projektwrapper
+gestartete sandboxed Debug-App zeigte auf dem Mac mini sichtbar **Port 1 ·
+Ultra USB 3.0**, **SanDisk · USB**, **5.0 Gbps** und in den Details **Dieser Mac
+→ Port 1 → Ultra USB 3.0**. Die Restliste sank von drei auf zwei, der Gesamtzähler
+blieb zehn und die D1-/Anker-Belegungen blieben korrekt. Physisches Umstecken,
+USB2 und die erneute Intel-MacBook-Abnahme stehen noch aus. Fehlt dort die
+explizite Portangabe, werden echte Registry-Daten für die weitere Diagnose
+benötigt. Nach Nennung dieser offenen Prüfungen hat der Maintainer die
+Veröffentlichung und damit diese Release-Ausnahme freigegeben. Die Korrektur
+wird als 0.7.1 (Build 12) vorbereitet; konkrete Signierungs-, Veröffentlichungs-
+und Downloadnachweise werden nach Abschluss ergänzt.
+
+Die Release-Prüfung zeigte eine Timing-Annahme im bestehenden Ethernet-
+Freigabetest: Das Bereitschaftssignal kann vor dem Ende der Hintergrundabfrage
+ankommen. Der Test wartet jetzt begrenzt auf die Freigabe und prüft weiterhin
+das Entfernen des Monitor-Callbacks. Der Ethernet-Laufzeitcode blieb unverändert.
 
 ## Veröffentlichung 0.7.0 — 05.09.2026
 
@@ -627,7 +700,7 @@ Update-Abfragen oder Netzwerk-Client-Code.
 Ihr Produktuntertitel lautet `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-Die aktuelle Produktversion ist `0.7.0` (Build 11). Releases werden auf einem
+Die aktuelle Produktversion ist `0.7.1` (Build 12). Releases werden auf einem
 geprüften Branch vorbereitet und vor dem Tagging in den geschützten Branch
 `main` integriert.
 Produkt, Programmdatei, Target und Projekt heißen `MenuBarIO`; das Test-Target
@@ -1105,8 +1178,8 @@ USB- und Thunderbolt-Identitäten müssen über Aktualisierungen hinweg stabil
 bleiben. Interne Geräte und USB-Hubs zählen nicht zum Zähler externer Geräte.
 Thunderbolt-Geräte bleiben Teil dieses Zählers, werden aber nur in der Gruppe
 der physischen Ports und nicht unter Weitere USB-Geräte dargestellt. Sicher
-zugeordnete USB-Geräte bleiben ebenfalls gezählt, erscheinen aber am externen
-Mehrprotokoll-Port statt in dieser Restliste. Bluetooth-Geräte werden getrennt
+zugeordnete USB-Geräte bleiben ebenfalls gezählt, erscheinen aber am Host- oder
+externen Mehrprotokoll-Port statt in dieser Restliste. Bluetooth-Geräte werden getrennt
 gezählt. Die sichtbare Gruppenreihenfolge lautet Thunderbolt-/USB4-Hostports,
 externe Thunderbolt-/USB4-Ports, Weitere USB-Geräte, Bluetooth-Geräte, interne
 Geräte und USB-Hubs.
