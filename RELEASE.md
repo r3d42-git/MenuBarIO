@@ -21,6 +21,12 @@ network access or a third-party packaging dependency. Because Finder records
 the window layout, create a DMG from an unlocked local macOS session with
 Finder available; a headless release intentionally fails before packaging.
 
+After a manual read-only Finder inspection, close the installer window and
+detach that inspection mount before running `publish_release.sh` or another
+`verify_release.sh`. The verifier mounts the exact image afresh; leaving the
+same DMG mounted can make `hdiutil attach` fail with `Resource busy`. Detach
+only the known inspection mount and rerun the unchanged verifier/wrapper.
+
 Before creating any release, run `./script/verify.sh` and complete the
 hardware acceptance checks in [`TESTING.md`](TESTING.md). The script executes
 the XCTest suite and the Xcode static analyzer in isolated DerivedData. The
@@ -98,6 +104,13 @@ erstellt; es fügt weder Netzwerkzugriff noch eine Drittanbieter-Abhängigkeit
 für den Paketbau hinzu. Weil Finder das Fensterlayout speichert, ein DMG aus
 einer entsperrten lokalen macOS-Sitzung mit verfügbarem Finder erstellen; ein
 kopfloser Release bricht bewusst vor dem Paketbau ab.
+
+Nach einer manuellen schreibgeschützten Finder-Prüfung das Installerfenster
+schließen und den eigenen Prüfmount aushängen, bevor `publish_release.sh` oder
+erneut `verify_release.sh` läuft. Der Verifier bindet genau dieses Image frisch
+ein; ein noch vorhandener Mount desselben DMGs kann `hdiutil attach` mit
+„Ressource ist belegt“ abbrechen lassen. Nur den bekannten Prüfmount aushängen
+und den unveränderten Verifier beziehungsweise Wrapper erneut ausführen.
 
 Vor jedem Release `./script/verify.sh` ausführen und die Hardware-Abnahme in
 [`TESTING.md`](TESTING.md) abschließen. Das Skript führt die XCTest-Suite und

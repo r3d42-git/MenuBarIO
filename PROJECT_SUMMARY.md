@@ -53,8 +53,8 @@ three Anker downstream USB assignments remained correct. Evidence is under
 Physical replug/USB2 checks and a repeat on the Intel MacBook remain pending;
 systems that omit the explicit socket property need actual Registry evidence.
 The maintainer requested publication after these remaining checks were stated,
-authorizing the 0.7.1 release exception. This fix is prepared as 0.7.1 (build
-12); exact signing, publication and download evidence will follow below.
+authorizing the 0.7.1 release exception. This fix is published as 0.7.1 (build
+12); exact signing, publication and download evidence follows below.
 
 The release preflight exposed a timing assumption in the existing Ethernet
 deallocation test: `.ready` can reach the main queue before the background
@@ -62,6 +62,51 @@ USB-discovery closure releases its temporary strong reference. The test now
 uses a bounded deallocation expectation before asserting monitor teardown,
 preserving leak detection without requiring synchronous background completion.
 No Ethernet runtime code changed.
+
+### Published 0.7.1 release evidence — 2026-09-05
+
+- Release: [MenuBarIO v0.7.1](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.7.1),
+  from immutable annotated tag `v0.7.1` at
+  `6485e8e58fcb8261595a1eeb4780b2fe212b1f8b`, after
+  [PR #29](https://github.com/r3d42-git/MenuBarIO/pull/29).
+- Asset: [MenuBarIO-0.7.1-mac.dmg](https://github.com/r3d42-git/MenuBarIO/releases/download/v0.7.1/MenuBarIO-0.7.1-mac.dmg),
+  3,183,134 bytes, plus its `.dmg.sha256` sidecar. SHA-256:
+  `d43dc6ccfd3af5ead0b8bd10fd504efbf47067f9e63ce8d593374f9c6747627a`.
+- Universal `arm64 x86_64`, macOS 13+, version 0.7.1 (build 12), bundle
+  `de.r3d.menubarusb.tb`, Hardened Runtime, signed by
+  `Developer ID Application: Philipp John Hild (G6JH37W285)`.
+- Apple app submission `c9fb5a54-163e-485e-9b19-c60333b557ad` was Accepted.
+  Its ticket was stapled and validated before packaging. Final DMG submission
+  `6300a818-6449-4a23-ab79-1e760069564b` was independently Accepted,
+  stapled and validated.
+- The repository-native build and publication wrappers passed. The local
+  artifact, wrapper download and an additional independent fresh download
+  passed integrity, strict signatures, both attached tickets, Gatekeeper,
+  architectures, version/bundle/entitlements and exact GPL/upstream/source
+  material in both DMG and app. Both public asset files match their local bytes,
+  exact sizes and GitHub SHA-256 digests.
+- A read-only Finder check of the final DMG showed the app/Programme/arrow
+  layout and all four license/source files fully visible. Close and detach
+  this manual mount before publication: the first wrapper attempt stopped in
+  local verification with `hdiutil: attach failed - Ressource ist belegt`
+  because the Finder check still had the same image mounted. Detaching that
+  owned mount resolved it; the unchanged bytes passed the complete wrapper,
+  with no duplicate upload or credential/security change.
+- 106 tests, static analysis and the Universal archive passed locally and
+  both native CI jobs passed for PR #29 and the exact release commit in
+  [run 33965459138](https://github.com/r3d42-git/MenuBarIO/actions/runs/33965459138).
+  Pages passed in [run 33965459135](https://github.com/r3d42-git/MenuBarIO/actions/runs/33965459135).
+  The corrected asynchronous deallocation test also passed 30 targeted repeats.
+- The app extracted from the independent public download retained its strict
+  signature and attached ticket and launched as version 0.7.1/build 12 from
+  `.release/0.7.1/public-app/MenuBarIO.app`. Computer Use timed out on this
+  relaunch, so this is a process/path/version smoke check; the visible Port 1
+  acceptance above belongs to the exact pre-release Debug build. Physical
+  Intel/USB2/replug, macOS 13/14 and clean-Mac acceptance remain as stated above.
+
+Local artifacts and retained release/public-download logs are in
+`.release/0.7.1/` and `.release/0.7.1/verification/`. This evidence is added in a
+separate documentation change after publication; the release tag stays fixed.
 
 ## MenuBarIO 0.7.0 compact improvements — 2026-09-05
 
@@ -653,13 +698,25 @@ USB2 und die erneute Intel-MacBook-Abnahme stehen noch aus. Fehlt dort die
 explizite Portangabe, werden echte Registry-Daten für die weitere Diagnose
 benötigt. Nach Nennung dieser offenen Prüfungen hat der Maintainer die
 Veröffentlichung und damit diese Release-Ausnahme freigegeben. Die Korrektur
-wird als 0.7.1 (Build 12) vorbereitet; konkrete Signierungs-, Veröffentlichungs-
-und Downloadnachweise werden nach Abschluss ergänzt.
+ist als 0.7.1 (Build 12) veröffentlicht. Konkrete Signierungs-, Veröffentlichungs-
+und Downloadnachweise stehen oben unter „Published 0.7.1 release evidence“.
 
 Die Release-Prüfung zeigte eine Timing-Annahme im bestehenden Ethernet-
 Freigabetest: Das Bereitschaftssignal kann vor dem Ende der Hintergrundabfrage
 ankommen. Der Test wartet jetzt begrenzt auf die Freigabe und prüft weiterhin
 das Entfernen des Monitor-Callbacks. Der Ethernet-Laufzeitcode blieb unverändert.
+
+Der vollständige Release- und Veröffentlichungswrapper bestand alle Prüfungen.
+App und DMG besitzen getrennte angeheftete Apple-Tickets; lokale und frisch
+heruntergeladene Dateien stimmen mit GitHubs SHA-256-Digests überein. Das
+Finder-Layout mit allen sechs Elementen wurde am schreibgeschützten finalen DMG
+geprüft. Den eigenen Finder-Prüfmount vor dem Veröffentlichungswrapper aushängen,
+damit dessen erneutes Einbinden nicht mit „Ressource ist belegt“ abbricht.
+Die öffentliche App startete als 0.7.1/Build 12; die anschließende Computer-Use-
+Abfrage lief ins Zeitlimit, daher gilt für diesen Start nur die Prozess-/Pfad-
+und Versionsprüfung. Die oben beschriebene sichtbare Port-Abnahme stammt vom
+Debug-Build. Der Release-Tag bleibt auf dem geprüften Commit; diese Übergabe
+wird nachgelagert als reine Dokumentationsänderung integriert.
 
 ## Veröffentlichung 0.7.0 — 05.09.2026
 
