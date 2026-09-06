@@ -24,6 +24,30 @@ author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
 
+## Code-backed architecture atlas — 2026-09-06
+
+`docs/architecture/index.html` and `docs/architecture/en/index.html` are the
+German and English entry points to seven Archify diagrams covering system
+architecture, physical USB port assignment, refresh generations, source-status
+decisions, display/report boundaries, Bluetooth battery enrichment and verified
+release delivery. Every diagram-card link opens its self-contained HTML in a
+new tab. `docs/architecture/README.md` adds source/test references and explains
+hub-owner inference versus physical socket evidence, identities/counts,
+power/Ethernet and known hardware limits. The diagrams describe source commit
+`ea9a6e183a2da11b9772aae63cfdfac5ca89852b`; JSON specifications and separate
+delivery/browser/visual-review receipts are retained alongside the standalone
+HTML. Viewer controls use Archify's English fallback. Vite copies the curated
+public atlas into the existing Pages artifact at `/architecture/` and
+`/architecture/en/`, and the project-history navigation links to the matching
+locale. Pages verification covers both routes and an English/German diagram;
+the 14 delivered diagrams no longer request external fonts. The atlas was
+published through [PR #31](https://github.com/r3d42-git/MenuBarIO/pull/31),
+merged as `f2f4b7f2afaa9b9acd66e4dd602c0b28544a09cc`; the Pages build, deploy
+and public-route verification passed in
+[run 34031968329](https://github.com/r3d42-git/MenuBarIO/actions/runs/34031968329).
+App code, tests, version, releases and unrelated local edits were preserved.
+No new physical hardware acceptance is claimed.
+
 ## MenuBarIO 0.7.1: direct USB devices on host ports — 2026-09-05
 
 After the 0.7.0 hardware tests, the user found that a USB stick connected to a
@@ -672,6 +696,30 @@ steps governed by `RELEASE.md`; do not infer them from a code change.
 
 # Projektübersicht
 
+## Codebasierter Architektur-Atlas — 06.09.2026
+
+`docs/architecture/index.html` und `docs/architecture/en/index.html`
+erschließen sieben Archify-Diagramme auf Deutsch und Englisch zu
+Systemarchitektur, physischer USB-Portzuordnung, Refresh-Generationen,
+Quellenstatus, Anzeige und Bericht, Bluetooth-Batterie sowie Release-Auslieferung.
+Jede Diagrammkarte öffnet die eigenständige HTML-Datei in einem neuen Tab.
+`docs/architecture/README.md` vertieft Hub-Eigentümer versus Buchsenbeweis,
+Identität und Zählung, Strom/Ethernet und Hardwaregrenzen mit Code-/Testverweisen.
+Basis ist Commit `ea9a6e183a2da11b9772aae63cfdfac5ca89852b`; Spezifikationen,
+eigenständige HTML-Dateien und getrennte Liefer-, Browser- und Sichtprüfbelege
+liegen daneben. Die feste Viewer-Bedienung verwendet den englischen Fallback.
+Vite kopiert ausschließlich die kuratierten öffentlichen Atlas-Dateien nach
+`/architecture/` und `/architecture/en/`; der Projektverlauf verlinkt auf die
+passende Sprache, und die Pages-Prüfung deckt beide Routen sowie je ein
+deutsches/englisches Diagramm ab. Die 14 ausgelieferten Diagramme fragen keine
+externen Fonts mehr an. Der Atlas wurde über
+[PR #31](https://github.com/r3d42-git/MenuBarIO/pull/31) veröffentlicht,
+mit `f2f4b7f2afaa9b9acd66e4dd602c0b28544a09cc` gemergt; Pages-Build, Deploy
+und öffentliche Routenprüfung bestanden im
+[Lauf 34031968329](https://github.com/r3d42-git/MenuBarIO/actions/runs/34031968329).
+App-Code, Tests, Version, Releases und nicht zugehörige lokale Änderungen
+blieben erhalten. Eine neue physische Hardwareabnahme ist damit nicht verbunden.
+
 ## MenuBarIO 0.7.1: direkte USB-Geräte an Hostports — 05.09.2026
 
 Nach den 0.7.0-Tests meldete der Benutzer auf Intel-MacBook und Mac mini einen
@@ -1228,8 +1276,9 @@ Universal-Slices der enthaltenen App sowie des Installer-Layouts.
   Icon-Vorlage. Die abgeleiteten macOS-Größen liegen in
   `MenuBarIO/Assets.xcassets/AppIcon.appiconset/`. Kategorien und Status in
   der App verwenden SF Symbols.
-- `website/` enthält den zweisprachigen statischen Projektverlauf, seine
-  lokal eingebundenen Assets und die GitHub-Pages-Prüfungen.
+- `website/` enthält den zweisprachigen statischen Projektverlauf, den unter
+  `/architecture/` und `/architecture/en/` veröffentlichten Architektur-Atlas,
+  lokal eingebundene Assets und die GitHub-Pages-Prüfungen.
 
 USB- und Thunderbolt-Identitäten müssen über Aktualisierungen hinweg stabil
 bleiben. Interne Geräte und USB-Hubs zählen nicht zum Zähler externer Geräte.
