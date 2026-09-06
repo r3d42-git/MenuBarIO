@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "deliver",
+  "type": "workflow",
+  "input": "/Volumes/Media/codex/MenubarUSB/docs/architecture/specs/02-ports.workflow.json",
+  "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/02-ports.html",
+  "specification": {
+    "sha256": "3c685ddc4a64ecf34c2b6492662ea2d4deeb26a7d835307add41f8a3b9f0a61b",
+    "bytes": 4342
+  },
+  "artifact": {
+    "sha256": "b5c12c0d7d6454305ae43e90988d24cf5cf77eee32d00d989a7bd5f3d2758895",
+    "bytes": 711726
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  }
+}

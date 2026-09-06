@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "01 · MenuBarIO — System Architecture",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1260,
+      710
+    ],
+    "repository": {
+      "url": "https://github.com/r3d42-git/MenuBarIO",
+      "revision": "ea9a6e183a2da11b9772aae63cfdfac5ca89852b"
+    },
+    "locale": "en"
+  },
+  "components": [
+    {
+      "id": "registry",
+      "type": "external",
+      "label": "IOKit / IORegistry",
+      "sublabel": "USB + Thunderbolt / USB4",
+      "pos": [
+        40,
+        80
+      ],
+      "size": [
+        300,
+        92
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Services/USBDeviceDiscovery.swift"
+        }
+      ]
+    },
+    {
+      "id": "usb",
+      "type": "backend",
+      "label": "USBDeviceManager",
+      "sublabel": "Discovery → topology → status",
+      "pos": [
+        480,
+        80
+      ],
+      "size": [
+        300,
+        92
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Classes/USBDeviceManager.swift"
+        }
+      ]
+    },
+    {
+      "id": "ports",
+      "type": "frontend",
+      "label": "Port and USB views",
+      "sublabel": "Groups, paths, and device count",
+      "pos": [
+        920,
+        80
+      ],
+      "size": [
+        300,
+        92
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Views/MainList/Components/MainListDeviceList/MainListDeviceList.swift"
+        }
+      ]
+    },
+    {
+      "id": "radio",
+      "type": "external",
+      "label": "IOBluetooth + CoreBluetooth",
+      "sublabel": "Connections and battery data",
+      "pos": [
+        40,
+        300
+      ],
+      "size": [
+        300,
+        92
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Services/BluetoothDeviceReader.swift"
+        }
+      ]
+    },
+    {
+      "id": "bluetooth",
+      "type": "backend",
+      "label": "BluetoothDeviceManager",
+      "sublabel": "Connected devices + source status",
+      "pos": [
+        480,
+        300
+      ],
+      "size": [
+        300,
+        92
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Classes/BluetoothDeviceManager.swift"
+        }
+      ]
+    },
+    {
+      "id": "btlist",
+      "type": "frontend",
+      "label": "Bluetooth-Ansichten",
+      "sublabel": "Separate count, optional battery",
+      "pos": [
+        920,
+        300
+      ],
+      "size": [
+        300,
+        92
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Views/MainList/Components/BluetoothDeviceRow.swift"
+        }
+      ]
+    },
+    {
+      "id": "local",
+      "type": "external",
+      "label": "IOPowerSources / SystemConfiguration",
+      "sublabel": "Power supply and Ethernet link",
+      "pos": [
+        40,
+        520
+      ],
+      "size": [
+        300,
+        92
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Services/PowerSourceMonitor.swift"
+        }
+      ]
+    },
+    {
+      "id": "aux",
+      "type": "backend",
+      "label": "Optional monitors",
+      "sublabel": "Published by USBDeviceManager",
+      "pos": [
+        480,
+        520
+      ],
+      "size": [
+        300,
+        92
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Services/EthernetLinkMonitor.swift"
+        }
+      ]
+    },
+    {
+      "id": "status",
+      "type": "frontend",
+      "label": "Power and LAN display",
+      "sublabel": "Charging power, charging port, LAN symbol",
+      "pos": [
+        920,
+        520
+      ],
+      "size": [
+        300,
+        92
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Views/MenuBar/MenuBarLabel.swift"
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "registry-to-usb",
+      "to": "usb",
+      "label": "read",
+      "from": "registry"
+    },
+    {
+      "id": "usb-to-ports",
+      "to": "ports",
+      "label": "@Published",
+      "from": "usb"
+    },
+    {
+      "id": "radio-to-bluetooth",
+      "to": "bluetooth",
+      "label": "read",
+      "from": "radio"
+    },
+    {
+      "id": "bluetooth-to-btlist",
+      "to": "btlist",
+      "label": "@Published",
+      "from": "bluetooth"
+    },
+    {
+      "id": "local-to-aux",
+      "to": "aux",
+      "label": "observe",
+      "from": "local"
+    },
+    {
+      "id": "aux-to-status",
+      "to": "status",
+      "label": "@Published",
+      "from": "aux"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Composed in MenuBarIOApp",
+      "items": [
+        "StateObjects live at app level.",
+        "MenuBarExtra and legacy settings share the managers."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "One local process",
+      "items": [
+        "SwiftUI / Combine; macOS 13+, arm64 + x86_64.",
+        "No cloud database, telemetry, or update check."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Refresh is separate",
+      "items": [
+        "The lifecycle coordinator coalesces wake / session / manual refreshes.",
+        "Source monitors also react directly to events."
+      ]
+    }
+  ]
+}

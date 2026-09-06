@@ -425,6 +425,7 @@ const copy = {
     en: 'MenuBarIO project history – Home',
   },
   repository: { de: 'Repository', en: 'Repository' },
+  architectureAtlas: { de: 'Architektur-Atlas', en: 'Architecture atlas' },
   languageLabel: { de: 'Sprache wählen', en: 'Choose language' },
   heroKicker: {
     de: 'Vom MIT-lizenzierten Ursprung zur eigenen Produktidentität',
@@ -568,6 +569,14 @@ export default function HistoryPage({ locale }: { locale: SiteLocale }) {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            <a
+              href={pageUrl(isGerman ? 'architecture/' : 'architecture/en/')}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-3.5 py-2 text-xs font-medium text-[#bec7d4] transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f4b85a]"
+            >
+              <Layers3 className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{t(copy.architectureAtlas)}</span>
+            </a>
+
             <div
               className="flex items-center rounded-full border border-white/10 bg-white/[0.035] p-1 font-mono text-[10px] font-semibold tracking-[0.08em]"
               aria-label={t(copy.languageLabel)}

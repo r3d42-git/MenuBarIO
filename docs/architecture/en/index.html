@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Understanding MenuBarIO · Architecture Atlas</title>
+    <link rel="canonical" href="https://r3d42-git.github.io/MenuBarIO/architecture/en/">
+    <link rel="alternate" hreflang="de" href="https://r3d42-git.github.io/MenuBarIO/architecture/">
+    <style data-atlas-styles>
+:root {
+  color-scheme: light dark;
+  --background: #f3f5f7;
+  --surface: #ffffff;
+  --ink: #18262e;
+  --muted: #556872;
+  --line: #d7e0e5;
+  --accent: #007b75;
+  --accent-soft: #d9f0eb;
+  --warm: #ee8e39;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--ink);
+  font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+main { max-width: 1380px; margin: auto; padding: 52px 38px; }
+
+a { color: var(--accent); text-underline-offset: 4px; }
+a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+
+header { max-width: 960px; margin-bottom: 36px; }
+.eyebrow {
+  color: var(--accent);
+  font: 600 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+}
+h1 { margin: 16px 0 20px; font-size: clamp(32px, 4vw, 52px); line-height: 1.1; letter-spacing: -.04em; }
+header > p { max-width: 830px; color: var(--muted); font-size: 19px; }
+
+.masthead, .language-switch, .meta, .links { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; }
+.masthead { justify-content: space-between; }
+.language-switch { font: 600 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.language-switch a, .language-switch span { border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; text-decoration: none; }
+.language-switch span { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.meta { margin-top: 24px; color: var(--muted); font-size: 13px; }
+.meta span { border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px; }
+.links { margin: 24px 0; }
+
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+article { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); transition: transform .15s ease; }
+article:hover { transform: translateY(-3px); }
+.diagram { display: block; padding: 24px 24px 8px; color: inherit; text-decoration: none; }
+h2 { margin: 13px 0 10px; font-size: 21px; line-height: 1.3; letter-spacing: -.02em; }
+h2 span { float: right; color: var(--accent); }
+article p { min-height: 74px; margin: 0 0 18px; color: var(--muted); font-size: 15px; }
+.preview {
+  display: grid;
+  min-height: 164px;
+  gap: 12px;
+  align-content: center;
+  padding: 19px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 55%, var(--surface)), var(--surface));
+}
+.preview-flow { display: grid; grid-template-columns: 1fr 22px 1fr 22px 1fr; align-items: center; gap: 7px; }
+.preview-flow i { height: 1px; background: var(--accent); }
+.preview-box { min-height: 38px; border: 1px solid var(--accent); border-radius: 5px; background: var(--surface); }
+.preview-box:nth-of-type(3n) { border-color: var(--warm); }
+.preview-lines { display: grid; gap: 8px; }
+.preview-lines i { display: block; height: 7px; border-radius: 99px; background: var(--line); }
+.preview-lines i:nth-child(2) { width: 76%; background: var(--accent); }
+.preview-lines i:nth-child(3) { width: 52%; }
+.preview-caption { color: var(--muted); font: 600 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .03em; }
+.source { display: block; margin: 8px 24px 20px; overflow-wrap: anywhere; font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 42px; padding: 28px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.notes h3 { margin: 0 0 10px; font-size: 16px; }
+.notes p { margin: 0; color: var(--muted); font-size: 14px; }
+footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
+
+@media (prefers-color-scheme: dark) {
+  :root { --background: #0b141c; --surface: #13212c; --ink: #e6eff3; --muted: #a5bac6; --line: #2c4150; --accent: #69d6bf; --accent-soft: #163a38; --warm: #f3af67; }
+}
+@media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .notes { grid-template-columns: 1fr; } }
+@media (max-width: 650px) { main { padding: 28px 18px; } .grid { grid-template-columns: 1fr; } article p { min-height: 0; } }
+@media (prefers-reduced-motion: reduce) { article { transition: none; } article:hover { transform: none; } }
+</style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="masthead">
+          <div class="eyebrow">MenuBarIO / Code-backed architecture atlas</div>
+          <nav class="language-switch" aria-label="Choose language"><a href="../" lang="de" hreflang="de">DE</a><span aria-current="page">EN</span></nav>
+        </div>
+        <h1>From a hardware event<br>to a clear display.</h1>
+        <p>Seven connected diagrams explain MenuBarIO’s components, decision rules, and data paths. Start with the system map, then follow the question you want to understand.</p>
+        <div class="meta"><span>Code: ea9a6e1</span><span>Version 0.7.1 · Build 12</span><span>As of 6 September 2026</span><span>Static GitHub Pages</span></div>
+        <nav class="links"><a href="01-system.html" target="_blank" rel="noreferrer">Start with the system map ↗</a><a href="../../en/">Project history</a></nav>
+      </header>
+
+      <section class="grid" aria-label="Seven diagrams">
+        <article><a class="diagram" href="01-system.html" target="_blank" rel="noreferrer"><div class="eyebrow">01 / Architecture</div><h2>System architecture <span aria-hidden="true">↗</span></h2><p>Which macOS sources provide which data, and who publishes it for SwiftUI?</p><div class="preview"><div class="preview-flow"><b class="preview-box"></b><i></i><b class="preview-box"></b><i></i><b class="preview-box"></b></div><div class="preview-lines"><i></i><i></i><i></i></div><div class="preview-caption">Source → manager → display</div></div></a><a class="source" target="_blank" rel="noreferrer" href="https://github.com/r3d42-git/MenuBarIO/blob/ea9a6e183a2da11b9772aae63cfdfac5ca89852b/MenuBarIO/MenuBarIOApp.swift#L12">Code: MenuBarIOApp.swift ↗</a></article>
+        <article><a class="diagram" href="02-ports.html" target="_blank" rel="noreferrer"><div class="eyebrow">02 / Decision flow</div><h2>Physical port assignment <span aria-hidden="true">↗</span></h2><p>Why may a USB device occupy a Mac or dock socket, and when does it remain unassigned?</p><div class="preview"><div class="preview-flow"><b class="preview-box"></b><i></i><b class="preview-box"></b><i></i><b class="preview-box"></b></div><div class="preview-lines"><i></i><i></i><i></i></div><div class="preview-caption">IOKit signal → decision → port</div></div></a><a class="source" target="_blank" rel="noreferrer" href="https://github.com/r3d42-git/MenuBarIO/blob/ea9a6e183a2da11b9772aae63cfdfac5ca89852b/MenuBarIO/Structs/USBPortAttachmentResolver.swift#L47">Code: USBPortAttachmentResolver.swift ↗</a></article>
+        <article><a class="diagram" href="03-refresh.html" target="_blank" rel="noreferrer"><div class="eyebrow">03 / Sequence</div><h2>Concurrency and refresh <span aria-hidden="true">↗</span></h2><p>How do generations prevent slower hardware requests from overwriting newer results?</p><div class="preview"><div class="preview-flow"><b class="preview-box"></b><i></i><b class="preview-box"></b><i></i><b class="preview-box"></b></div><div class="preview-lines"><i></i><i></i><i></i></div><div class="preview-caption">Request → generation → publication</div></div></a><a class="source" target="_blank" rel="noreferrer" href="https://github.com/r3d42-git/MenuBarIO/blob/ea9a6e183a2da11b9772aae63cfdfac5ca89852b/MenuBarIO/Classes/USBDeviceManager.swift#L4">Code: USBDeviceManager.swift ↗</a></article>
+        <article><a class="diagram" href="04-status.html" target="_blank" rel="noreferrer"><div class="eyebrow">04 / Decision flow</div><h2>Source-status meaning <span aria-hidden="true">↗</span></h2><p>How do zero devices, detection in progress, stale data, and an unavailable source differ?</p><div class="preview"><div class="preview-flow"><b class="preview-box"></b><i></i><b class="preview-box"></b><i></i><b class="preview-box"></b></div><div class="preview-lines"><i></i><i></i><i></i></div><div class="preview-caption">Result → state → visible data</div></div></a><a class="source" target="_blank" rel="noreferrer" href="https://github.com/r3d42-git/MenuBarIO/blob/ea9a6e183a2da11b9772aae63cfdfac5ca89852b/MenuBarIO/Structs/HardwareSourceStatus.swift#L9">Code: HardwareSourceStatus.swift ↗</a></article>
+        <article><a class="diagram" href="05-outputs.html" target="_blank" rel="noreferrer"><div class="eyebrow">05 / Data and component map</div><h2>Groups, paths, and privacy <span aria-hidden="true">↗</span></h2><p>How do the same models produce three outputs with different information boundaries?</p><div class="preview"><div class="preview-flow"><b class="preview-box"></b><i></i><b class="preview-box"></b><i></i><b class="preview-box"></b></div><div class="preview-lines"><i></i><i></i><i></i></div><div class="preview-caption">Models → groups → outputs</div></div></a><a class="source" target="_blank" rel="noreferrer" href="https://github.com/r3d42-git/MenuBarIO/blob/ea9a6e183a2da11b9772aae63cfdfac5ca89852b/MenuBarIO/Structs/USBDeviceGroups.swift#L1">Code: USBDeviceGroups.swift ↗</a></article>
+        <article><a class="diagram" href="06-battery.html" target="_blank" rel="noreferrer"><div class="eyebrow">06 / Component map</div><h2>Bluetooth battery <span aria-hidden="true">↗</span></h2><p>How do HID values and bounded BLE reads supplement already connected devices?</p><div class="preview"><div class="preview-flow"><b class="preview-box"></b><i></i><b class="preview-box"></b><i></i><b class="preview-box"></b></div><div class="preview-lines"><i></i><i></i><i></i></div><div class="preview-caption">HID / BLE → bounded read → battery</div></div></a><a class="source" target="_blank" rel="noreferrer" href="https://github.com/r3d42-git/MenuBarIO/blob/ea9a6e183a2da11b9772aae63cfdfac5ca89852b/MenuBarIO/Services/BluetoothBatteryReader.swift#L131">Code: BluetoothBatteryReader.swift ↗</a></article>
+        <article><a class="diagram" href="07-release.html" target="_blank" rel="noreferrer"><div class="eyebrow">07 / Delivery map</div><h2>Verified delivery <span aria-hidden="true">↗</span></h2><p>Why are the app and DMG notarized separately, with public bytes checked again?</p><div class="preview"><div class="preview-flow"><b class="preview-box"></b><i></i><b class="preview-box"></b><i></i><b class="preview-box"></b></div><div class="preview-lines"><i></i><i></i><i></i></div><div class="preview-caption">Archive → notarization → public download</div></div></a><a class="source" target="_blank" rel="noreferrer" href="https://github.com/r3d42-git/MenuBarIO/blob/ea9a6e183a2da11b9772aae63cfdfac5ca89852b/script/release.sh#L45">Code: release.sh ↗</a></article>
+      </section>
+
+      <section class="notes" aria-label="Reading key">
+        <div><h3>Socket, transport, and hub are different.</h3><p>USB on a Thunderbolt-capable socket remains USB. A hub group alone does not prove a physical dock port.</p></div>
+        <div><h3>Stale is an intentional state.</h3><p>After a failed refresh, the app keeps the last complete data set and makes its status visible. A successful empty discovery is a real zero result.</p></div>
+        <div><h3>Presentation and counting are separate.</h3><p>A confidently assigned USB device moves from the remaining list to a port, yet still appears exactly once in the external-device count.</p></div>
+      </section>
+      <footer>Diagram content and the built-in Archify controls are in English. Each diagram opens in a new tab and works independently with light/dark themes, zoom, focus, and export.</footer>
+    </main>
+  </body>
+</html>

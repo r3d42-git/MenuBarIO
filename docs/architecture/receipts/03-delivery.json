@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "deliver",
+  "type": "sequence",
+  "input": "/Volumes/Media/codex/MenubarUSB/docs/architecture/specs/03-refresh.sequence.json",
+  "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/03-refresh.html",
+  "specification": {
+    "sha256": "845370e9a6d8c3c34605809089c0bbe2e8986ce7f1d092f0f1b27eed7e08b05c",
+    "bytes": 2699
+  },
+  "artifact": {
+    "sha256": "135c14153a1b5f27a9c3bbde522ad4412fe503a2cbcfefc4477814f367ea6eac",
+    "bytes": 706346
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "deliver",
+  "type": "workflow",
+  "input": "/Volumes/Media/codex/MenubarUSB/docs/architecture/specs/04-status.workflow.json",
+  "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/04-status.html",
+  "specification": {
+    "sha256": "85ab20af8238f4b2a4bc5c659e65688aa474b9c7c7b7ea616ce980a52f5982be",
+    "bytes": 3108
+  },
+  "artifact": {
+    "sha256": "aceb2a57e5d6b6f1478bf5e5f84177909ebbdbab81b37e7997c5e9e52529a1dc",
+    "bytes": 705341
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  }
+}

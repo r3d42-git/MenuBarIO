@@ -3,11 +3,25 @@ import { join, relative, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const dist = join(root, 'dist');
+const architectureDiagrams = [
+  '01-system.html',
+  '02-ports.html',
+  '03-refresh.html',
+  '04-status.html',
+  '05-outputs.html',
+  '06-battery.html',
+  '07-release.html',
+];
 const requiredFiles = [
   'index.html',
   'en/index.html',
   'menubario-icon.png',
   'og.png',
+  'architecture/index.html',
+  'architecture/en/index.html',
+  'architecture/atlas.css',
+  ...architectureDiagrams.map((path) => join('architecture', path)),
+  ...architectureDiagrams.map((path) => join('architecture/en', path)),
 ];
 
 for (const path of requiredFiles) {
@@ -83,10 +97,64 @@ for (const [path, language, title] of htmlChecks) {
   }
 }
 
+const atlasChecks = [
+  ['architecture/index.html', 'lang="de"', 'MenuBarIO verstehen · Architektur-Atlas'],
+  ['architecture/en/index.html', 'lang="en"', 'Understanding MenuBarIO · Architecture Atlas'],
+  ['architecture/01-system.html', 'Systemarchitektur', '01 · MenuBarIO — Systemarchitektur'],
+  ['architecture/en/01-system.html', 'lang="en"', '01 · MenuBarIO — System Architecture'],
+];
+
+for (const [path, language, title] of atlasChecks) {
+  const html = readFileSync(join(dist, path), 'utf8');
+  for (const marker of [language, title]) {
+    if (!html.includes(marker)) {
+      throw new Error(`${path} is missing ${marker}`);
+    }
+  }
+
+  const externalRuntimeResource = [
+    ...html.matchAll(/<(?:script|link)\b[^>]*>/gi),
+  ].find((match) => {
+    const tag = match[0];
+    const isRuntimeTag =
+      tag.startsWith('<script') ||
+      /\brel="(?:stylesheet|modulepreload|preload|preconnect|dns-prefetch)"/i.test(
+        tag,
+      );
+    return isRuntimeTag && /\b(?:src|href)="https?:\/\//i.test(tag);
+  });
+  if (externalRuntimeResource) {
+    throw new Error(`${path} loads a script, stylesheet or font from another host`);
+  }
+}
+
+for (const path of architectureDiagrams.flatMap((diagram) => [
+  join('architecture', diagram),
+  join('architecture/en', diagram),
+])) {
+  const html = readFileSync(join(dist, path), 'utf8');
+  if (/<(?:script|link)\b[^>]*(?:src|href)="https?:\/\//i.test(html)) {
+    throw new Error(`${path} must remain a self-contained diagram page`);
+  }
+}
+
+for (const path of ['architecture/index.html', 'architecture/en/index.html']) {
+  const html = readFileSync(join(dist, path), 'utf8');
+  const diagramLinks = [
+    ...html.matchAll(
+      /class="diagram" href="0[1-7]-[a-z-]+\.html" target="_blank" rel="noreferrer"/g,
+    ),
+  ];
+  if (diagramLinks.length !== architectureDiagrams.length) {
+    throw new Error(`${path} must open every diagram in a new tab`);
+  }
+}
+
 const source = readFileSync(join(root, 'src/history-page.tsx'), 'utf8');
 for (const marker of [
   "pageUrl('en/')",
   'pageUrl()',
+  "pageUrl(isGerman ? 'architecture/' : 'architecture/en/')",
   'https://github.com/r3d42-git/MenuBarIO',
   'https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.5.0',
   'https://github.com/rafaelSwi/MenuBarUSB',

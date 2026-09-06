@@ -1,0 +1,146 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "04 · Source status — empty, stale, and unavailable",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "backend": {
+          "label": "Evaluation"
+        },
+        "security": {
+          "label": "Decision rule / status"
+        }
+      }
+    },
+    "locale": "en"
+  },
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Empty is a valid result",
+      "items": [
+        "A complete discovery without devices yields ready + 0.",
+        "Every new refresh returns to refreshing."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "stale is not device loss",
+      "items": [
+        "USB and Bluetooth preserve the last snapshot.",
+        "The display names the last successful time."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Bluetooth switched off",
+      "items": [
+        "Deliberately clears devices and the battery cache.",
+        "unavailable(bluetoothPoweredOff) instead of stale."
+      ]
+    }
+  ],
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Current refresh"
+    },
+    {
+      "id": "stale",
+      "label": "Previous success"
+    },
+    {
+      "id": "missing",
+      "label": "Source unavailable"
+    }
+  ],
+  "mainPath": [
+    "refreshing",
+    "result",
+    "ready"
+  ],
+  "nodes": [
+    {
+      "id": "refreshing",
+      "lane": "main",
+      "col": 0,
+      "type": "backend",
+      "label": "refreshing",
+      "sublabel": "Keep existing timestamp",
+      "width": 240,
+      "height": 76
+    },
+    {
+      "id": "result",
+      "lane": "main",
+      "col": 1,
+      "type": "backend",
+      "label": "Evaluate result",
+      "sublabel": "USB: current generation only",
+      "width": 240,
+      "height": 76
+    },
+    {
+      "id": "ready",
+      "lane": "main",
+      "col": 2,
+      "type": "backend",
+      "label": "ready",
+      "sublabel": "Replace snapshot; refresh timestamp",
+      "width": 240,
+      "height": 76
+    },
+    {
+      "id": "stale",
+      "lane": "stale",
+      "col": 2,
+      "type": "security",
+      "label": "stale",
+      "sublabel": "Keep last snapshot unchanged",
+      "width": 240,
+      "height": 76
+    },
+    {
+      "id": "unavailable",
+      "lane": "missing",
+      "col": 2,
+      "type": "security",
+      "label": "unavailable",
+      "sublabel": "Explicit reason; clear when Bluetooth is off",
+      "width": 240,
+      "height": 76
+    }
+  ],
+  "edges": [
+    {
+      "id": "refreshing-result",
+      "from": "refreshing",
+      "to": "result",
+      "label": "Reading complete",
+      "role": "main"
+    },
+    {
+      "id": "result-ready",
+      "from": "result",
+      "to": "ready",
+      "label": "complete",
+      "role": "main"
+    },
+    {
+      "id": "result-stale",
+      "from": "result",
+      "to": "stale",
+      "label": "Error + previous success",
+      "role": "error"
+    },
+    {
+      "id": "result-unavailable",
+      "from": "result",
+      "to": "unavailable",
+      "label": "No success / Bluetooth off",
+      "role": "error"
+    }
+  ]
+}

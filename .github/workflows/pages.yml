@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - website/**
+      - docs/architecture/**
       - README.md
       - PROJECT_SUMMARY.md
       - .github/workflows/pages.yml
@@ -11,6 +12,7 @@ on:
     branches: [main]
     paths:
       - website/**
+      - docs/architecture/**
       - README.md
       - PROJECT_SUMMARY.md
       - .github/workflows/pages.yml

@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "05 · One data set — display, detail copy, and report",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1260,
+      710
+    ],
+    "repository": {
+      "url": "https://github.com/r3d42-git/MenuBarIO",
+      "revision": "ea9a6e183a2da11b9772aae63cfdfac5ca89852b"
+    },
+    "locale": "en"
+  },
+  "components": [
+    {
+      "id": "snapshot",
+      "type": "backend",
+      "label": "Manager data",
+      "sublabel": "Devices, ports, status, battery",
+      "pos": [
+        40,
+        300
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Classes/USBDeviceManager.swift"
+        }
+      ]
+    },
+    {
+      "id": "groups",
+      "type": "backend",
+      "label": "USBDeviceGroups",
+      "sublabel": "Remaining USB / port USB / Thunderbolt / internal / hubs",
+      "pos": [
+        480,
+        80
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Structs/USBDeviceGroups.swift"
+        }
+      ]
+    },
+    {
+      "id": "details",
+      "type": "backend",
+      "label": "DeviceDetailsBuilder",
+      "sublabel": "Live selection + ConnectionPathResolver",
+      "pos": [
+        480,
+        300
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Support/DeviceDetailsBuilder.swift"
+        }
+      ]
+    },
+    {
+      "id": "report",
+      "type": "backend",
+      "label": "DiagnosticReportBuilder",
+      "sublabel": "overview: deliberate field selection",
+      "pos": [
+        480,
+        520
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Support/DiagnosticReportBuilder.swift"
+        }
+      ]
+    },
+    {
+      "id": "list",
+      "type": "frontend",
+      "label": "List and menu-bar count",
+      "sublabel": "Port USB leaves remaining list",
+      "pos": [
+        920,
+        80
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Views/MainList/Components/MainListDeviceList/MainListDeviceList.swift"
+        }
+      ]
+    },
+    {
+      "id": "copy",
+      "type": "frontend",
+      "label": "Explicit detail copy",
+      "sublabel": "May contain serial number / address",
+      "pos": [
+        920,
+        300
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Views/MainList/DeviceDetailsView.swift"
+        }
+      ]
+    },
+    {
+      "id": "save",
+      "type": "frontend",
+      "label": "NSSavePanel → Markdown",
+      "sublabel": "Only the user-selected file",
+      "pos": [
+        920,
+        520
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Support/MarkdownReportExporter.swift"
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "snapshot-groups",
+      "from": "snapshot",
+      "to": "groups",
+      "label": "group"
+    },
+    {
+      "id": "snapshot-details",
+      "from": "snapshot",
+      "to": "details",
+      "label": "select",
+      "labelAt": [
+        445,
+        345
+      ]
+    },
+    {
+      "id": "snapshot-report",
+      "from": "snapshot",
+      "to": "report",
+      "label": "Snapshot"
+    },
+    {
+      "id": "groups-list",
+      "from": "groups",
+      "to": "list",
+      "label": "display"
+    },
+    {
+      "id": "details-copy",
+      "from": "details",
+      "to": "copy",
+      "label": "Command-C"
+    },
+    {
+      "id": "report-save",
+      "from": "report",
+      "to": "save",
+      "label": "export"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Count independently of placement",
+      "items": [
+        "USB count = remaining USB + port USB + external Thunderbolt devices.",
+        "Internal devices / hubs: 0; Bluetooth counts separately."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Overview report is data-minimizing",
+      "items": [
+        "No serial numbers, Bluetooth addresses, or stable IDs.",
+        "Version, Mac model, measurements, and source status remain."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Path only with an unambiguous chain",
+      "items": [
+        "Host port → dock port → device; hub parents recursively.",
+        "Ambiguity or a cycle produces an unknown path."
+      ]
+    }
+  ]
+}
