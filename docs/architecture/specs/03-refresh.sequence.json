@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "03 · Refresh — nur die neueste Generation",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [
+      1040,
+      480
+    ]
+  },
+  "participants": [
+    {
+      "id": "event",
+      "type": "external",
+      "label": "Auslöser",
+      "sublabel": "Hardware / UI"
+    },
+    {
+      "id": "manager",
+      "type": "backend",
+      "label": "USBDeviceManager",
+      "sublabel": "Main Queue"
+    },
+    {
+      "id": "worker",
+      "type": "backend",
+      "label": "USBDeviceDiscovery",
+      "sublabel": "Serielle Utility Queue"
+    },
+    {
+      "id": "view",
+      "type": "frontend",
+      "label": "SwiftUI",
+      "sublabel": "Beobachtet @Published"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m0",
+      "from": "event",
+      "to": "manager",
+      "y": 160,
+      "label": "refresh() → Generation 1",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m1",
+      "from": "manager",
+      "to": "worker",
+      "y": 192,
+      "label": "startRefresh(1), asynchron",
+      "variant": "dashed"
+    },
+    {
+      "id": "m2",
+      "from": "event",
+      "to": "manager",
+      "y": 224,
+      "label": "refresh() → Generation 2",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m3",
+      "from": "worker",
+      "to": "manager",
+      "y": 256,
+      "label": "Snapshot 1 fertig",
+      "variant": "return"
+    },
+    {
+      "id": "m4",
+      "from": "manager",
+      "to": "worker",
+      "y": 288,
+      "label": "veraltet → startRefresh(2)",
+      "variant": "dashed"
+    },
+    {
+      "id": "m8",
+      "from": "worker",
+      "to": "manager",
+      "y": 320,
+      "label": "Snapshot 2 fertig und aktuell",
+      "variant": "return"
+    },
+    {
+      "id": "m9",
+      "from": "manager",
+      "to": "view",
+      "y": 352,
+      "label": "vollständig → Modelle + ready",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Ein laufender USB-Auftrag",
+      "items": [
+        "Weitere Anfragen erhöhen nur latestGeneration.",
+        "Nach Abschluss startet direkt der neueste Auftrag."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Auslöser haben eigene Wege",
+      "items": [
+        "Wake / Session: HardwareRefreshCoordinator, 350 ms.",
+        "USB-Monitor direkt; manuell auch Bluetooth / Strom / LAN."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Publikation ist eine zweite Schranke",
+      "items": [
+        "Aktuelle Generation allein reicht nicht: isComplete nötig.",
+        "Bei Fehlern bleibt der letzte vollständige Snapshot erhalten."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "03 · Refresh — only the latest generation",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [
+      1040,
+      480
+    ],
+    "locale": "en"
+  },
+  "participants": [
+    {
+      "id": "event",
+      "type": "external",
+      "label": "Triggers",
+      "sublabel": "Hardware / UI"
+    },
+    {
+      "id": "manager",
+      "type": "backend",
+      "label": "USBDeviceManager",
+      "sublabel": "Main Queue"
+    },
+    {
+      "id": "worker",
+      "type": "backend",
+      "label": "USBDeviceDiscovery",
+      "sublabel": "Serial utility queue"
+    },
+    {
+      "id": "view",
+      "type": "frontend",
+      "label": "SwiftUI",
+      "sublabel": "Observes @Published"
+    }
+  ],
+  "messages": [
+    {
+      "id": "m0",
+      "from": "event",
+      "to": "manager",
+      "y": 160,
+      "label": "refresh() → generation 1",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m1",
+      "from": "manager",
+      "to": "worker",
+      "y": 192,
+      "label": "startRefresh(1), asynchronous",
+      "variant": "dashed"
+    },
+    {
+      "id": "m2",
+      "from": "event",
+      "to": "manager",
+      "y": 224,
+      "label": "refresh() → generation 2",
+      "variant": "emphasis"
+    },
+    {
+      "id": "m3",
+      "from": "worker",
+      "to": "manager",
+      "y": 256,
+      "label": "Snapshot 1 complete",
+      "variant": "return"
+    },
+    {
+      "id": "m4",
+      "from": "manager",
+      "to": "worker",
+      "y": 288,
+      "label": "stale → startRefresh(2)",
+      "variant": "dashed"
+    },
+    {
+      "id": "m8",
+      "from": "worker",
+      "to": "manager",
+      "y": 320,
+      "label": "Snapshot 2 complete and current",
+      "variant": "return"
+    },
+    {
+      "id": "m9",
+      "from": "manager",
+      "to": "view",
+      "y": 352,
+      "label": "complete → models + ready",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "One USB job in flight",
+      "items": [
+        "Further requests only increase latestGeneration.",
+        "After completion, the newest job starts directly."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Triggers have their own paths",
+      "items": [
+        "Wake / session: HardwareRefreshCoordinator, 350 ms.",
+        "USB monitor directly; manual refresh also covers Bluetooth / power / LAN."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Publication is a second gate",
+      "items": [
+        "A current generation alone is insufficient: isComplete is required.",
+        "On errors, the last complete snapshot remains."
+      ]
+    }
+  ]
+}

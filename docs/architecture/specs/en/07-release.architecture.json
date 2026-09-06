@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "07 · Release — app ticket, DMG ticket, and public download",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1260,
+      710
+    ],
+    "repository": {
+      "url": "https://github.com/r3d42-git/MenuBarIO",
+      "revision": "ea9a6e183a2da11b9772aae63cfdfac5ca89852b"
+    },
+    "locale": "en"
+  },
+  "components": [
+    {
+      "id": "verify",
+      "type": "security",
+      "label": "Quality gate",
+      "sublabel": "Tests, audits, universal archive",
+      "pos": [
+        40,
+        80
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "script/release.sh"
+        }
+      ]
+    },
+    {
+      "id": "sign",
+      "type": "backend",
+      "label": "Sign app",
+      "sublabel": "Developer ID + license materials",
+      "pos": [
+        480,
+        80
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "script/release.sh"
+        }
+      ]
+    },
+    {
+      "id": "app",
+      "type": "security",
+      "label": "Notarize app",
+      "sublabel": "Accepted → staple → validate",
+      "pos": [
+        920,
+        80
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "script/release.sh"
+        }
+      ]
+    },
+    {
+      "id": "dmg",
+      "type": "backend",
+      "label": "Create DMG",
+      "sublabel": "Layout + already stapled app",
+      "pos": [
+        920,
+        300
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "script/release.sh"
+        }
+      ]
+    },
+    {
+      "id": "ticket",
+      "type": "security",
+      "label": "Notarize DMG",
+      "sublabel": "Sign → Accepted → staple",
+      "pos": [
+        480,
+        300
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "script/release.sh"
+        }
+      ]
+    },
+    {
+      "id": "check",
+      "type": "security",
+      "label": "Verify container",
+      "sublabel": "DMG AND enclosed app",
+      "pos": [
+        40,
+        300
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "script/release.sh"
+        }
+      ]
+    },
+    {
+      "id": "publish",
+      "type": "backend",
+      "label": "GitHub release",
+      "sublabel": "Check existing tag; upload",
+      "pos": [
+        40,
+        520
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "script/publish_release.sh"
+        }
+      ]
+    },
+    {
+      "id": "download",
+      "type": "security",
+      "label": "Download fresh copy",
+      "sublabel": "SHA-256 + verify container again",
+      "pos": [
+        480,
+        520
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "script/publish_release.sh"
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "verify-sign",
+      "from": "verify",
+      "to": "sign",
+      "label": "passed"
+    },
+    {
+      "id": "sign-app",
+      "from": "sign",
+      "to": "app",
+      "label": "App ZIP"
+    },
+    {
+      "id": "app-dmg",
+      "from": "app",
+      "to": "dmg",
+      "label": "App stapled",
+      "labelAt": [
+        1070,
+        235
+      ]
+    },
+    {
+      "id": "dmg-ticket",
+      "from": "dmg",
+      "to": "ticket",
+      "label": "final DMG"
+    },
+    {
+      "id": "ticket-check",
+      "from": "ticket",
+      "to": "check",
+      "label": "DMG stapled"
+    },
+    {
+      "id": "check-publish",
+      "from": "check",
+      "to": "publish",
+      "label": "verified",
+      "labelAt": [
+        190,
+        455
+      ]
+    },
+    {
+      "id": "publish-download",
+      "from": "publish",
+      "to": "download",
+      "label": "download again"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Code before publication",
+      "items": [
+        "PR → native CI on Apple Silicon and Intel → main → tag.",
+        "release.sh builds; publish_release.sh publishes separately."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Two artifacts, two Apple tickets",
+      "items": [
+        "The app is stapled before packaging.",
+        "Gatekeeper alone does not replace a ticket in the container."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "The website has its own path",
+      "items": [
+        "website/ → Vite → Pages workflow → public verification.",
+        "No runtime data flow exists between the website and macOS app."
+      ]
+    }
+  ]
+}

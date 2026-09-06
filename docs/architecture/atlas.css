@@ -1,0 +1,84 @@
+:root {
+  color-scheme: light dark;
+  --background: #f3f5f7;
+  --surface: #ffffff;
+  --ink: #18262e;
+  --muted: #556872;
+  --line: #d7e0e5;
+  --accent: #007b75;
+  --accent-soft: #d9f0eb;
+  --warm: #ee8e39;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--ink);
+  font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+main { max-width: 1380px; margin: auto; padding: 52px 38px; }
+
+a { color: var(--accent); text-underline-offset: 4px; }
+a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+
+header { max-width: 960px; margin-bottom: 36px; }
+.eyebrow {
+  color: var(--accent);
+  font: 600 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+}
+h1 { margin: 16px 0 20px; font-size: clamp(32px, 4vw, 52px); line-height: 1.1; letter-spacing: -.04em; }
+header > p { max-width: 830px; color: var(--muted); font-size: 19px; }
+
+.masthead, .language-switch, .meta, .links { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; }
+.masthead { justify-content: space-between; }
+.language-switch { font: 600 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.language-switch a, .language-switch span { border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; text-decoration: none; }
+.language-switch span { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.meta { margin-top: 24px; color: var(--muted); font-size: 13px; }
+.meta span { border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px; }
+.links { margin: 24px 0; }
+
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+article { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); transition: transform .15s ease; }
+article:hover { transform: translateY(-3px); }
+.diagram { display: block; padding: 24px 24px 8px; color: inherit; text-decoration: none; }
+h2 { margin: 13px 0 10px; font-size: 21px; line-height: 1.3; letter-spacing: -.02em; }
+h2 span { float: right; color: var(--accent); }
+article p { min-height: 74px; margin: 0 0 18px; color: var(--muted); font-size: 15px; }
+.preview {
+  display: grid;
+  min-height: 164px;
+  gap: 12px;
+  align-content: center;
+  padding: 19px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 55%, var(--surface)), var(--surface));
+}
+.preview-flow { display: grid; grid-template-columns: 1fr 22px 1fr 22px 1fr; align-items: center; gap: 7px; }
+.preview-flow i { height: 1px; background: var(--accent); }
+.preview-box { min-height: 38px; border: 1px solid var(--accent); border-radius: 5px; background: var(--surface); }
+.preview-box:nth-of-type(3n) { border-color: var(--warm); }
+.preview-lines { display: grid; gap: 8px; }
+.preview-lines i { display: block; height: 7px; border-radius: 99px; background: var(--line); }
+.preview-lines i:nth-child(2) { width: 76%; background: var(--accent); }
+.preview-lines i:nth-child(3) { width: 52%; }
+.preview-caption { color: var(--muted); font: 600 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .03em; }
+.source { display: block; margin: 8px 24px 20px; overflow-wrap: anywhere; font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 42px; padding: 28px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.notes h3 { margin: 0 0 10px; font-size: 16px; }
+.notes p { margin: 0; color: var(--muted); font-size: 14px; }
+footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
+
+@media (prefers-color-scheme: dark) {
+  :root { --background: #0b141c; --surface: #13212c; --ink: #e6eff3; --muted: #a5bac6; --line: #2c4150; --accent: #69d6bf; --accent-soft: #163a38; --warm: #f3af67; }
+}
+@media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .notes { grid-template-columns: 1fr; } }
+@media (max-width: 650px) { main { padding: 28px 18px; } .grid { grid-template-columns: 1fr; } article p { min-height: 0; } }
+@media (prefers-reduced-motion: reduce) { article { transition: none; } article:hover { transform: none; } }

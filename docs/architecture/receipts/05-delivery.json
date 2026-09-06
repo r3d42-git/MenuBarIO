@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/Volumes/Media/codex/MenubarUSB/docs/architecture/specs/05-outputs.architecture.json",
+  "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/05-outputs.html",
+  "specification": {
+    "sha256": "349decae1806ff280a5cbd3ae3a7e479f95c1df0b4e5fb199f9b606f6bef888a",
+    "bytes": 4517
+  },
+  "artifact": {
+    "sha256": "794675e7096f1eb60f06606965f6fae61499b92875e45129232fd6f6d3626fa9",
+    "bytes": 710579
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  },
+  "evidence": {
+    "verified": true,
+    "repository": "https://github.com/r3d42-git/MenuBarIO",
+    "revision": "ea9a6e183a2da11b9772aae63cfdfac5ca89852b",
+    "references": 7
+  }
+}

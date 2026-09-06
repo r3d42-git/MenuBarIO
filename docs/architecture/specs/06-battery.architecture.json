@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "06 · Bluetooth-Batterie — Quellen, Freigabe und Cache",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1260,
+      710
+    ],
+    "repository": {
+      "url": "https://github.com/r3d42-git/MenuBarIO",
+      "revision": "ea9a6e183a2da11b9772aae63cfdfac5ca89852b"
+    }
+  },
+  "components": [
+    {
+      "id": "connected",
+      "type": "backend",
+      "label": "Verbundenes Gerät",
+      "sublabel": "Adresse normalisieren",
+      "pos": [
+        40,
+        80
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Services/BluetoothBatteryReader.swift"
+        }
+      ]
+    },
+    {
+      "id": "hid",
+      "type": "backend",
+      "label": "HID BatteryPercent",
+      "sublabel": "Eindeutiger gültiger Wert?",
+      "pos": [
+        480,
+        80
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Services/BluetoothBatteryReader.swift"
+        }
+      ]
+    },
+    {
+      "id": "display",
+      "type": "backend",
+      "label": "Batterie anzeigen",
+      "sublabel": "0 bis 100 Prozent",
+      "pos": [
+        920,
+        80
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Services/BluetoothBatteryReader.swift"
+        }
+      ]
+    },
+    {
+      "id": "identity",
+      "type": "backend",
+      "label": "BLE-Zuordnung",
+      "sublabel": "UUID + Adresse im selben Record",
+      "pos": [
+        40,
+        300
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Services/BluetoothBatteryReader.swift"
+        }
+      ]
+    },
+    {
+      "id": "access",
+      "type": "backend",
+      "label": "Abfrage zulässig?",
+      "sublabel": "Autorisiert, verbunden, ≥ 5 min",
+      "pos": [
+        480,
+        300
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Services/BluetoothBatteryReader.swift"
+        }
+      ]
+    },
+    {
+      "id": "gatt",
+      "type": "backend",
+      "label": "GATT lesen",
+      "sublabel": "180F → 2A19; Timeout 10 s",
+      "pos": [
+        920,
+        300
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Services/BluetoothBatteryReader.swift"
+        }
+      ]
+    },
+    {
+      "id": "cache",
+      "type": "backend",
+      "label": "RAM-Cache",
+      "sublabel": "Gültiger Wert, höchstens 15 min",
+      "pos": [
+        920,
+        520
+      ],
+      "size": [
+        300,
+        90
+      ],
+      "sources": [
+        {
+          "path": "MenuBarIO/Services/BluetoothBatteryReader.swift"
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "connected-hid",
+      "from": "connected",
+      "to": "hid",
+      "label": "Registry"
+    },
+    {
+      "id": "hid-display",
+      "from": "hid",
+      "to": "display",
+      "label": "gültiger Wert"
+    },
+    {
+      "id": "connected-identity",
+      "from": "connected",
+      "to": "identity",
+      "label": "UUID + Adresse",
+      "labelAt": [
+        190,
+        235
+      ]
+    },
+    {
+      "id": "identity-access",
+      "from": "identity",
+      "to": "access",
+      "label": "eindeutig"
+    },
+    {
+      "id": "access-gatt",
+      "from": "access",
+      "to": "gatt",
+      "label": "bereits autorisiert"
+    },
+    {
+      "id": "gatt-cache",
+      "from": "gatt",
+      "to": "cache",
+      "label": "Wert / Fehler",
+      "labelAt": [
+        1070,
+        455
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Nur bestehende Verbindungen",
+      "items": [
+        "Kein Scan, Pairing oder Namensabgleich.",
+        "BLE-Identität muss zum verbundenen Gerät gehören."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Keine Zusatzfreigabe für Batterie",
+      "items": [
+        "CBManager.authorization muss bereits allowedAlways sein.",
+        "GATT: mindestens 5 min Abstand, Timeout 10 s, Cache 15 min."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Unbekannt bleibt unsichtbar",
+      "items": [
+        "Batterieanzeige liest HID-Wert, sonst frischen RAM-Cache.",
+        "onChange aktualisiert die Gerätezeile; Fehler löschen den Cachewert."
+      ]
+    }
+  ]
+}

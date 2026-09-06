@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-06",
+  "scope": "English architecture atlas and GitHub Pages integration",
+  "archifyDelivery": [
+    {
+      "specification": "specs/en/01-system.architecture.json",
+      "artifact": "en/01-system.html",
+      "artifactSha256": "83ff83b6821e22d64b93edc64a10a012b534e2a0cb868cb863704966703a1b8d"
+    },
+    {
+      "specification": "specs/en/02-ports.workflow.json",
+      "artifact": "en/02-ports.html",
+      "artifactSha256": "11c6d89fca2ac860b3cefb25bea9768b84cec234d3ede485600d6c957d959112"
+    },
+    {
+      "specification": "specs/en/03-refresh.sequence.json",
+      "artifact": "en/03-refresh.html",
+      "artifactSha256": "1023e4092ff48cd0f7d9f0552158dc488b5e49157cfd5e7b66b1189c1509a06a"
+    },
+    {
+      "specification": "specs/en/04-status.workflow.json",
+      "artifact": "en/04-status.html",
+      "artifactSha256": "0852afc64f3f79b166e160f3d2f672b0d9e9f113c7223cf120febea7befd5c40"
+    },
+    {
+      "specification": "specs/en/05-outputs.architecture.json",
+      "artifact": "en/05-outputs.html",
+      "artifactSha256": "f968706a15dd6b37751afa7b8d22bdfa1b63df31af2ea7d6de10743850083534"
+    },
+    {
+      "specification": "specs/en/06-battery.architecture.json",
+      "artifact": "en/06-battery.html",
+      "artifactSha256": "6d1fa31658013af5c83c42761093574d23eabf5ebbafb399431cbfbd43c9134c"
+    },
+    {
+      "specification": "specs/en/07-release.architecture.json",
+      "artifact": "en/07-release.html",
+      "artifactSha256": "61b9bb8f9e76bd474b46022c7cbf0298fa412407ca95552bdeb4f1f317d114f3"
+    }
+  ],
+  "archifyValidation": {
+    "quality": "showcase",
+    "diagramCount": 7,
+    "checksPerDiagram": 9,
+    "errors": 0,
+    "warnings": 0
+  },
+  "pagesBuild": {
+    "routes": [
+      "/MenuBarIO/architecture/",
+      "/MenuBarIO/architecture/en/"
+    ],
+    "commands": [
+      "npm run lint",
+      "npm run typecheck",
+      "npm run build",
+      "npm run check:artifact"
+    ],
+    "artifactCount": 26,
+    "diagramCardsOpenNewTab": true,
+    "externalRuntimeResources": false
+  },
+  "manualInAppReview": {
+    "browser": "Codex In-app Browser",
+    "reviewed": [
+      "German landing page",
+      "English landing page",
+      "English system diagram",
+      "Project-history architecture-atlas link",
+      "New tab creation after opening an English diagram card"
+    ],
+    "chromeLaunched": false
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "source_revision": "ea9a6e183a2da11b9772aae63cfdfac5ca89852b",
+  "date": "2026-09-06",
+  "artifacts": [
+    {
+      "diagram_type": "architecture",
+      "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/01-system.html",
+      "specification_sha256": "cf69eff1d8bcf5dce44a249671a82ce6918e270b1f2c5b6f850305590a32df85",
+      "specification_bytes": 5126,
+      "artifact_sha256": "813af710612e8e8035728359cbed6ad2ce18ed5a09c86fb0443d87e5d9c97f06",
+      "artifact_bytes": 713658,
+      "validation": {
+        "checksPassed": 9,
+        "checkCount": 9,
+        "compositionProfile": "showcase",
+        "compositionStatus": "pass",
+        "errors": 0,
+        "warnings": 0
+      },
+      "browser_evidence": "passed",
+      "visual_review": "passed",
+      "visual_review_scope": "Rendered artifact screenshot at 2048x1320; complementary theme screenshot reviewed separately",
+      "correction_rounds": 0
+    },
+    {
+      "diagram_type": "workflow",
+      "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/02-ports.html",
+      "specification_sha256": "3c685ddc4a64ecf34c2b6492662ea2d4deeb26a7d835307add41f8a3b9f0a61b",
+      "specification_bytes": 4342,
+      "artifact_sha256": "b5c12c0d7d6454305ae43e90988d24cf5cf77eee32d00d989a7bd5f3d2758895",
+      "artifact_bytes": 711726,
+      "validation": {
+        "checksPassed": 9,
+        "checkCount": 9,
+        "compositionProfile": "showcase",
+        "compositionStatus": "pass",
+        "errors": 0,
+        "warnings": 0
+      },
+      "browser_evidence": "passed",
+      "visual_review": "passed",
+      "visual_review_scope": "Rendered artifact screenshot at 2048x1320; complementary theme screenshot reviewed separately",
+      "correction_rounds": 1
+    },
+    {
+      "diagram_type": "sequence",
+      "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/03-refresh.html",
+      "specification_sha256": "845370e9a6d8c3c34605809089c0bbe2e8986ce7f1d092f0f1b27eed7e08b05c",
+      "specification_bytes": 2699,
+      "artifact_sha256": "135c14153a1b5f27a9c3bbde522ad4412fe503a2cbcfefc4477814f367ea6eac",
+      "artifact_bytes": 706346,
+      "validation": {
+        "checksPassed": 9,
+        "checkCount": 9,
+        "compositionProfile": "showcase",
+        "compositionStatus": "pass",
+        "errors": 0,
+        "warnings": 0
+      },
+      "browser_evidence": "failed",
+      "visual_review": "passed",
+      "visual_review_scope": "In-app browser, dark full-page at 2048x1320; both themes measured at all four desktop sizes",
+      "correction_rounds": 1
+    },
+    {
+      "diagram_type": "workflow",
+      "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/04-status.html",
+      "specification_sha256": "85ab20af8238f4b2a4bc5c659e65688aa474b9c7c7b7ea616ce980a52f5982be",
+      "specification_bytes": 3108,
+      "artifact_sha256": "aceb2a57e5d6b6f1478bf5e5f84177909ebbdbab81b37e7997c5e9e52529a1dc",
+      "artifact_bytes": 705341,
+      "validation": {
+        "checksPassed": 9,
+        "checkCount": 9,
+        "compositionProfile": "showcase",
+        "compositionStatus": "pass",
+        "errors": 0,
+        "warnings": 0
+      },
+      "browser_evidence": "passed",
+      "visual_review": "passed",
+      "visual_review_scope": "Rendered artifact screenshot at 2048x1320; complementary theme screenshot reviewed separately",
+      "correction_rounds": 1
+    },
+    {
+      "diagram_type": "architecture",
+      "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/05-outputs.html",
+      "specification_sha256": "349decae1806ff280a5cbd3ae3a7e479f95c1df0b4e5fb199f9b606f6bef888a",
+      "specification_bytes": 4517,
+      "artifact_sha256": "794675e7096f1eb60f06606965f6fae61499b92875e45129232fd6f6d3626fa9",
+      "artifact_bytes": 710579,
+      "validation": {
+        "checksPassed": 9,
+        "checkCount": 9,
+        "compositionProfile": "showcase",
+        "compositionStatus": "pass",
+        "errors": 0,
+        "warnings": 0
+      },
+      "browser_evidence": "passed",
+      "visual_review": "passed",
+      "visual_review_scope": "Rendered artifact screenshot at 2048x1320; complementary theme screenshot reviewed separately",
+      "correction_rounds": 0
+    },
+    {
+      "diagram_type": "architecture",
+      "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/06-battery.html",
+      "specification_sha256": "ccd1f5c1e8a5aa0294bc0371c86aba126ecf1da816228709edaee38ad96e72b4",
+      "specification_bytes": 4468,
+      "artifact_sha256": "534c10e08f045a3f75927643d18d82652966f9ca873344995fc5b873956b7a12",
+      "artifact_bytes": 709108,
+      "validation": {
+        "checksPassed": 9,
+        "checkCount": 9,
+        "compositionProfile": "showcase",
+        "compositionStatus": "pass",
+        "errors": 0,
+        "warnings": 0
+      },
+      "browser_evidence": "passed",
+      "visual_review": "passed",
+      "visual_review_scope": "Rendered artifact screenshot at 2048x1320; complementary theme screenshot reviewed separately",
+      "correction_rounds": 0
+    },
+    {
+      "diagram_type": "architecture",
+      "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/07-release.html",
+      "specification_sha256": "55692ddb6296373d0fd47a4690a4de9fe09a890af5f2b6bc127295018ebc9d8a",
+      "specification_bytes": 4716,
+      "artifact_sha256": "61a4627ffada695a444d1921de5bf905f9094f4d6d21bdbbe1eb8c0506bb9cb7",
+      "artifact_bytes": 711477,
+      "validation": {
+        "checksPassed": 9,
+        "checkCount": 9,
+        "compositionProfile": "showcase",
+        "compositionStatus": "pass",
+        "errors": 0,
+        "warnings": 0
+      },
+      "browser_evidence": "passed",
+      "visual_review": "passed",
+      "visual_review_scope": "Rendered artifact screenshot at 2048x1320; complementary theme screenshot reviewed separately",
+      "correction_rounds": 0
+    }
+  ]
+}

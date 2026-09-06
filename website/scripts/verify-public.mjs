@@ -8,6 +8,10 @@ const root = new URL(baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`);
 const checks = [
   ['', 'MenuBarIO – Projektverlauf'],
   ['en/', 'MenuBarIO – Project History'],
+  ['architecture/', 'MenuBarIO verstehen · Architektur-Atlas'],
+  ['architecture/en/', 'Understanding MenuBarIO · Architecture Atlas'],
+  ['architecture/01-system.html', '01 · MenuBarIO — Systemarchitektur'],
+  ['architecture/en/01-system.html', '01 · MenuBarIO — System Architecture'],
   ['menubario-icon.png', null],
   ['og.png', null],
 ];

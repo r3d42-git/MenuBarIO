@@ -1,0 +1,208 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "02 · Wie USB-Geräte einen physischen Port erhalten",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "backend": {
+          "label": "Auswertung"
+        },
+        "security": {
+          "label": "Prüfregel / Status"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "build",
+      "label": "IOKit-Topologie"
+    },
+    {
+      "id": "host",
+      "label": "Direkt am Mac"
+    },
+    {
+      "id": "dock",
+      "label": "Am externen Router"
+    },
+    {
+      "id": "fallback",
+      "label": "Fehlend / mehrdeutig"
+    }
+  ],
+  "mainPath": [
+    "native",
+    "host",
+    "unique",
+    "hostyes"
+  ],
+  "nodes": [
+    {
+      "id": "native",
+      "lane": "build",
+      "col": 0,
+      "type": "backend",
+      "label": "Native Portbelegung",
+      "sublabel": "TB-Router + direkte Attachments",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "host",
+      "lane": "host",
+      "col": 1,
+      "type": "backend",
+      "label": "Host-USB prüfen",
+      "sublabel": "UsbCPortNumber am direkten Parent",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "unique",
+      "lane": "host",
+      "col": 2,
+      "type": "security",
+      "label": "Eindeutig zuweisbar?",
+      "sublabel": "Ein Port und ein USB-Kandidat",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "hostyes",
+      "lane": "host",
+      "col": 3,
+      "type": "backend",
+      "label": "Hostport belegen",
+      "sublabel": "USB-Transport und Rate bleiben",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "dock",
+      "lane": "dock",
+      "col": 1,
+      "type": "backend",
+      "label": "Dock-Beweis prüfen",
+      "sublabel": "Hostbindung + Controller + Tunnel",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "map",
+      "lane": "dock",
+      "col": 2,
+      "type": "security",
+      "label": "DROM-Mapping eindeutig?",
+      "sublabel": "USB-2/3-Companion → ein Kandidat",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "dockyes",
+      "lane": "dock",
+      "col": 3,
+      "type": "backend",
+      "label": "Dockport belegen",
+      "sublabel": "Nur bisher unbelegte Ports",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "residual",
+      "lane": "fallback",
+      "col": 3,
+      "type": "security",
+      "label": "USB bleibt in Restliste",
+      "sublabel": "Keine physische Zuordnung behaupten",
+      "width": 230,
+      "height": 76
+    }
+  ],
+  "edges": [
+    {
+      "id": "native-host",
+      "from": "native",
+      "to": "host",
+      "label": "Host",
+      "role": "branch"
+    },
+    {
+      "id": "host-unique",
+      "from": "host",
+      "to": "unique",
+      "label": "zulässig",
+      "role": "main"
+    },
+    {
+      "id": "unique-hostyes",
+      "from": "unique",
+      "to": "hostyes",
+      "label": "ja",
+      "role": "main"
+    },
+    {
+      "id": "native-dock",
+      "from": "native",
+      "to": "dock",
+      "label": "Dock",
+      "role": "branch"
+    },
+    {
+      "id": "dock-map",
+      "from": "dock",
+      "to": "map",
+      "label": "inkl. USB Port Map",
+      "role": "main"
+    },
+    {
+      "id": "map-dockyes",
+      "from": "map",
+      "to": "dockyes",
+      "label": "ja",
+      "role": "main"
+    },
+    {
+      "id": "unique-residual",
+      "from": "unique",
+      "to": "residual",
+      "label": "nein",
+      "role": "error"
+    },
+    {
+      "id": "map-residual",
+      "from": "map",
+      "to": "residual",
+      "label": "nein",
+      "role": "error"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Host: nur direkte Peripherie",
+      "items": [
+        "Extern, zählbar, USB; kein Hub-Elternteil.",
+        "Kein Billboard, Tunnel oder TB-Eigentümer."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Dock: mehrere Belege zusammen",
+      "items": [
+        "Gleicher Controller, Hub-Elternteil und Hub-Port.",
+        "DROM verbindet Companion-Hubports mit Buchsen."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Daten haben Vorrang",
+      "items": [
+        "Native Thunderbolt-Belegungen werden nie überschrieben.",
+        "Fehlt ein Vorbeleg, bleibt USB ebenfalls unzugeordnet."
+      ]
+    }
+  ]
+}

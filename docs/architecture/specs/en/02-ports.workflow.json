@@ -1,0 +1,209 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "02 · How USB devices receive a physical port",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "backend": {
+          "label": "Evaluation"
+        },
+        "security": {
+          "label": "Decision rule / status"
+        }
+      }
+    },
+    "locale": "en"
+  },
+  "lanes": [
+    {
+      "id": "build",
+      "label": "IOKit topology"
+    },
+    {
+      "id": "host",
+      "label": "Directly on the Mac"
+    },
+    {
+      "id": "dock",
+      "label": "On an external router"
+    },
+    {
+      "id": "fallback",
+      "label": "Missing / ambiguous"
+    }
+  ],
+  "mainPath": [
+    "native",
+    "host",
+    "unique",
+    "hostyes"
+  ],
+  "nodes": [
+    {
+      "id": "native",
+      "lane": "build",
+      "col": 0,
+      "type": "backend",
+      "label": "Native port occupation",
+      "sublabel": "TB router + direct attachments",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "host",
+      "lane": "host",
+      "col": 1,
+      "type": "backend",
+      "label": "Check host USB",
+      "sublabel": "UsbCPortNumber on the direct parent",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "unique",
+      "lane": "host",
+      "col": 2,
+      "type": "security",
+      "label": "Uniquely assignable?",
+      "sublabel": "One port and one USB candidate",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "hostyes",
+      "lane": "host",
+      "col": 3,
+      "type": "backend",
+      "label": "Occupy host port",
+      "sublabel": "USB transport and speed remain",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "dock",
+      "lane": "dock",
+      "col": 1,
+      "type": "backend",
+      "label": "Check dock evidence",
+      "sublabel": "Host binding + controller + tunnel",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "map",
+      "lane": "dock",
+      "col": 2,
+      "type": "security",
+      "label": "DROM mapping unambiguous?",
+      "sublabel": "USB 2/3 companion → one candidate",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "dockyes",
+      "lane": "dock",
+      "col": 3,
+      "type": "backend",
+      "label": "Occupy dock port",
+      "sublabel": "Only ports not occupied yet",
+      "width": 230,
+      "height": 76
+    },
+    {
+      "id": "residual",
+      "lane": "fallback",
+      "col": 3,
+      "type": "security",
+      "label": "USB remains in the remaining list",
+      "sublabel": "Do not claim a physical assignment",
+      "width": 230,
+      "height": 76
+    }
+  ],
+  "edges": [
+    {
+      "id": "native-host",
+      "from": "native",
+      "to": "host",
+      "label": "Host",
+      "role": "branch"
+    },
+    {
+      "id": "host-unique",
+      "from": "host",
+      "to": "unique",
+      "label": "allowed",
+      "role": "main"
+    },
+    {
+      "id": "unique-hostyes",
+      "from": "unique",
+      "to": "hostyes",
+      "label": "yes",
+      "role": "main"
+    },
+    {
+      "id": "native-dock",
+      "from": "native",
+      "to": "dock",
+      "label": "Dock",
+      "role": "branch"
+    },
+    {
+      "id": "dock-map",
+      "from": "dock",
+      "to": "map",
+      "label": "including USB Port Map",
+      "role": "main"
+    },
+    {
+      "id": "map-dockyes",
+      "from": "map",
+      "to": "dockyes",
+      "label": "yes",
+      "role": "main"
+    },
+    {
+      "id": "unique-residual",
+      "from": "unique",
+      "to": "residual",
+      "label": "no",
+      "role": "error"
+    },
+    {
+      "id": "map-residual",
+      "from": "map",
+      "to": "residual",
+      "label": "no",
+      "role": "error"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Host: direct peripherals only",
+      "items": [
+        "External, countable, USB; no hub parent.",
+        "No Billboard, tunnel, or Thunderbolt owner."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Dock: combine several pieces of evidence",
+      "items": [
+        "Same controller, hub parent, and hub port.",
+        "DROM connects companion hub ports to sockets."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Evidence takes priority",
+      "items": [
+        "Native Thunderbolt assignments are never overwritten.",
+        "Without prior evidence, USB remains unassigned too."
+      ]
+    }
+  ]
+}

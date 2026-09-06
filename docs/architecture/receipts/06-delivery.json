@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/Volumes/Media/codex/MenubarUSB/docs/architecture/specs/06-battery.architecture.json",
+  "output": "/Volumes/Media/codex/MenubarUSB/docs/architecture/06-battery.html",
+  "specification": {
+    "sha256": "ccd1f5c1e8a5aa0294bc0371c86aba126ecf1da816228709edaee38ad96e72b4",
+    "bytes": 4468
+  },
+  "artifact": {
+    "sha256": "534c10e08f045a3f75927643d18d82652966f9ca873344995fc5b873956b7a12",
+    "bytes": 709108
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  },
+  "evidence": {
+    "verified": true,
+    "repository": "https://github.com/r3d42-git/MenuBarIO",
+    "revision": "ea9a6e183a2da11b9772aae63cfdfac5ca89852b",
+    "references": 7
+  }
+}

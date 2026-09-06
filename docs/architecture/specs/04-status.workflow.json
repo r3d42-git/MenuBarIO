@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "04 · Quellenstatus — leer, veraltet und nicht verfügbar",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "backend": {
+          "label": "Auswertung"
+        },
+        "security": {
+          "label": "Prüfregel / Status"
+        }
+      }
+    }
+  },
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Leer ist ein gültiges Ergebnis",
+      "items": [
+        "Vollständige Erkennung ohne Geräte ergibt ready + 0.",
+        "Jeder erneute Refresh führt wieder zu refreshing."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "stale ist kein Geräteverlust",
+      "items": [
+        "USB und Bluetooth bewahren den letzten Snapshot.",
+        "Die Anzeige nennt den letzten erfolgreichen Zeitpunkt."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Bluetooth ausgeschaltet",
+      "items": [
+        "Leert Geräte und Batteriecache gezielt.",
+        "unavailable(bluetoothPoweredOff) statt stale."
+      ]
+    }
+  ],
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Aktueller Refresh"
+    },
+    {
+      "id": "stale",
+      "label": "Vorheriger Erfolg"
+    },
+    {
+      "id": "missing",
+      "label": "Quelle fehlt"
+    }
+  ],
+  "mainPath": [
+    "refreshing",
+    "result",
+    "ready"
+  ],
+  "nodes": [
+    {
+      "id": "refreshing",
+      "lane": "main",
+      "col": 0,
+      "type": "backend",
+      "label": "refreshing",
+      "sublabel": "Bisherigen Zeitstempel behalten",
+      "width": 240,
+      "height": 76
+    },
+    {
+      "id": "result",
+      "lane": "main",
+      "col": 1,
+      "type": "backend",
+      "label": "Ergebnis bewerten",
+      "sublabel": "USB: nur die aktuelle Generation",
+      "width": 240,
+      "height": 76
+    },
+    {
+      "id": "ready",
+      "lane": "main",
+      "col": 2,
+      "type": "backend",
+      "label": "ready",
+      "sublabel": "Snapshot ersetzen; Zeitstempel neu",
+      "width": 240,
+      "height": 76
+    },
+    {
+      "id": "stale",
+      "lane": "stale",
+      "col": 2,
+      "type": "security",
+      "label": "stale",
+      "sublabel": "Letzten Snapshot unverändert behalten",
+      "width": 240,
+      "height": 76
+    },
+    {
+      "id": "unavailable",
+      "lane": "missing",
+      "col": 2,
+      "type": "security",
+      "label": "unavailable",
+      "sublabel": "Expliziter Grund; Bluetooth aus: leeren",
+      "width": 240,
+      "height": 76
+    }
+  ],
+  "edges": [
+    {
+      "id": "refreshing-result",
+      "from": "refreshing",
+      "to": "result",
+      "label": "Lesen beendet",
+      "role": "main"
+    },
+    {
+      "id": "result-ready",
+      "from": "result",
+      "to": "ready",
+      "label": "vollständig",
+      "role": "main"
+    },
+    {
+      "id": "result-stale",
+      "from": "result",
+      "to": "stale",
+      "label": "Fehler + letzter Erfolg",
+      "role": "error"
+    },
+    {
+      "id": "result-unavailable",
+      "from": "result",
+      "to": "unavailable",
+      "label": "kein Erfolg / BT aus",
+      "role": "error"
+    }
+  ]
+}
