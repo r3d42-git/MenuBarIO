@@ -6,6 +6,8 @@
 
 [**Projektverlauf / Project History**](https://r3d42-git.github.io/MenuBarIO/)
 
+[**Architektur-Atlas / Architecture Atlas**](https://r3d42-git.github.io/MenuBarIO/architecture/) · [English](https://r3d42-git.github.io/MenuBarIO/architecture/en/)
+
 MenuBarIO is a native macOS menu-bar utility for inspecting connected USB,
 Thunderbolt, USB4 and Bluetooth hardware.
 
