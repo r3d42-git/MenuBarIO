@@ -64,7 +64,7 @@ maintained independently.
 
 ## Compatibility
 
-The current release, **MenuBarIO 0.7.1**, is a **Universal** app for Apple
+The current release, **MenuBarIO 0.7.2**, is a **Universal** app for Apple
 Silicon (`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. Automated
 checks run natively on both architectures. The physical Intel-Mac observations
 and the hardware cases that still apply after discovery changes are documented
@@ -164,7 +164,7 @@ MenuBarIO selbst wird unabhängig entwickelt und gepflegt.
 
 ## Kompatibilität
 
-Der aktuelle Release **MenuBarIO 0.7.1** ist eine **Universal-App** für
+Der aktuelle Release **MenuBarIO 0.7.2** ist eine **Universal-App** für
 Apple-Silicon- (`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die
 automatischen Prüfungen laufen nativ auf beiden Architekturen. Die physischen
 Beobachtungen auf einem Intel-Mac und die nach Änderungen an der

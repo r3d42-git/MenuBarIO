@@ -128,6 +128,15 @@ After every change to IOKit discovery, check them once:
     IDs, stable internal IDs, usernames and paths must be absent. Check the
     separate USB, Bluetooth and Thunderbolt-port context-menu copies as well.
 
+### MenuBarIO 0.7.2 acceptance — 2026-09-15
+
+Xcode 27.0 / macOS 27.0 SDK: 106 tests, static analysis and the Universal
+archive passed after replacing the unimportable deprecated USB-port macro
+with its identical registry key. The signed ad-hoc Debug app launched. The
+maintainer subsequently confirmed the appearance was good and authorized
+publication. Agent UI automation timed out for this build; no additional
+physical replug, Intel/MacBook or clean-Mac acceptance is claimed.
+
 ### MenuBarIO 0.7.1 acceptance and release exception — 2026-09-05
 
 The local gate passed 106 tests, static analysis and the Universal archive.

@@ -324,7 +324,9 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
     static func directUSBHostConnectorNumber(portProperties: [String: Any]) -> Int? {
         // UsbCPortNumber is the physical socket ordinal, unlike PortNumber,
         // the USB location ID or a Thunderbolt router's controller number.
-        guard let number = (portProperties[kUSBHostPortPropertyUsbCPortNumber] as? NSNumber)?.intValue,
+        // The macOS 27 SDK's deprecated macro no longer imports into Swift.
+        // Read its unchanged registry key when present; absent evidence stays unassigned.
+        guard let number = (portProperties["UsbCPortNumber"] as? NSNumber)?.intValue,
             number > 0
         else { return nil }
         return number
