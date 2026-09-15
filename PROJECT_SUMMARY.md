@@ -24,6 +24,49 @@ author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
 
+## Published MenuBarIO 0.7.2 — 2026-09-15
+
+- Release: [MenuBarIO v0.7.2](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.7.2),
+  immutable annotated tag at `aab8f894b65532a614e01c24eeba7a22374a6469`,
+  integrated through [PR #34](https://github.com/r3d42-git/MenuBarIO/pull/34).
+- Asset: [MenuBarIO-0.7.2-mac.dmg](https://github.com/r3d42-git/MenuBarIO/releases/download/v0.7.2/MenuBarIO-0.7.2-mac.dmg),
+  3,161,432 bytes, plus `.dmg.sha256`. SHA-256:
+  `833c76c0e3c6c5b6587216000f9d15a653468b6805e9fc29444230d4914d83b5`.
+- Version 0.7.2/build 13, Xcode 27.0 (`27A266a`), macOS 27.0 SDK,
+  Universal arm64/x86_64, macOS 13+, bundle `de.r3d.menubarusb.tb`.
+  Developer ID Application: Philipp John Hild (`G6JH37W285`), Hardened Runtime.
+- App notarization `3325b4fa-cf10-4df7-91f0-3e0c1b82f689`: Accepted;
+  app ticket stapled and validated before packaging.
+  DMG notarization `8904fff8-46e2-4504-8516-18e94f3209da`: independently
+  Accepted; final DMG ticket stapled and validated.
+- Full local preflight and release gates passed, including 106 tests,
+  static analysis and Universal archives. PR #34 passed both native macOS
+  jobs and Pages. The exact release commit passed native arm64/Intel CI in
+  [run 34939233366](https://github.com/r3d42-git/MenuBarIO/actions/runs/34939233366)
+  and Pages build/deploy/public verification in
+  [run 34939233380](https://github.com/r3d42-git/MenuBarIO/actions/runs/34939233380).
+- The repository release and publish wrappers passed. An additional fresh
+  download matched local bytes, sizes and GitHub SHA-256 digests for both
+  assets. Its DMG and enclosed app passed strict signatures, both tickets,
+  Gatekeeper, version, architectures, entitlements and exact license/source
+  material. The extracted public app retained its signature and ticket;
+  build 13 and `macosx27.0` were verified before the local launch check.
+- Finder inspection of the final DMG showed the app, Programme link, arrow
+  and all four license/source files. The read-only inspection mount was
+  detached before publication. macOS 27 emits hdiutil deprecation warnings;
+  all packaging and verification commands still succeed. A future packaging
+  maintenance change can evaluate diskutil image commands with older-host
+  compatibility tests; no release workaround was necessary.
+- The maintainer accepted the new build's appearance and publication.
+  Physical direct-USB replug, Intel/MacBook and fresh clean-Mac installation
+  were not newly exercised for this SDK correction.
+
+Artifacts and logs are retained in `.release/0.7.2/`, including
+`verification/`, `independent-download/` and `public-app/`. Release work used
+an isolated local checkout at `/private/tmp/menubario-072-release` to preserve
+unrelated archive-cleanup edits in the primary checkout. This evidence is a
+separate documentation change; the published tag remains fixed.
+
 ## MenuBarIO 0.7.2 release preparation — 2026-09-15
 
 Maintenance release for building with Xcode 27 / macOS 27 SDK. The USB socket
