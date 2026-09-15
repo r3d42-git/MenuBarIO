@@ -64,11 +64,15 @@ maintained independently.
 
 ## Compatibility
 
-The current release, **MenuBarIO 0.7.2**, is a **Universal** app for Apple
-Silicon (`arm64`) and Intel (`x86_64`) Macs running macOS 13 or newer. Automated
-checks run natively on both architectures. The physical Intel-Mac observations
-and the hardware cases that still apply after discovery changes are documented
-in [TESTING.md](TESTING.md).
+**MenuBarIO 0.8.0** requires an
+Apple-Silicon Mac (`arm64`) with **macOS 15 or newer**. This checkout and its
+CI/build/release scripts use that baseline.
+
+[MenuBarIO 0.7.2](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.7.2)
+remains the last regular Universal release for Intel Macs and macOS 13/14.
+It stays available unchanged. Critical fixes for that version may be evaluated
+individually; regular Intel feature updates are no longer planned.
+Hardware acceptance is documented in [TESTING.md](TESTING.md).
 
 The legacy bundle identifier `de.r3d.menubarusb.tb` is intentionally retained
 so existing installations keep their preferences and login-item identity.
@@ -164,12 +168,15 @@ MenuBarIO selbst wird unabhängig entwickelt und gepflegt.
 
 ## Kompatibilität
 
-Der aktuelle Release **MenuBarIO 0.7.2** ist eine **Universal-App** für
-Apple-Silicon- (`arm64`) und Intel-Macs (`x86_64`) mit macOS 13 oder neuer. Die
-automatischen Prüfungen laufen nativ auf beiden Architekturen. Die physischen
-Beobachtungen auf einem Intel-Mac und die nach Änderungen an der
-Geräteerkennung weiterhin erforderlichen Hardware-Abnahmen sind in
-[TESTING.md](TESTING.md) dokumentiert.
+**MenuBarIO 0.8.0** benötigt einen
+Mac mit Apple Silicon (`arm64`) und **macOS 15 oder neuer**. Dieser Checkout
+und seine CI-/Build-/Release-Skripte verwenden bereits diese Basis.
+
+[MenuBarIO 0.7.2](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.7.2)
+bleibt als letzte reguläre Universal-Version für Intel-Macs und macOS 13/14
+unverändert verfügbar. Kritische Korrekturen können im Einzelfall geprüft
+werden; regelmäßige Intel-Funktionsupdates sind nicht mehr geplant.
+Die Hardware-Abnahme ist in [TESTING.md](TESTING.md) dokumentiert.
 
 Die bisherige Bundle-ID `de.r3d.menubarusb.tb` bleibt absichtlich erhalten,
 damit vorhandene Installationen ihre Einstellungen und die Identität des

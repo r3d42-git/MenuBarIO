@@ -10,9 +10,9 @@ DERIVED_DATA_PATH="${MENUBARIO_DERIVED_DATA_PATH:-${TMPDIR:-/tmp}/menubario-deri
 APP_BUNDLE="$DERIVED_DATA_PATH/Build/Products/Debug/$APP_NAME.app"
 
 case "$TARGET_ARCHITECTURE" in
-  arm64|x86_64) ;;
+  arm64) ;;
   *)
-    echo "Unsupported macOS build architecture: $TARGET_ARCHITECTURE" >&2
+    echo "Apple Silicon is required; unsupported build architecture: $TARGET_ARCHITECTURE" >&2
     exit 2
     ;;
 esac

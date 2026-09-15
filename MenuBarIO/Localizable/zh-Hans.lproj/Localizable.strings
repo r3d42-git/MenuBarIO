@@ -42,15 +42,12 @@
 "open_profiler" = "打开系统信息";
 "close" = "关闭";
 "product_subtitle" = "适用于 macOS 的 USB、Thunderbolt、USB4 与蓝牙检查器";
-"legacy_settings" = "旧版设置";
-"legacy_settings_description" = "您正在使用已移植到 macOS Ventura 和 Sonoma 的旧版 MenuBarIO。";
 "ethernet_connected_icon" = "有活动的有线连接时显示局域网图标";
 "window_size_normal" = "默认";
 "window_size_big" = "大";
 "window_size_verybig" = "很大";
 "window_size_huge" = "巨大";
 "window_width" = "窗口宽度";
-"list_width" = "列表宽度";
 "show_charger" = "在设备列表中显示 MacBook 充电状态";
 "power_supply" = "电源";
 "charging_at_watts_format" = "正在以 %d W 充电";

@@ -14,14 +14,6 @@ struct MenuBarLabel: View {
     }
 
     private var labelImage: NSImage {
-        if #available(macOS 15.0, *) {
-            modernLabelImage
-        } else {
-            standardLabelImage
-        }
-    }
-
-    private var modernLabelImage: NSImage {
         HStack(spacing: 5) {
             if showEthernet && deviceManager.ethernetCableConnected {
                 HStack(spacing: 7) {
@@ -31,15 +23,6 @@ struct MenuBarLabel: View {
             } else {
                 Image(systemName: "cable.connector")
             }
-            countLabels
-        }
-        .fixedSize()
-        .asImage()
-    }
-
-    private var standardLabelImage: NSImage {
-        HStack(spacing: 5) {
-            Image(systemName: "cable.connector")
             countLabels
         }
         .fixedSize()

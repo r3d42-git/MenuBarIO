@@ -3,13 +3,13 @@
 ## Purpose and scope
 
 MenuBarIO is a local-only macOS menu-bar app for showing connected USB,
-Thunderbolt/USB4 and Bluetooth devices. It targets macOS 13 or newer and does
-not contain telemetry, analytics, update checks or network client code.
+Thunderbolt/USB4 and Bluetooth devices. New releases target Apple Silicon
+(arm64) and macOS 15 or newer and do not contain telemetry, analytics, update checks or network client code.
 Its product subtitle is `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-The current product version is `0.7.2` (build 13). Releases are prepared from a
-reviewed branch and integrated into protected `main` before tagging.
+The current product version is `0.8.0` (build 14). Version `0.7.2` (build 13)
+is retained for Intel and macOS 13/14. Releases are prepared from a reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target and project are named `MenuBarIO`; the test
 target is `MenuBarIOTests`. The legacy app bundle identifier
 `de.r3d.menubarusb.tb` remains
@@ -23,6 +23,45 @@ original author. There is no collaboration or affiliation with the original
 author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
+
+## MenuBarIO 0.8.0: Apple Silicon and macOS 15+ — 2026-09-15
+
+The maintainer chose Apple Silicon only and macOS 15.0 minimum from the next
+release (0.8.0). Version 0.7.2 stays available as the last regular Universal
+release for Intel and macOS 13/14; critical maintenance can be considered
+individually without promising regular Intel feature updates.
+
+- Project, app, tests and Info.plist use macOS 15.0; all Xcode configurations
+  explicitly build arm64. Release version: 0.8.0/build 14.
+- Removed the three Ventura/Sonoma legacy-settings files, their extra Window
+  scene, the settings-routing fallback and legacy menu-bar label rendering.
+  Three unused localization keys were removed in all seven languages. The
+  detail-view onChange now uses the modern zero-argument closure.
+- The local build/test scripts reject Intel hosts/architecture overrides;
+  release archives target arm64. The native Intel CI job is removed.
+  verify_platform.sh enforces exactly arm64 and macOS 15.0 in both the local
+  archive and the actual app inside the release DMG, before publication.
+- General hardware discovery and data migration remain intact. Intel-named
+  peripheral controllers are not evidence that a device is an Intel Mac.
+  The architecture atlas retains its explicitly documented historical source
+  snapshot; no automatic regeneration/publication was performed.
+- README, release instructions and active hardware/compatibility checklists
+  distinguish the new baseline from the retained historical 0.7.2 release.
+  Historical release notes, tags and DMGs are unchanged. The maintainer
+  requested publication after the local validation and open test boundaries
+  were reported. Final publication evidence follows separately.
+
+Validation: 106 tests passed with zero failures/skips on the Mac mini running
+macOS 27 with Xcode 27. Static analysis, localization/privacy audits and the
+arm64 archive passed. The final executable declares `minos 15.0` / `sdk 27.0`;
+the bundle minimum is also 15.0. The platform guard accepted the new app and
+rejected the historical Universal app and a fixture with a macOS 13 minimum;
+the test wrapper rejected an x86_64 override before building. The Debug app
+launched through script/build_and_run.sh --verify. UI automation timed out;
+visual acceptance and a physical macOS 15 runtime test remain open.
+Evidence: `/private/tmp/menubario-080-platform-check/`,
+`/private/tmp/menubario-080-platform-final.log` and
+`/private/tmp/menubario-080-launch.log`.
 
 ## Published MenuBarIO 0.7.2 — 2026-09-15
 
@@ -58,8 +97,12 @@ the preserved source history.
   maintenance change can evaluate diskutil image commands with older-host
   compatibility tests; no release workaround was necessary.
 - The maintainer accepted the new build's appearance and publication.
-  Physical direct-USB replug, Intel/MacBook and fresh clean-Mac installation
-  were not newly exercised for this SDK correction.
+  After publication, the maintainer also confirmed successful testing on an
+  Intel MacBook. Its OS version and individual test cases were not specified;
+  this is user-reported physical acceptance, separate from automated CI.
+  A fresh clean-Mac installation and specific direct-USB replug cases remain
+  unverified. The release policy above supersedes the original Universal
+  baseline; this published artifact remains unchanged.
 
 Artifacts and logs are retained in `.release/0.7.2/`, including
 `verification/`, `independent-download/` and `public-app/`. Release work used
