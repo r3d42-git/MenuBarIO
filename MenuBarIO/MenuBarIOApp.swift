@@ -46,16 +46,6 @@ struct MenuBarIOApp: App {
             )
         }
         .menuBarExtraStyle(.window)
-
-        Window("settings", id: "legacy_settings") {
-            LegacySettingsView()
-                .appColorScheme(.dark)
-                .environment(\.locale, appLanguage.locale)
-                .environmentObject(deviceManager)
-                .environmentObject(bluetoothManager)
-                .id(appLanguage.id)
-        }
-        .windowStyle(.hiddenTitleBar)
     }
 
     private var appLanguage: AppLanguage {

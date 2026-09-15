@@ -42,15 +42,12 @@
 "open_profiler" = "システム情報を開く";
 "close" = "閉じる";
 "product_subtitle" = "macOS用USB・Thunderbolt・USB4・Bluetoothインスペクタ";
-"legacy_settings" = "レガシー設定";
-"legacy_settings_description" = "MenuBarIOのレガシーバージョンを使用しています。基本的に、macOS Sequoia以前のmacOSバージョンに対応したバージョンです。レガシーバージョンを使用すると、一部の機能（継承、アイコンのカスタマイズなど）にはアクセスできませんが、ほとんどの場合、アプリは完全に使用可能です。";
 "ethernet_connected_icon" = "有線接続が有効なときにLANアイコンを表示";
 "window_size_normal" = "標準";
 "window_size_big" = "大";
 "window_size_verybig" = "とても大きい";
 "window_size_huge" = "巨大";
 "window_width" = "ウィンドウ幅";
-"list_width" = "リスト幅";
 "show_charger" = "MacBookの充電状態をデバイスリストに表示";
 "power_supply" = "電源";
 "charging_at_watts_format" = "%d Wで充電中";

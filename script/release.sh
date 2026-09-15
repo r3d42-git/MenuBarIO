@@ -14,9 +14,8 @@ VERSION="$1"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PRODUCT_NAME="MenuBarIO"
 BUNDLE_IDENTIFIER="de.r3d.menubarusb.tb"
-# Distribution is deliberately Universal. Do not make this configurable: a
-# release must contain both supported Mac architectures.
-ARCHITECTURES="arm64 x86_64"
+# New releases require Apple Silicon and macOS 15+.
+ARCHITECTURES="arm64"
 VOLUME_NAME="$PRODUCT_NAME installieren"
 RELEASE_DIR="${MENUBARIO_RELEASE_DIR:-$ROOT_DIR/.release/$VERSION}"
 ARCHIVE_PATH="$RELEASE_DIR/$PRODUCT_NAME.xcarchive"
@@ -74,9 +73,7 @@ fi
 codesign -d --entitlements :- "$APP_PATH" > "$ENTITLEMENTS_PATH" 2>/dev/null
 bash "$ROOT_DIR/script/verify_entitlements.sh" "$ENTITLEMENTS_PATH"
 
-for architecture in $ARCHITECTURES; do
-  lipo "$APP_PATH/Contents/MacOS/$PRODUCT_NAME" -verify_arch "$architecture"
-done
+"$ROOT_DIR/script/verify_platform.sh" "$APP_PATH"
 
 # Notarize and staple the app before it is copied into the installer. The DMG
 # receives its own independent ticket after packaging.

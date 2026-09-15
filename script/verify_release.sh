@@ -13,7 +13,6 @@ PRODUCT_NAME="MenuBarIO"
 BUNDLE_IDENTIFIER="de.r3d.menubarusb.tb"
 TEAM_IDENTIFIER="G6JH37W285"
 APPLICATIONS_LINK_NAME="Programme"
-ARCHITECTURES="arm64 x86_64"
 MOUNT_DIR=""
 ENTITLEMENTS_PATH=""
 
@@ -69,9 +68,7 @@ ENTITLEMENTS_PATH="$(mktemp /private/tmp/menubario-release-entitlements.XXXXXX)"
 codesign -d --entitlements :- "$APP_PATH" > "$ENTITLEMENTS_PATH" 2>/dev/null
 bash "$ROOT_DIR/script/verify_entitlements.sh" "$ENTITLEMENTS_PATH"
 
-for architecture in $ARCHITECTURES; do
-  lipo "$APP_PATH/Contents/MacOS/$PRODUCT_NAME" -verify_arch "$architecture"
-done
+"$ROOT_DIR/script/verify_platform.sh" "$APP_PATH"
 
 APP_VERSION="$(plutil -extract CFBundleShortVersionString raw "$APP_PATH/Contents/Info.plist")"
 if [[ "$APP_VERSION" != "$VERSION" ]]; then

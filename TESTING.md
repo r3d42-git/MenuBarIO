@@ -9,7 +9,7 @@
 The command uses an isolated DerivedData directory and runs:
 
 - the deployment-target audit: every project, app and test configuration must
-  declare macOS 13.0;
+  declare macOS 15.0;
 - the privacy audit: no telemetry, update checks or network client code;
 - the localization audit for valid syntax, matching locale keys, duplicate keys
   and unused literal keys;
@@ -17,19 +17,13 @@ The command uses an isolated DerivedData directory and runs:
 - the XCTest suite for device identity, device grouping, formatting, refresh
   coordination, migration and settings boundaries;
 - the Xcode Static Analyzer for the Release configuration;
-- a Release app containing both Apple-Silicon (`arm64`) and Intel (`x86_64`)
-  slices; `lipo` verifies both slices in the resulting executable.
+- an Apple-Silicon-only Release app; `script/verify_platform.sh` verifies exactly
+  `arm64` and macOS 15.0 in the built app bundle.
 
 The unit tests intentionally run without a debug signature: they test pure
 model and data logic, and the unsigned local test host avoids a Gatekeeper
 dialog. This does not affect the signed and notarized product delivered to
 users, which is verified separately by the release script.
-
-The current Xcode toolchain reports that its bundled XCTest support libraries
-were built for macOS 14 when the test bundle declares macOS 13. This toolchain
-warning concerns only Apple's non-shipping test runtime. The application target
-still builds for macOS 13, and runtime compatibility remains covered by the
-separate macOS 13/14 smoke test below.
 
 For an app-launch smoke test only:
 
@@ -37,11 +31,11 @@ For an app-launch smoke test only:
 ./script/build_and_run.sh --verify
 ```
 
-GitHub Actions runs the same checks natively on an Apple-Silicon runner and an
-Intel runner for pull requests and every push to `main`. The local XCTest run
-uses the architecture of the current Mac; it can be selected explicitly with
-`MENUBARIO_TEST_ARCH=arm64` or `MENUBARIO_TEST_ARCH=x86_64` when that native
-architecture is available.
+GitHub Actions runs the same checks natively on an Apple-Silicon runner for
+pull requests and every push to `main`. Local tests also require Apple Silicon.
+Intel is no longer a target from 0.8.0 onward; 0.7.2 remains the last regular
+Universal release. Historical acceptance records below describe their original
+release scope and do not impose Intel/macOS 13/14 checks on new releases.
 
 ## CI recovery
 
@@ -50,8 +44,8 @@ does not create them after a short wait, close and reopen the pull request to
 issue a regular `pull_request` event again. The workflow also supports a
 manual dispatch from the Actions page (or `gh workflow run ci.yml --ref
 BRANCH`) as a non-administrative fallback. In either case, merge only after
-both the `verify` and `verify-intel` checks have completed successfully for the
-pull request commit.
+`verify` and all required checks have completed successfully for the pull
+request commit.
 
 ## Hardware acceptance before a release
 
@@ -73,7 +67,7 @@ After every change to IOKit discovery, check them once:
    once. Occupied ports show the attached device, actual protocol and negotiated
    speed; an empty port shows its maximum capability instead.
    Connect a USB2 device and a USB3 stick directly to each host socket on Apple
-   Silicon and Intel. With an explicit `UsbCPortNumber`, each must occupy that
+   Silicon. With an explicit `UsbCPortNumber`, each must occupy that
    socket with its USB rate, disappear from Other USB Devices and count once.
    Check the detail path, then unplug/move it and verify that the previous port
    clears. Native Thunderbolt/dock assignments must retain priority. If the
@@ -99,9 +93,8 @@ After every change to IOKit discovery, check them once:
    cable icon may appear only when a wired link is active and must not initiate
    a network connection from the app.
 11. For a release that changes device discovery, repeat the applicable cases
-   1–10 on an Intel Mac. If the required Intel Mac or device is unavailable,
-   record the approved exception in the release notes instead of claiming
-   physical acceptance that was not performed.
+   on the supported Apple-Silicon hardware. Record unavailable hardware cases
+   explicitly rather than claiming acceptance that was not performed.
 12. On a MacBook with charging-status display enabled, connect a known power
    adapter while the battery is actively charging. The row should show battery
    percentage, live charging watts and adapter watts when macOS provides them.
@@ -112,8 +105,8 @@ After every change to IOKit discovery, check them once:
     use the footer refresh button. It must show a compact progress state, avoid
     overlapping work and update USB/Thunderbolt, Bluetooth, power and Ethernet
     together. Put the Mac to sleep and wake it again; the same refresh must run
-    without restarting the app. Repeat the physical sleep/wake case on Apple
-    Silicon and the supported Intel/T2 Mac.
+    without restarting the app. Repeat the physical sleep/wake case on an Apple-Silicon desktop and
+    an Apple-Silicon MacBook.
 14. Temporarily make one discovery source unavailable. The last successfully
     discovered devices must remain visible with a stale-data notice; a valid
     empty result must still show zero devices. Turning Bluetooth off must show
@@ -128,14 +121,26 @@ After every change to IOKit discovery, check them once:
     IDs, stable internal IDs, usernames and paths must be absent. Check the
     separate USB, Bluetooth and Thunderbolt-port context-menu copies as well.
 
+### MenuBarIO 0.8.0 development validation — 2026-09-15
+
+106 tests, static analysis, all source audits and the arm64-only archive passed
+on macOS 27 with Xcode 27. Both Mach-O and bundle metadata declare macOS 15.0.
+The platform guard rejected a Universal binary and incorrect minimum-version
+metadata; the test wrapper rejected x86_64. Debug launch passed. UI automation
+timed out, and a real macOS 15 runtime test remains pending. The maintainer subsequently requested publication with these test boundaries
+stated; release signing/notarization evidence is recorded in PROJECT_SUMMARY.md.
+
 ### MenuBarIO 0.7.2 acceptance — 2026-09-15
 
 Xcode 27.0 / macOS 27.0 SDK: 106 tests, static analysis and the Universal
 archive passed after replacing the unimportable deprecated USB-port macro
 with its identical registry key. The signed ad-hoc Debug app launched. The
 maintainer subsequently confirmed the appearance was good and authorized
-publication. Agent UI automation timed out for this build; no additional
-physical replug, Intel/MacBook or clean-Mac acceptance is claimed.
+publication. Agent UI automation timed out for this build. After publication,
+the maintainer also reported successful testing on an Intel MacBook; the OS
+version and individual cases were not specified. This adds physical Intel
+acceptance without claiming a fresh clean-Mac installation or specific replug
+coverage.
 
 ### MenuBarIO 0.7.1 acceptance and release exception — 2026-09-05
 
@@ -184,15 +189,11 @@ Regression checklist:
 
 ### Compatibility smoke tests
 
-- On macOS 15 or newer, verify the integrated settings view, the menu-bar
-  presentation, language switching, launch at login and device refresh.
-- On macOS 13 or 14, verify the separate legacy settings window, the legacy
-  menu-bar presentation, language switching, launch at login and device
-  refresh. No control may look active when its function is unavailable.
-- The declared deployment target and Universal slices are automated checks;
-  these runtime smoke tests remain required because current SDK testing cannot
-  emulate the complete menu-bar, login-item and physical-hardware behavior of
-  an older macOS installation.
+- On Apple Silicon with macOS 15 and the current macOS, verify integrated
+  settings, menu-bar presentation, language switching, launch at login,
+  report export and device refresh.
+- The architecture and minimum version are checked automatically. A current
+  SDK build does not replace a real macOS 15 runtime test.
 
 ### Approved MenuBarIO 0.6.0 release exception — 2026-09-01
 
@@ -326,7 +327,7 @@ license in the freshly mounted DMG.
 Der Befehl verwendet ein isoliertes DerivedData-Verzeichnis und führt aus:
 
 - die Deployment-Target-Prüfung: jede Projekt-, App- und Testkonfiguration muss
-  macOS 13.0 deklarieren;
+  macOS 15.0 deklarieren;
 - die Datenschutzprüfung: keine Telemetrie, Update-Abfragen oder
   Netzwerk-Client-Code;
 - die Lokalisierungsprüfung auf gültige Syntax, identische Schlüssel je
@@ -335,20 +336,13 @@ Der Befehl verwendet ein isoliertes DerivedData-Verzeichnis und führt aus:
 - die XCTest-Tests für Geräteidentität, Gerätegruppierung, Formatierung,
   Aktualisierungskoordination, Migration und Einstellungsgrenzen;
 - den Xcode Static Analyzer für die Release-Konfiguration;
-- eine Release-App mit Apple-Silicon- (`arm64`) und Intel-Slice (`x86_64`);
-  `lipo` prüft beide Slices in der erzeugten ausführbaren Datei.
+- eine reine Apple-Silicon-Release-App; `script/verify_platform.sh` prüft exakt
+  `arm64` und macOS 15.0 im erzeugten App-Bundle.
 
 Die Unit-Tests laufen bewusst ohne Debug-Signatur: Sie prüfen reine
 Modell- und Datenlogik, und der unsignierte lokale Test-Host vermeidet einen
 Gatekeeper-Dialog. Das signierte, notarisiert ausgelieferte Produkt wird davon
 nicht berührt und wird im Release-Skript separat geprüft.
-
-Die aktuelle Xcode-Toolchain weist darauf hin, dass ihre mitgelieferten
-XCTest-Unterstützungsbibliotheken für macOS 14 gebaut wurden, obwohl das
-Test-Bundle macOS 13 deklariert. Diese Toolchain-Warnung betrifft nur Apples
-nicht ausgelieferte Testlaufzeit. Das App-Target wird weiterhin für macOS 13
-gebaut; die Laufzeitkompatibilität deckt zusätzlich der separate
-macOS-13-/14-Starttest weiter unten ab.
 
 Zum reinen Starttest der App:
 
@@ -357,10 +351,10 @@ Zum reinen Starttest der App:
 ```
 
 GitHub Actions führt dieselben Prüfungen bei Pull Requests und jedem Push auf
-`main` nativ auf einem Apple-Silicon- und einem Intel-Runner aus. Die lokalen
-XCTest-Tests verwenden die Architektur des aktuellen Macs; sie kann mit
-`MENUBARIO_TEST_ARCH=arm64` beziehungsweise `MENUBARIO_TEST_ARCH=x86_64`
-ausdrücklich gewählt werden, wenn diese Architektur nativ verfügbar ist.
+`main` nativ auf einem Apple-Silicon-Runner aus. Auch lokale Tests benötigen
+Apple Silicon. Ab 0.8.0 ist Intel kein Ziel mehr; 0.7.2 bleibt die letzte reguläre
+Universal-Version. Historische Abnahmen weiter unten gelten für ihre damaligen
+Releases, nicht als Intel-/macOS-13/14-Prüfpflicht für neue Versionen.
 
 ## CI-Wiederherstellung
 
@@ -370,7 +364,7 @@ Pull Request schließen und wieder öffnen, damit erneut ein reguläres
 `pull_request`-Ereignis ausgelöst wird. Der Workflow unterstützt zusätzlich
 einen manuellen Start über die Actions-Seite (oder `gh workflow run ci.yml
 --ref BRANCH`) als nicht-administrativen Fallback. In beiden Fällen erst
-mergen, wenn die Checks `verify` und `verify-intel` für den Pull-Request-Commit
+mergen, wenn `verify` und alle Pflichtprüfungen für den Pull-Request-Commit
 erfolgreich abgeschlossen sind.
 
 ## Hardware-Abnahme vor einem Release
@@ -394,7 +388,7 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
    genau einmal erscheinen. Belegte Ports zeigen Gerät, tatsächliches Protokoll
    und ausgehandelte Geschwindigkeit; ein freier Port stattdessen seine
    maximale Fähigkeit.
-   Auf Apple Silicon und Intel ein USB2-Gerät und einen USB3-Stick direkt an
+   Auf Apple Silicon ein USB2-Gerät und einen USB3-Stick direkt an
    jedem Hostanschluss prüfen. Bei expliziter `UsbCPortNumber` muss das Gerät
    dort mit seiner USB-Rate erscheinen, aus **Weitere USB-Geräte** verschwinden
    und genau einmal zählen. Detailpfad kontrollieren, dann ab-/umstecken: Die
@@ -423,11 +417,9 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
 10. Falls die Ethernet-Anzeige aktiviert ist: Einstellung zweimal ein- und
    ausschalten. Das Kabelsymbol darf nur bei aktivem kabelgebundenem Link
    erscheinen und darf keine Netzwerkverbindung der App auslösen.
-11. Bei einem Release mit Änderungen an der Geräteerkennung die zutreffenden
-   Fälle 1–10 auf einem Intel-Mac wiederholen. Falls der benötigte Intel-Mac oder
-   ein Gerät nicht verfügbar ist, die genehmigte Ausnahme in den Release Notes
-   dokumentieren, statt eine nicht durchgeführte physische Abnahme zu
-   behaupten.
+11. Bei Änderungen an der Geräteerkennung die zutreffenden Fälle auf der
+   unterstützten Apple-Silicon-Hardware wiederholen. Nicht verfügbare
+   Hardware-Fälle ausdrücklich als ungeprüft dokumentieren.
 12. Auf einem MacBook mit aktivierter Ladestatusanzeige bei aktiv ladendem Akku
    ein bekanntes Netzteil anschließen. Die Zeile soll Akkustand, aktuelle
    Ladeleistung und Netzteilleistung zeigen, sofern macOS die Werte liefert. Bei
@@ -440,8 +432,8 @@ werden. Nach jeder Änderung an der IOKit-Erkennung einmal prüfen:
     USB/Thunderbolt, Bluetooth, Stromversorgung und Ethernet gemeinsam
     aktualisieren. Den Mac anschließend in den Ruhezustand versetzen und wieder
     aufwecken; dieselbe Aktualisierung muss ohne App-Neustart erfolgen. Diesen
-    physischen Sleep/Wake-Fall auf Apple Silicon und dem unterstützten
-    Intel-/T2-Mac wiederholen.
+    physischen Sleep/Wake-Fall auf einem Apple-Silicon-Desktop und einem
+    Apple-Silicon-MacBook wiederholen.
 14. Eine Erkennungsquelle vorübergehend nicht verfügbar machen. Die zuletzt
     erfolgreich erkannten Geräte müssen mit einem Hinweis auf möglicherweise
     veraltete Daten sichtbar bleiben; ein gültiges leeres Ergebnis zeigt
@@ -488,17 +480,11 @@ stehen oben unter „MenuBarIO 0.7.0 acceptance“.
 
 ### Kompatibilitäts-Starttests
 
-- Unter macOS 15 oder neuer die integrierte Einstellungsansicht, die
-  Menüleistendarstellung, Sprachumschaltung, Start bei Anmeldung und
-  Geräteaktualisierung prüfen.
-- Unter macOS 13 oder 14 das separate klassische Einstellungsfenster, die
-  ältere Menüleistendarstellung, Sprachumschaltung, Start bei Anmeldung und
-  Geräteaktualisierung prüfen. Kein Bedienelement darf aktiv wirken, wenn
-  seine Funktion nicht verfügbar ist.
-- Das deklarierte Deployment Target und die Universal-Slices werden
-  automatisiert geprüft. Die Laufzeit-Starttests bleiben nötig, weil das
-  aktuelle SDK das vollständige Verhalten von Menüleiste, Anmeldeobjekt und
-  physischer Hardware unter einer älteren macOS-Installation nicht emuliert.
+- Auf Apple Silicon mit macOS 15 und aktuellem macOS integrierte Einstellungen,
+  Menüleiste, Sprachumschaltung, Anmeldeobjekt, Berichtsexport und Aktualisierung
+  prüfen.
+- Architektur und Mindestversion werden automatisch geprüft. Ein Build mit dem
+  aktuellen SDK ersetzt keinen echten Laufzeittest unter macOS 15.
 
 ### Genehmigte Release-Ausnahme für MenuBarIO 0.6.0 — 01.09.2026
 

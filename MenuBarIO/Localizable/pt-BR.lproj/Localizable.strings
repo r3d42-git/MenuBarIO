@@ -42,15 +42,12 @@
 "open_profiler" = "Abrir Informações do Sistema";
 "close" = "Fechar";
 "product_subtitle" = "Inspetor de USB, Thunderbolt, USB4 e Bluetooth para macOS";
-"legacy_settings" = "Ajustes (Legacy)";
-"legacy_settings_description" = "Você está usando a versão legada do MenuBarIO, adaptada para macOS Ventura e Sonoma.";
 "ethernet_connected_icon" = "Mostrar um ícone LAN para conexões cabeadas ativas";
 "window_size_normal" = "Padrão";
 "window_size_big" = "Grande";
 "window_size_verybig" = "Gigante";
 "window_size_huge" = "Máximo";
 "window_width" = "Largura da janela";
-"list_width" = "Largura da lista";
 "show_charger" = "Mostrar o estado de carregamento do MacBook na lista de dispositivos";
 "power_supply" = "Fonte de energia";
 "charging_at_watts_format" = "Carregando a %d W";

@@ -1,12 +1,12 @@
-# MenuBarIO 0.7.2 — Corresponding source / Zugehöriger Quellcode
+# MenuBarIO 0.8.0 — Corresponding source / Zugehöriger Quellcode
 
 License / Lizenz: GPL-3.0-or-later
 
 Exact public source tag / Exakter öffentlicher Quellcode-Tag:
-https://github.com/r3d42-git/MenuBarIO/tree/v0.7.2
+https://github.com/r3d42-git/MenuBarIO/tree/v0.8.0
 
 Source archive / Quellcodearchiv:
-https://github.com/r3d42-git/MenuBarIO/archive/refs/tags/v0.7.2.tar.gz
+https://github.com/r3d42-git/MenuBarIO/archive/refs/tags/v0.8.0.tar.gz
 
 Build instructions and project-native scripts are included in README.md,
 RELEASE.md and script/ at that tag. The complete source is available from

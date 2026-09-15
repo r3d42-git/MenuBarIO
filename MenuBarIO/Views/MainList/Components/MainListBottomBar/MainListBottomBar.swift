@@ -12,21 +12,12 @@ struct MainListBottomBar: View {
     @EnvironmentObject var manager: USBDeviceManager
     @EnvironmentObject private var bluetoothManager: BluetoothDeviceManager
     @EnvironmentObject private var refreshCoordinator: HardwareRefreshCoordinator
-    @Environment(\.openWindow) private var openWindow
 
     @Binding var currentWindow: AppWindow
     @State private var exportFeedbackToken: UUID?
 
     private var isRefreshing: Bool {
         manager.sourceStatus.isRefreshing || bluetoothManager.sourceStatus.isRefreshing
-    }
-
-    private func goToSettings() {
-        if #available(macOS 15.0, *) {
-            currentWindow = .settings
-        } else {
-            openWindow(id: "legacy_settings")
-        }
     }
 
     private func exportReport() {
@@ -92,7 +83,7 @@ struct MainListBottomBar: View {
             .accessibilityLabel(Text(exportFeedbackToken == nil ? "export_report" : "report_saved"))
 
             Button {
-                goToSettings()
+                currentWindow = .settings
             } label: {
                 Label("settings", systemImage: "gearshape")
                     .font(.subheadline.weight(.medium))

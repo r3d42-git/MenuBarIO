@@ -50,22 +50,22 @@ under **Sign-In and Security → App-Specific Passwords**; do not put it in a
 shell history, file, patch, or repository. Apple documents this credential
 flow in its [notarization guide](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).
 
-Run the Universal release with only values appropriate to this fork:
+Run the Apple-Silicon release with only values appropriate to this fork:
 
 ```bash
 MENUBARIO_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
 ./script/release.sh VERSION
 ```
 
-The release script always archives **both** executable slices: Apple Silicon
-(`arm64`) and Intel (`x86_64`). It verifies each slice before packaging, and
-the CI workflow runs the XCTest suite natively on both architectures. Version
-0.1.1 was Apple-Silicon-only; releases from 0.1.2 onward, including the current
-MenuBarIO 0.7.2 release, are Universal. When a release changes device discovery,
-complete
-the applicable hardware acceptance cases in [`TESTING.md`](TESTING.md),
-including the Intel-Mac cases, or record an explicit release exception if a
-required device is not available.
+Starting with 0.8.0, the release script archives only **arm64**, with a
+**macOS 15.0** minimum. `script/verify_platform.sh` rejects additional slices
+or an incorrect minimum OS in both the archive and the app inside the DMG.
+CI runs on Apple Silicon. Hardware acceptance uses Apple-Silicon Macs,
+including an Apple-Silicon MacBook for charging tests.
+
+The published Universal 0.7.2 remains available for Intel and macOS 13/14.
+Use the scripts from its immutable tag when verifying its historical artifact;
+this checkout's platform verifier intentionally enforces the new baseline.
 
 The release script aborts when uncommitted or nonignored untracked files exist,
 runs the XCTest suite and static analysis, then verifies the separately stapled
@@ -138,23 +138,22 @@ Sicherheit → App-spezifische Passwörter** erzeugen; es nicht in der
 Shell-Historie, Datei, einem Patch oder Repository ablegen. Apple dokumentiert
 diesen Ablauf in seinem [Notarisierungsleitfaden](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).
 
-Den Universal-Release nur mit für diesen Fork geeigneten Werten ausführen:
+Den Apple-Silicon-Release nur mit für diesen Fork geeigneten Werten ausführen:
 
 ```bash
 MENUBARIO_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
 ./script/release.sh VERSION
 ```
 
-Das Release-Skript archiviert immer **beide** ausführbaren Slices: Apple
-Silicon (`arm64`) und Intel (`x86_64`). Es prüft jeden Slice vor dem Paketbau;
-der CI-Ablauf führt die XCTest-Suite nativ auf beiden Architekturen aus.
-Version 0.1.1 war ausschließlich für Apple Silicon bestimmt; die Releases ab
-0.1.2 einschließlich des aktuellen Releases MenuBarIO 0.7.2 sind
-Universal-Versionen.
-Wenn ein Release die Geräteerkennung ändert, die zutreffenden
-Hardware-Abnahmefälle in [`TESTING.md`](TESTING.md) einschließlich der
-Intel-Mac-Fälle ausführen oder eine ausdrückliche Release-Ausnahme
-dokumentieren, falls ein benötigtes Gerät nicht verfügbar ist.
+Ab 0.8.0 archiviert das Release-Skript ausschließlich **arm64** mit
+**macOS 15.0** als Mindestversion. `script/verify_platform.sh` weist weitere
+Architekturen oder eine falsche Mindestversion sowohl im Archiv als auch in
+der App im DMG zurück. CI läuft auf Apple Silicon. Die Hardware-Abnahme
+verwendet Apple-Silicon-Macs, einschließlich eines MacBooks für Ladetests.
+
+Die veröffentlichte Universal-Version 0.7.2 bleibt für Intel und macOS 13/14
+verfügbar. Für die Prüfung ihres historischen Artefakts die Skripte aus dem
+unveränderlichen Tag verwenden; der aktuelle Verifier erzwingt die neue Basis.
 
 Das Release-Skript bricht bei nicht committeten oder nicht ignorierten
 unversionierten Dateien ab, führt die XCTest-Suite und die statische Analyse

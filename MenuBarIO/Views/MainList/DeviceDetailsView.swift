@@ -64,7 +64,7 @@ struct DeviceDetailsView: View {
                 refreshButton.padding(14)
             }
         }
-        .onChange(of: content?.copyText) { _ in copied = false }
+        .onChange(of: content?.copyText) { copied = false }
         .task(id: copied) {
             guard copied else { return }
             try? await Task.sleep(nanoseconds: 1_500_000_000)
