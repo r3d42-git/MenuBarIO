@@ -8,7 +8,7 @@ not contain telemetry, analytics, update checks or network client code.
 Its product subtitle is `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-The current product version is `0.7.1` (build 12). Releases are prepared from a
+The current product version is `0.7.2` (build 13). Releases are prepared from a
 reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target and project are named `MenuBarIO`; the test
 target is `MenuBarIOTests`. The legacy app bundle identifier
@@ -23,6 +23,95 @@ original author. There is no collaboration or affiliation with the original
 author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
+
+## MenuBarIO 0.7.2 release preparation — 2026-09-15
+
+Maintenance release for building with Xcode 27 / macOS 27 SDK. The USB socket
+lookup uses the same registry key directly because the SDK's deprecated C
+macro no longer imports into Swift. No port inference or permission changes.
+The maintainer confirmed that the new build looked good and requested the
+complete publication. macOS 13 deployment, Universal arm64/x86_64, bundle
+identity and the existing app/DMG notarization contract are retained.
+Physical direct-USB replug, Intel/MacBook and clean-Mac checks were not newly
+performed for this source-equivalent SDK correction. Publication evidence
+will follow separately without moving the release tag.
+
+## macOS 27 compatibility review — 2026-09-15
+
+Reviewed source `251c926dd236693dfd861a48d2155f4730161a5f` after the
+maintainer reported an uneventful app test following the OS upgrade.
+The initial runtime review found no mandatory change with the previous SDK.
+The subsequent Xcode 27 build exposed the SDK compatibility issue below.
+
+### Xcode 27 follow-up — 2026-09-15
+
+After the toolchain update, Xcode 27.0 (`27A266a`) and macOS 27.0 SDK were
+confirmed active. The first fresh build failed because
+`kUSBHostPortPropertyUsbCPortNumber` no longer imports into Swift: the SDK
+header now prefixes the macro with `IOUSBHOST_PROPERTY_DEPRECATED`, a
+`_Pragma` expression unsupported by the Swift macro importer.
+
+`USBDeviceDiscovery.directUSBHostConnectorNumber` now reads the identical
+`"UsbCPortNumber"` dictionary key directly, with a comment explaining the SDK
+boundary. Existing behavior is preserved: only positive explicit socket
+numbers are used; missing evidence remains unassigned. The SDK marks this
+property deprecated, so future availability must not be assumed. A read-only
+IOService snapshot on this Mac contained no such key; physical direct-USB
+replug acceptance remains open. No replacement socket inference was added.
+
+After this focused change, the complete `script/verify.sh` gate passed:
+106 tests, zero failures/skips, Release static analysis, all audits and the
+signed ad-hoc Universal arm64/x86_64 archive. Existing tests cover the exact
+key, missing evidence and nonpositive values. No new test-only warnings beyond
+the previously recorded warnings were identified.
+`script/build_and_run.sh --verify` also passed, and the running process was
+confirmed at `/private/tmp/menubario-xcode27-review/Build/Products/Debug/MenuBarIO.app`.
+Native UI inspection of this new build timed out, so its SDK-dependent visual,
+picker, keyboard and save-panel acceptance remains open. The earlier visible
+UI checks below apply to the installed release only.
+
+Evidence: `/private/tmp/menubario-xcode27-initial-build-failure.log`,
+`/private/tmp/menubario-xcode27-verify.log`,
+`/private/tmp/menubario-xcode27-launch.log` and
+`/private/tmp/menubario-xcode27-review/`. No version bump, commit or release.
+
+### Initial check with Xcode 26.6
+
+- Local environment: Mac mini, arm64, macOS 27.0 (`26A428`), Xcode 26.6
+  (`17F113`) with macOS 26.5 SDK. This verifies operation on macOS 27;
+  compilation with Xcode 27 / macOS 27 SDK remains unverified.
+- `script/verify.sh` passed all 106 tests with zero failures or skips,
+  Release static analysis, privacy/localization/format/deployment audits,
+  and the ad-hoc signed Universal arm64/x86_64 archive with license checks.
+  The initial sandbox attempt could not write Xcode's module cache; the same
+  command passed in the permitted local execution context. Existing test-only
+  warnings concern the weak-reference declaration and XCTest's macOS 14
+  runtime versus the project's macOS 13 deployment target.
+- The installed `/Applications/MenuBarIO.app`, version 0.7.1/build 12, was
+  inspected through the native UI: nine devices, three occupied host ports,
+  three dock ports, USB devices and a Bluetooth battery value were visible.
+  Refresh completed; ASM1352R-Fast details showed 10 Gbps and the path through
+  Mac Port 3 / Anker Dock Port 2. Escape returned to the list. Settings opened
+  with readable controls and the existing macOS 27 Ethernet note. This UI
+  evidence belongs to the installed release, not the newly built archive.
+- Reviewed Apple's [macOS 27 release notes](https://developer.apple.com/documentation/macos-release-notes/macos-27-release-notes)
+  and [Xcode 27 release notes](https://developer.apple.com/documentation/xcode-release-notes/xcode-27-release-notes)
+  against the app's IOKit discovery/notifications, Bluetooth reads, local
+  Ethernet monitoring, login item, SwiftUI state and AppKit export/appearance.
+  Reduced context-menu icon visibility is expected system behavior; the app's
+  actions retain text labels. No matching mandatory migration was identified.
+  The app already includes native arm64 code. Retain macOS 13 deployment and
+  the Intel slice for supported older systems.
+- Follow-up when Xcode 27 is available: run the same gate against its SDK and
+  repeat menu/picker, appearance, keyboard and save-panel checks because some
+  framework behavior changes depend on the SDK used to link the app.
+  This review did not newly exercise physical replug, sleep/wake, MacBook
+  charging, login registration, permission-denied cases or other Macs.
+
+Local evidence: `/private/tmp/menubario-macos27-verify.log` and
+`/private/tmp/menubario-macos27-review/` (including the XCTest result bundle
+and verification archive). App code, product version and release artifacts
+were unchanged; pre-existing local edits were preserved.
 
 ## Code-backed architecture atlas — 2026-09-06
 
