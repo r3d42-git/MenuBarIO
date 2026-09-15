@@ -24,6 +24,43 @@ author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
 
+## Published MenuBarIO 0.8.0 — 2026-09-15
+
+- Published [v0.8.0](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.8.0),
+  version 0.8.0/build 14, from immutable tag commit
+  `8dd245531a6a09a77f82a4561ada3d6219b910a5` after PR #36 and required checks.
+- `MenuBarIO-0.8.0-mac.dmg`: 2,789,004 bytes; SHA256
+  `47c3f698a1bf2d2ebf6647f4c81ad2d98e140bd1f414c8a2d3798a098c902024`.
+  The release also contains its checksum file. Version 0.7.2 remains available
+  unchanged for Intel and macOS 13/14.
+- Verified arm64 only, macOS 15.0 minimum, SDK 27.0, bundle identifier
+  `de.r3d.menubarusb.tb`; signed with Developer ID Application: Philipp John Hild
+  (`G6JH37W285`), Hardened Runtime and the existing sandbox entitlements.
+- Apple accepted app submission `d3d584f7-4eec-4ec1-ac41-42b4169f3bf0`
+  and DMG submission `89d0b6bb-1b85-42ea-94d7-6026db8f4d81`.
+  Both tickets were stapled and validated. Signature and Gatekeeper checks
+  passed for the final DMG and its enclosed app.
+- Native release wrappers completed successfully. A second independent public
+  download matched local bytes, GitHub asset sizes and GitHub SHA256 digests.
+  `script/verify_release.sh` passed again on that downloaded DMG, including
+  platform, image integrity, signing, tickets, Gatekeeper, GPL, upstream notice
+  and exact source reference checks for the installer and app resources.
+- Local validation passed 106 tests (zero failures/skips), static analysis,
+  localization/privacy checks and archive. Required PR checks passed. Exact
+  release-commit [macOS CI](https://github.com/r3d42-git/MenuBarIO/actions/runs/34945705792)
+  and [Pages CI](https://github.com/r3d42-git/MenuBarIO/actions/runs/34945705845)
+  also passed.
+- Finder visual inspection of the final installer confirmed the app,
+  Applications alias, installation arrow and all four license/source files.
+  macOS 27 hdiutil deprecation warnings did not affect verification.
+- Debug launch passed; app UI automation timed out. New app visual acceptance,
+  physical macOS 15 runtime acceptance and clean-Mac installation remain open;
+  these limits were disclosed before the maintainer requested publication.
+- Final artifacts, notarization records, public download and verification logs
+  are retained locally under `.release/0.8.0/`. Publication used an isolated
+  checkout to preserve unrelated local archive-ignore and historical handoff
+  edits. This separate documentation follow-up does not move the release tag.
+
 ## MenuBarIO 0.8.0: Apple Silicon and macOS 15+ — 2026-09-15
 
 The maintainer chose Apple Silicon only and macOS 15.0 minimum from the next
