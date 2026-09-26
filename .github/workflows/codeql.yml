@@ -28,7 +28,9 @@ jobs:
       matrix:
         include:
           - language: swift
-            runner: macos-15
+            # CodeQL tracing uses Intel tooling; cross-compile the arm64 app.
+            # Native app tests continue on Apple Silicon in ci.yml.
+            runner: macos-15-intel
             build-mode: manual
           - language: javascript-typescript
             runner: ubuntu-latest
@@ -49,7 +51,7 @@ jobs:
       - name: Build Swift app without signing credentials
         if: matrix.language == 'swift'
         run: |
-          xcodebuild build -quiet \
+          xcodebuild build \
             -project MenuBarIO.xcodeproj \
             -scheme MenuBarIO \
             -configuration Debug \
