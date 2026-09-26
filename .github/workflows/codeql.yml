@@ -53,9 +53,9 @@ jobs:
             -project MenuBarIO.xcodeproj \
             -scheme MenuBarIO \
             -configuration Debug \
-            -destination 'platform=macOS,arch=arm64' \
+            -destination 'generic/platform=macOS' \
             -derivedDataPath "$RUNNER_TEMP/codeql-derived-data" \
-            CODE_SIGNING_ALLOWED=NO
+            ARCHS=arm64 ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO
       - name: Analyze
         uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
         with:
