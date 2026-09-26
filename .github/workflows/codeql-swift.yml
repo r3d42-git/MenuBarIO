@@ -1,0 +1,46 @@
+name: Optional Swift CodeQL analysis
+
+# Expensive initial extraction: opt in explicitly, never delay normal PRs.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-swift:
+    name: Optional Swift analysis
+    runs-on: macos-15-intel
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
+        with:
+          languages: swift
+          build-mode: manual
+          queries: security-extended
+      - name: Build ARM64 app for analysis
+        run: |
+          xcodebuild build \
+            -project MenuBarIO.xcodeproj \
+            -scheme MenuBarIO \
+            -configuration Debug \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath "$RUNNER_TEMP/codeql-derived-data" \
+            ARCHS=arm64 ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO
+      - name: Analyze into an on-demand report
+        uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
+        with:
+          # Keep the optional scan out of the mandatory code-scanning baseline.
+          upload: false
+          output: ${{ runner.temp }}/swift-codeql-report
+      - name: Save report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: swift-codeql-report
+          path: ${{ runner.temp }}/swift-codeql-report/*.sarif
+          if-no-files-found: error
+          retention-days: 7

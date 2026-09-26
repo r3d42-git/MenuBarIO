@@ -74,7 +74,12 @@ anything.
 
 After reviewing and pushing the release commit and its annotated `vVERSION`
 tag, publish the DMG, its checksum and the versioned release notes. The script
-then independently re-checks the exact GitHub download with:
+creates a draft, downloads and verifies both uploaded files, then
+publishes it and independently verifies a fresh download again. New releases
+use GitHub release immutability: published assets and their tag cannot be
+replaced or deleted. A failed draft verification leaves the draft unpublished
+for inspection. Correct a published artifact through a new version, not by
+replacing an existing asset. Run:
 
 ```bash
 ./script/publish_release.sh VERSION
@@ -162,8 +167,14 @@ und die App in genau diesem DMG. Es lädt nichts hoch.
 
 Nach Prüfung und Push des Release-Commits und seines annotierten Tags
 `vVERSION` das DMG, seine Prüfsumme und die versionsbezogenen Release Notes
-veröffentlichen. Das Skript prüft danach den exakten GitHub-Download
-unabhängig erneut mit:
+veröffentlichen. Das Skript erstellt einen Entwurf, lädt beide hochgeladenen
+Dateien zur
+Prüfung herunter und veröffentlicht erst danach. Ein frischer Download wird
+anschließend erneut geprüft. Für neue Releases gilt GitHubs Unveränderlichkeit:
+Veröffentlichte Dateien und Tags können nicht ersetzt oder gelöscht werden.
+Bei fehlgeschlagener Entwurfsprüfung bleibt der Entwurf unveröffentlicht zur
+Untersuchung erhalten. Korrekturen veröffentlichter Artefakte benötigen eine
+neue Version. Aufruf:
 
 ```bash
 ./script/publish_release.sh VERSION
