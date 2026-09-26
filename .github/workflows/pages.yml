@@ -1,13 +1,8 @@
 name: Verify and publish GitHub Pages
 
 on:
+  # Required branch check: run for every PR, including dependency updates.
   pull_request:
-    paths:
-      - website/**
-      - docs/architecture/**
-      - README.md
-      - PROJECT_SUMMARY.md
-      - .github/workflows/pages.yml
   push:
     branches: [main]
     paths:
@@ -20,8 +15,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: github-pages
@@ -35,8 +28,10 @@ jobs:
       run:
         working-directory: website
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 22.13.0
           cache: npm
@@ -46,26 +41,32 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
       - run: npm run check:artifact
-      - uses: actions/configure-pages@v6
-      - uses: actions/upload-pages-artifact@v5
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: website/dist
 
   deploy:
     name: Deploy GitHub Pages site
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     needs: build-site
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 22.13.0
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5
       - name: Verify public routes and assets
         run: node website/scripts/verify-public.mjs "${{ steps.deployment.outputs.page_url }}"

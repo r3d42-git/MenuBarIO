@@ -34,6 +34,8 @@ fi
 PRODUCT_VERSION="$(sed -nE 's/.*MARKETING_VERSION = ([0-9.]+);/\1/p' MenuBarIO.xcodeproj/project.pbxproj | sort -u)"
 ./script/verify_license_material.sh "$ROOT_DIR" "$PRODUCT_VERSION"
 
+python3 -B -m unittest discover -s script/tests -p "test_*.py"
+
 ./script/privacy_audit.sh
 ./script/localization_audit.sh
 swiftc -typecheck script/generate_dmg_background.swift

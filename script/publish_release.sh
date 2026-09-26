@@ -81,27 +81,39 @@ gh release create "$TAG" "$DMG_PATH" "$CHECKSUM_PATH" \
   --repo "$REPOSITORY" \
   --title "$PRODUCT_NAME $VERSION" \
   --notes-file "$RELEASE_NOTES_PATH" \
-  --verify-tag
+  --verify-tag \
+  --draft
 
+# Validate uploaded bytes before publishing locks the tag and assets.
+# On failure the draft is retained for inspection; no release is published.
 DOWNLOAD_DIR="$(mktemp -d /private/tmp/menubario-release-download.XXXXXX)"
-gh release download "$TAG" \
-  --repo "$REPOSITORY" \
-  --pattern "$(basename "$DMG_PATH")" \
-  --pattern "$(basename "$CHECKSUM_PATH")" \
-  --dir "$DOWNLOAD_DIR"
+verify_download() {
+  local phase="$1"
+  local target_dir="$DOWNLOAD_DIR/$phase"
+  mkdir -p "$target_dir"
+  gh release download "$TAG" \
+    --repo "$REPOSITORY" \
+    --pattern "$(basename "$DMG_PATH")" \
+    --pattern "$(basename "$CHECKSUM_PATH")" \
+    --dir "$target_dir"
 
-DOWNLOADED_DMG="$DOWNLOAD_DIR/$(basename "$DMG_PATH")"
-DOWNLOADED_CHECKSUM="$DOWNLOAD_DIR/$(basename "$CHECKSUM_PATH")"
-DOWNLOADED_SHA256="$(shasum -a 256 "$DOWNLOADED_DMG" | awk '{print $1}')"
-if [[ "$DOWNLOADED_SHA256" != "$LOCAL_SHA256" ]]; then
-  echo "Downloaded artifact digest does not match the locally verified DMG." >&2
-  exit 1
-fi
-(
-  cd "$DOWNLOAD_DIR"
-  shasum -a 256 -c "$(basename "$DOWNLOADED_CHECKSUM")"
-)
+  local DOWNLOADED_DMG="$target_dir/$(basename "$DMG_PATH")"
+  local DOWNLOADED_CHECKSUM="$target_dir/$(basename "$CHECKSUM_PATH")"
+  local DOWNLOADED_SHA256="$(shasum -a 256 "$DOWNLOADED_DMG" | awk '{print $1}')"
+  if [[ "$DOWNLOADED_SHA256" != "$LOCAL_SHA256" ]]; then
+    echo "Downloaded artifact digest does not match the locally verified DMG." >&2
+    exit 1
+  fi
+  (
+    cd "$target_dir"
+    shasum -a 256 -c "$(basename "$DOWNLOADED_CHECKSUM")"
+  )
 
-"$ROOT_DIR/script/verify_release.sh" "$VERSION" "$DOWNLOADED_DMG"
+  cmp "$CHECKSUM_PATH" "$DOWNLOADED_CHECKSUM"
+  "$ROOT_DIR/script/verify_release.sh" "$VERSION" "$DOWNLOADED_DMG"
+}
+verify_download draft
+gh release edit "$TAG" --repo "$REPOSITORY" --draft=false
+verify_download published
 
 echo "Published and independently verified: $REPOSITORY $TAG"
