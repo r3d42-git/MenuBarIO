@@ -112,7 +112,7 @@ Diese Tests wurden für die Dokumentation gelesen, nicht erneut ausgeführt. Die
 - `specs/en/`: aus den deutschen Spezifikationen erzeugte englische Varianten.
 - `01-…07-*.html` und `en/01-…07-*.html`: die eigenständigen Diagramme in beiden Sprachen.
 - `index.html`, `en/index.html` und `atlas.css`: zweisprachige Pages-Startseiten mit neuen Tabs für die Diagramme; die CSS-Vorlage wird in die beiden HTML-Dateien eingebettet.
-- `tools/generate-english-specs.mjs`, `tools/inline-atlas-styles.mjs` und `tools/sanitize-pages-diagrams.mjs`: reproduzierbare Übersetzungsspezifikationen, eingebettete Startseiten-Styles und das Entfernen externer Font-Anfragen aus den gelieferten HTML-Dateien.
+- `tools/generate-english-specs.mjs`, `tools/inline-atlas-styles.mjs` und `tools/sanitize-pages-diagrams.mjs`: reproduzierbare Übersetzungsspezifikationen, eingebettete Startseiten-Styles und das Entfernen externer Font-Anfragen sowie die Absicherung der Fokus-IDs aus URL-Fragmenten in den gelieferten HTML-Dateien.
 - `*.visual-check.json`, `*.visual-check.html`, `*.png`: Browsermessungen und Screenshots der jeweils gelieferten Bytes.
 - `receipts/*-validation.json` und `*-delivery.json`: 9 Showcase-Prüfungen, Kompositionsdiagnostik, SHA-256 und Bytegröße je Spezifikation und HTML.
 - `receipts/handoff.json`: zusammengefasste Übergabe mit separatem automatischem Browserstatus und bildgestützter Sichtprüfung.
@@ -134,3 +134,9 @@ Bei der Erstellung wurden zu breite Workflow-Entwürfe für Batterie und Release
 ### Abschließender Prüfstatus
 
 Alle sieben finalen HTML-Dateien bestanden jeweils 9/9 Showcase-Prüfungen mit null Fehlern und Warnungen. Sechs bestanden zusätzlich `visual-check` in vier Desktopgrößen und mit Screenshots in beiden Farbschemata. Beim finalen Refresh-Diagramm brach die automatische Chrome-Prüfung mit einem Lade-Timeout ab. Auf Wunsch des Nutzers wurden weitere Chrome-Starts wegen Schlüsselbunddialogen eingestellt. Die integrierte Codex-Vorschau bestätigte für dieses Diagramm in Hell und Dunkel die vollständige Fenstercontainment bei 1440×900, 1600×1000, 1920×1080 und 2048×1320; eine vollständige dunkle Ansicht wurde bildgestützt geprüft. Der automatische Status bleibt ausdrücklich `failed`, die ergänzende Prüfung steht in `receipts/03-manual-browser.json`. Es wurde keine Schlüsselbundfreigabe erteilt.
+
+### Sicherheitskorrektur der Diagrammbedienung
+
+Der Nachbearbeitungsschritt prüft Fokus-IDs gegen tatsächlich vorhandene Knoten und verwendet `Set` für die Auswahl. Unbekannte geerbte Eigenschaftsnamen werden damit nicht als Knoten behandelt. Die Regressionstests unter `website/scripts/diagram-security.test.mjs` prüfen alle 14 Dateien einschließlich kodierter Eingaben, Mehrfachauswahl und Umschalten; sie laufen mit `npm run check:artifact` im Website-Verzeichnis. Der Nachbearbeitungsschritt ist wiederholbar und bricht bei einer unbekannten Runtime-Struktur ab.
+
+Die vorhandenen visuellen Prüfbelege und Prüfsummen dokumentieren die damalige Auslieferung vor dieser Runtime-Korrektur; sie sind keine Prüfsummen der jetzt korrigierten HTML-Dateien. Layout und Spezifikationen wurden durch diese Korrektur nicht geändert.

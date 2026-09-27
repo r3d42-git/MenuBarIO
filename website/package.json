@@ -11,7 +11,7 @@
     "lint": "oxlint src scripts vite.config.ts",
     "typecheck": "tsc --noEmit",
     "build": "vite build",
-    "check:artifact": "node scripts/verify-site.mjs",
+    "check:artifact": "node --test scripts/diagram-security.test.mjs && node scripts/verify-site.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
