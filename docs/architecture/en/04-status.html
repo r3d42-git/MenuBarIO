@@ -8550,11 +8550,11 @@
           Archify.routeProbe.clear({ updateUrl: false, restoreFocus: false });
         }
         var nodeList = nodes();
-        var byId = {};
+        var byId = Object.create(null);
         nodeList.forEach(function (node) { byId[node.getAttribute('data-node-id')] = node; });
         var normalized = [];
         (ids || []).forEach(function (id) {
-          if (byId[id] && normalized.indexOf(id) === -1) normalized.push(id);
+          if (typeof id === 'string' && Object.prototype.hasOwnProperty.call(byId, id) && normalized.indexOf(id) === -1) normalized.push(id);
         });
         if (!normalized.length) return false;
         if (normalized.length === activeIds.length && normalized.every(function (id, index) { return activeIds[index] === id; }) && options.toggle !== false) {
@@ -8564,27 +8564,26 @@
 
         clear({ updateUrl: false, preserveView: true });
         activeIds = normalized;
-        var selected = {};
-        var related = {};
+        var selected = new Set(normalized);
+        var related = new Set(normalized);
         var seenEdges = {};
         var matchedEdges = 0;
-        normalized.forEach(function (id) { selected[id] = true; related[id] = true; });
         var selectionMode = options.mode === 'selection' || normalized.length > 1;
 
         edges().forEach(function (edge) {
           var from = edge.getAttribute('data-edge-from');
           var to = edge.getAttribute('data-edge-to');
-          var match = selectionMode ? selected[from] && selected[to] : selected[from] || selected[to];
+          var match = selectionMode ? selected.has(from) && selected.has(to) : selected.has(from) || selected.has(to);
           if (!match) return;
           edge.setAttribute('data-focus-match', '');
-          if (!selectionMode) { related[from] = true; related[to] = true; }
+          if (!selectionMode) { related.add(from); related.add(to); }
           var edgeKey = edge.getAttribute('data-edge-key') || (from + '\u0000' + to + '\u0000' + (edge.getAttribute('data-edge-label') || ''));
           if (!seenEdges[edgeKey]) { seenEdges[edgeKey] = true; matchedEdges += 1; }
         });
         nodeList.forEach(function (node) {
           var nodeId = node.getAttribute('data-node-id');
-          if (related[nodeId]) node.setAttribute('data-focus-match', '');
-          if (selected[nodeId]) {
+          if (related.has(nodeId)) node.setAttribute('data-focus-match', '');
+          if (selected.has(nodeId)) {
             node.setAttribute('data-focus-selected', '');
             node.setAttribute('aria-pressed', 'true');
           }
