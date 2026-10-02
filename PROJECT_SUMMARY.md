@@ -8,7 +8,7 @@ Thunderbolt/USB4 and Bluetooth devices. New releases target Apple Silicon
 Its product subtitle is `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-The source is prepared for `0.8.1` (build 15), not yet published. Version
+The current published product version is `0.8.1` (build 15). Version
 `0.7.2` (build 13) is retained for Intel and macOS 13/14. Releases are prepared from a reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target and project are named `MenuBarIO`; the test
 target is `MenuBarIOTests`. The legacy app bundle identifier
@@ -24,11 +24,13 @@ author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
 
-## Prepared MenuBarIO 0.8.1 — not yet published
+## Abgeschlossener G2-Release 0.8.1 — 2026-10-02
 
-- Both Xcode app configurations now specify version 0.8.1/build 15; the arm64 and macOS 15 baseline is unchanged. No app behavior changed.
-- The release script defaults to the valid G2 Developer ID fingerprint `D548540E7FE1BD9B3C4518CC02D8786E1BFEB885`, preserves `MENUBARIO_SIGNING_IDENTITY`, and checks availability before verification and archive work. `SOURCE.md` names the exact planned `v0.8.1` source tag required by the license-material verifier.
-- Bilingual notes are prepared in `RELEASE_NOTES/0.8.1.md`. The pending `.gitignore` and historical archive handoff record are included in the proposed source change. Protected-main review, tests, signed build, notarization, tag, GitHub release and public download verification remain outstanding; v0.8.0 remains the latest published release.
+- [0.8.1](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.8.1) veröffentlicht, unveränderlicher annotierter Tag `v0.8.1` auf `362c34827df0b1aadcff8b372783034e20cf5c28`. App-Funktionen bleiben unverändert.
+- Native Releaseprüfungen und exakte Quellcommit-CI [Run 36973859646](https://github.com/r3d42-git/MenuBarIO/actions/runs/36973859646) erfolgreich. Beide Apple-Submission-IDs `22c10434-0eb8-45fb-a168-f9a98a3b2eb2 / 8e3f60d6-3a90-4b9d-a906-75bd0ae1d23a` sind Accepted; App und DMG tragen eigene gültige Staple-Tickets.
+- Frischer GitHub-Download besteht Container-/strikte Signaturprüfung, Architektur-/Bundle-Metadaten, bytegenaue Lizenzmaterialprüfung, Stapling und Gatekeeper. Zusätzliche Leaf-Prüfung bestätigt exakt G2 `D548540E7FE1BD9B3C4518CC02D8786E1BFEB885` für App und DMG.
+- `MenuBarIO-0.8.1-mac.dmg`; SHA-256 `3ab6edfde56ee334ea36f5f7aaaa16236c6e90516a916e86584d70da37d06ddd` stimmt lokal, mit GitHub-Download/-Digest und Sidecar überein. Version/Build `0.8.1/15`, Bundle-ID `de.r3d.menubarusb.tb`.
+- Abschlussbelege erfolgen in separatem Dokumentationscommit; der Release-Tag wird nicht bewegt. Keine neue manuelle UI-Abnahme abgeleitet.
 
 ## Published MenuBarIO 0.8.0 — 2026-09-15
 
