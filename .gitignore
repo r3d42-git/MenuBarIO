@@ -16,6 +16,7 @@ build/
 *.p8
 *.mobileprovision
 .release/
+/Archiv/
 
 # Keep the reproducible Codex Run action, ignore other local Codex state.
 .codex/*

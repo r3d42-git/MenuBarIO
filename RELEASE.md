@@ -50,10 +50,11 @@ under **Sign-In and Security → App-Specific Passwords**; do not put it in a
 shell history, file, patch, or repository. Apple documents this credential
 flow in its [notarization guide](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).
 
+The default identity is the G2 certificate with SHA-1 fingerprint `D548540E7FE1BD9B3C4518CC02D8786E1BFEB885`. Set `MENUBARIO_SIGNING_IDENTITY` only to override it; prefer a fingerprint over a certificate name when names match.
+
 Run the Apple-Silicon release with only values appropriate to this fork:
 
 ```bash
-MENUBARIO_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
 ./script/release.sh VERSION
 ```
 
@@ -143,10 +144,11 @@ Sicherheit → App-spezifische Passwörter** erzeugen; es nicht in der
 Shell-Historie, Datei, einem Patch oder Repository ablegen. Apple dokumentiert
 diesen Ablauf in seinem [Notarisierungsleitfaden](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).
 
+Standard ist das G2-Zertifikat mit SHA-1-Fingerabdruck `D548540E7FE1BD9B3C4518CC02D8786E1BFEB885`. `MENUBARIO_SIGNING_IDENTITY` überschreibt diese Auswahl; bei gleichen Zertifikatsnamen den Fingerabdruck verwenden.
+
 Den Apple-Silicon-Release nur mit für diesen Fork geeigneten Werten ausführen:
 
 ```bash
-MENUBARIO_SIGNING_IDENTITY='Developer ID Application: Your Name (YOURTEAMID)' \
 ./script/release.sh VERSION
 ```
 

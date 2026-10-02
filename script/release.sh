@@ -8,7 +8,8 @@ fi
 
 VERSION="$1"
 : "${MENUBARIO_TEAM_ID:=G6JH37W285}"
-: "${MENUBARIO_SIGNING_IDENTITY:?Set the Developer ID Application signing identity.}"
+# Fingerprint selects G2 when Developer ID certificates share a name.
+: "${MENUBARIO_SIGNING_IDENTITY:=D548540E7FE1BD9B3C4518CC02D8786E1BFEB885}"
 : "${MENUBARIO_NOTARY_PROFILE:=MenuBarUSB-TB-notary}"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -33,6 +34,12 @@ if [[ -n "$(git status --porcelain=v1 --untracked-files=all)" ]]; then
   echo "Commit, remove, or ignore them before creating an artifact." >&2
   exit 1
 fi
+
+IDENTITIES="$(security find-identity -v -p codesigning)"
+[[ "$IDENTITIES" == *"$MENUBARIO_SIGNING_IDENTITY"* ]] || {
+  echo "Developer ID signing identity unavailable: $MENUBARIO_SIGNING_IDENTITY" >&2
+  exit 1
+}
 
 if [[ -e "$RELEASE_DIR" ]]; then
   echo "Release directory already exists: $RELEASE_DIR" >&2

@@ -8,8 +8,8 @@ Thunderbolt/USB4 and Bluetooth devices. New releases target Apple Silicon
 Its product subtitle is `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-The current product version is `0.8.0` (build 14). Version `0.7.2` (build 13)
-is retained for Intel and macOS 13/14. Releases are prepared from a reviewed branch and integrated into protected `main` before tagging.
+The source is prepared for `0.8.1` (build 15), not yet published. Version
+`0.7.2` (build 13) is retained for Intel and macOS 13/14. Releases are prepared from a reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target and project are named `MenuBarIO`; the test
 target is `MenuBarIOTests`. The legacy app bundle identifier
 `de.r3d.menubarusb.tb` remains
@@ -23,6 +23,12 @@ original author. There is no collaboration or affiliation with the original
 author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
+
+## Prepared MenuBarIO 0.8.1 — not yet published
+
+- Both Xcode app configurations now specify version 0.8.1/build 15; the arm64 and macOS 15 baseline is unchanged. No app behavior changed.
+- The release script defaults to the valid G2 Developer ID fingerprint `D548540E7FE1BD9B3C4518CC02D8786E1BFEB885`, preserves `MENUBARIO_SIGNING_IDENTITY`, and checks availability before verification and archive work. `SOURCE.md` names the exact planned `v0.8.1` source tag required by the license-material verifier.
+- Bilingual notes are prepared in `RELEASE_NOTES/0.8.1.md`. The pending `.gitignore` and historical archive handoff record are included in the proposed source change. Protected-main review, tests, signed build, notarization, tag, GitHub release and public download verification remain outstanding; v0.8.0 remains the latest published release.
 
 ## Published MenuBarIO 0.8.0 — 2026-09-15
 
@@ -343,6 +349,29 @@ No Ethernet runtime code changed.
 Local artifacts and retained release/public-download logs are in
 `.release/0.7.1/` and `.release/0.7.1/verification/`. This evidence is added in a
 separate documentation change after publication; the release tag stays fixed.
+
+## Historical GitHub release cleanup — 2026-09-05
+
+At the maintainer's explicit request, the five MenuBarUSB-TB releases
+`v0.1.0` through `v0.1.4` and the four PortGlance releases `v0.2.0`,
+`v0.2.1`, `v0.3.0` and `v0.4.0` were archived locally and then deleted
+from GitHub. The local archive is
+`Archiv/GitHub-Releases-vor-MenuBarIO-2026-09-05/`; its README indexes the
+original DMGs, checksum sidecars, release notes, full API metadata and
+before/after Git reference snapshots. `/Archiv/` is excluded from Git.
+
+All 18 downloaded assets passed exact byte-size and GitHub SHA-256 comparisons;
+each of the nine DMGs also matched its original checksum sidecar before any
+release was deleted. `verification.json`, `cleanup-status.json` and the complete
+archive manifest `SHA256SUMS.txt` preserve the verification and cleanup evidence.
+
+The final GitHub inventory contains exactly MenuBarIO `v0.5.0`, `v0.6.0` and
+`v0.7.0`, with `v0.7.0` still latest. All twelve remote tags, all branch targets
+and the remaining release metadata were verified unchanged (download counters
+were excluded from the metadata comparison). Historical source remains available
+at its original tags; old release/DMG links recorded below are historical evidence
+and no longer active downloads. No source history, historical branding or
+historical license text was rewritten, and no new release was created.
 
 ## MenuBarIO 0.7.0 compact improvements — 2026-09-05
 
