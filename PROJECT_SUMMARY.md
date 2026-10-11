@@ -24,6 +24,30 @@ author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
 
+## Dependency maintenance — 2026-10-11
+
+- PR #42 updates the five pinned `actions/checkout` references to official
+  v7.0.1. Its merge commit `13f9fd8cef01cebb292cf2ea5632c1e2477c2c02`
+  passed macOS, Pages and CodeQL on `main`.
+- PR #39 retains the reviewed website minor/patch updates and adds
+  `@types/node` 22.20.5, matching the Node 22 Pages runtime. Dependabot ignores
+  major updates for this type package; Node 26 proposal #40 is superseded.
+- `source-map-js` is locked to 1.2.2 to address CVE-2026-93749 in the CSS build
+  dependency chain. Five focused regression/control tests cover oversized,
+  malformed and nested offsets, nested source traversal and legitimate CSS
+  maps. Three security tests fail on 1.2.1 and pass on 1.2.2; both legitimate
+  controls pass before and after. No public website parser exposure was found.
+- Local validation: clean npm installation, lint, typecheck, production build,
+  19 tests, 26 static artifacts and zero npm audit findings; complete native
+  `script/verify.sh` (tests, analysis, Apple Silicon archive) passed.
+- App version 0.8.1, published app artifacts and tags remain unchanged.
+
+Die Website-Abhängigkeiten werden mit passenden Node-22-Typdefinitionen
+aktualisiert. Die bestehende Source-Map-Schwachstelle der Buildwerkzeuge ist
+mit Version 1.2.2 und gezielten Regressionstests behoben. Dependabot schlägt
+keinen automatischen Hauptversionswechsel der Node-Typdefinitionen mehr vor.
+App-Version, veröffentlichte App-Artefakte und Release-Tags bleiben unverändert.
+
 ## Abgeschlossener G2-Release 0.8.1 — 2026-10-02
 
 - [0.8.1](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.8.1) veröffentlicht, unveränderlicher annotierter Tag `v0.8.1` auf `362c34827df0b1aadcff8b372783034e20cf5c28`. App-Funktionen bleiben unverändert.
