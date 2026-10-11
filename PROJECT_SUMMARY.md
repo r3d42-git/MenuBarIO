@@ -40,6 +40,14 @@ the preserved source history.
 - Local validation: clean npm installation, lint, typecheck, production build,
   19 tests, 26 static artifacts and zero npm audit findings; complete native
   `script/verify.sh` (tests, analysis, Apple Silicon archive) passed.
+- PR #39 merged as `1b648151cf015d0dce601571e4babeb702bfa25f` after all four
+  required GitHub checks passed. Superseded Node 26 PR #40 was closed.
+- PR #41 updates TypeScript to 7.0.2 on top of this corrected website state.
+  Local clean installation, lint, typecheck, build, all 19 tests, 26 artifact
+  checks and npm audit passed with the combined dependency set. Its generated
+  JS/CSS asset hashes match the preceding TypeScript 5.9.3 build.
+- Browser smoke checks passed for German/English page content, language
+  switching and the architecture atlas with no browser console errors.
 - App version 0.8.1, published app artifacts and tags remain unchanged.
 
 Die Website-Abhängigkeiten werden mit passenden Node-22-Typdefinitionen
