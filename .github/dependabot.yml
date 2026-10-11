@@ -7,10 +7,11 @@ updates:
       day: monday
       time: "07:00"
       timezone: Europe/Berlin
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
     groups:
       actions:
         patterns: ["*"]
+        update-types: [minor, patch]
   - package-ecosystem: npm
     directory: /website
     schedule:
@@ -18,7 +19,7 @@ updates:
       day: monday
       time: "07:00"
       timezone: Europe/Berlin
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
     # Match the Node 22 runtime pinned in pages.yml.
     ignore:
       - dependency-name: "@types/node"
