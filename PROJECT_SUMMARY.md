@@ -24,6 +24,80 @@ author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
 
+## Aktueller Abgleich und Sicherheitsscans — 2026-10-13
+
+### Synchronisierter Projektstand
+
+- Lokales `main` und `origin/main` wurden auf
+  `a76a2a6257aea7e6e97f1830ace38c9b175aac38` abgeglichen. Der zuvor lokale Stand
+  `833f9478e6d79b2e38b5b0223b74a2e460b6824f` lag drei Commits zurück; die
+  Übernahme erfolgte ohne eigenen Merge-Commit per Fast-Forward:
+  - `98dfe9b` / PR #49: Dependabot-Gruppierung und PR-Limits.
+  - `fd6cca8` / PR #51: CodeQL-Action auf v4.38.3, weiterhin per SHA fixiert.
+  - `a76a2a6` / PR #50: `lucide-react` 1.55.0, Rolldown 1.2.13 und zugehörige
+    Lockdatei-Aktualisierungen.
+- `npm ci` in `website/` hat die lokale Installation an diese Lockdatei
+  angepasst. Die zuvor noch installierte `source-map-js` 1.2.1 ist ersetzt;
+  lokal und in der Lockdatei gilt jetzt 1.2.2.
+- Am exakten Stand `a76a2a6` erfolgreich: `npm ci` (0 bekannte
+  Schwachstellen), `npm run lint`, `npm run typecheck`, `npm run build` und
+  `npm run check:artifact` mit 19/19 Tests und 26 geprüften statischen Dateien.
+- Alle 26 Dateien des lokalen Produktionsbuilds wurden online abgerufen und
+  bytegleich mit der [öffentlichen Website](https://r3d42-git.github.io/MenuBarIO/)
+  verglichen; auch die öffentlichen Routen bestanden `verify-public.mjs`.
+  Der [Pages-Lauf für diesen Commit](https://github.com/r3d42-git/MenuBarIO/actions/runs/38153797486)
+  sowie macOS-CI und CodeQL waren erfolgreich.
+- App-Quellen und Release-Skripte sind gegenüber `v0.8.1` unverändert. Die
+  lokale `.release/0.8.1/MenuBarIO-0.8.1-mac.dmg` stimmt mit dem online
+  ausgewiesenen SHA-256-Digest
+  `3ab6edfde56ee334ea36f5f7aaaa16236c6e90516a916e86584d70da37d06ddd` überein.
+  Dafür waren kein neuer Commit, Push oder App-Release erforderlich.
+- Vor dieser Dokumentation war der Arbeitsbaum sauber und ohne Abstand zu
+  `origin/main`. Dieser Handoff-Eintrag wird als separate Dokumentationsänderung
+  versioniert; App-Version und Release-Tag bleiben unverändert.
+
+### Abgeschlossene Codex-Security-Prüfungen
+
+1. **Standardscan** `12b45a50-232f-47ea-8793-d1e07a62b781` auf
+   `833f9478e6d79b2e38b5b0223b74a2e460b6824f`: **0 neue Sicherheitsbefunde**,
+   abgeschlossen und versiegelt. Geprüft wurden 253 versionierte Text-/Quelldateien
+   einschließlich nativer App, Tests, Website/Architekturdiagrammen, Build- und
+   Release-Skripten, CI und Konfiguration. 39 binäre Bild-/Fontdateien wurden
+   inventarisiert, aber nicht inhaltlich sicherheitsgeprüft.
+2. **Ergänzender Änderungsscan** `f7945d50-f195-4d07-ae5d-3d0cf554f660` für
+   `833f9478e6d79b2e38b5b0223b74a2e460b6824f..a76a2a6257aea7e6e97f1830ace38c9b175aac38`:
+   **0 neue Sicherheitsbefunde**, abgeschlossen und versiegelt. Alle fünf
+   geänderten Dateien der drei nachgezogenen Commits wurden geprüft, einschließlich
+   Dependabot-Konfiguration und Lockdatei. Der neue CodeQL-Pin wurde direkt mit
+   dem offiziellen Tag abgeglichen; CI-Berechtigungen und relevante
+   Website-Vertrauensgrenzen bleiben unverändert.
+
+Beide Prüfungen zusammen decken den synchronisierten Quellstand `a76a2a6` ab;
+der Änderungsscan ergänzt den Vollscan und ersetzt ihn nicht. Beide haben
+vollständige Abdeckung ihres dokumentierten Prüfumfangs und keine offenen
+Prüfkandidaten. Die drei historischen Befunde vom 25.08.2026 wurden zuvor als
+`closed` / `already_fixed` geschlossen: Steuer-/Bidi-Zeichen in Metadaten,
+ungültige numerische Metadaten und überlappende Hardware-Scans. Ihre Korrekturen
+aus `351cd398ee68d6af6a94bda4d3c286223e667036` bestehen im heutigen App-Code fort.
+
+Die versiegelten Berichte und kanonischen JSON-Dateien liegen lokal außerhalb
+des Repositories. Für den nächsten Chat sind dies die Einstiegspunkte:
+
+- [Standardscan-Bericht](/Users/r3d/.codex/state/plugins/codex-security/scans/MenubarUSB/833f9478e6d79b2e38b5b0223b74a2e460b6824f_20261013T071842Z_wylmn1ub/report.md)
+- [Änderungsscan-Bericht](/Users/r3d/.codex/state/plugins/codex-security/scans/MenubarUSB/a76a2a6257aea7e6e97f1830ace38c9b175aac38_20261013T074320Z_wg6oeciz/report.md)
+- Neben jedem Bericht: `scan-manifest.json`, `findings.json`, `coverage.json`
+  und `threatmodel.md`. Die absoluten Pfade gelten auf diesem Mac; sie sind
+  keine öffentlich erreichbaren Bericht-URLs.
+
+Prüfgrenzen: überwiegend statische Quellprüfung mit gezielten Regressionstests;
+keine neuen Hardware-/Fuzzingtests und kein vollständiges Audit sämtlicher
+Fremdbibliotheken oder nativer Bundler-Binärdateien. Der Standardscan enthielt
+keinen Live-Abgleich neuer Advisories; das anschließende `npm ci` meldete für die
+aktuelle Lockdatei 0 bekannte Schwachstellen. Das ist keine Garantie gegen
+unbekannte Schwachstellen. Die im unverändert übernommenen Bedrohungsmodell
+erwähnte alte lokale `node_modules`-Installation beschreibt den Zustand vor
+dem Abgleich; sie ist inzwischen aktualisiert.
+
 ## Dependency maintenance — 2026-10-11
 
 - PR #42 updates the five pinned `actions/checkout` references to official
