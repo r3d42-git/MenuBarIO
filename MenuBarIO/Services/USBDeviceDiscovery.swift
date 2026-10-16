@@ -114,6 +114,7 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
                     protocolVersion: properties?.intValue("Thunderbolt Version"),
                     device: device,
                     downstreamConnectors: thunderboltDownstreamConnectors(for: entry),
+                    activeDisplayOutputCount: activeDisplayOutputCount(for: entry),
                     usbPortMap: ThunderboltUSBPortMapEntry.entries(
                         from: properties?.dataValue("USB Port Map")
                     )
@@ -177,7 +178,8 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
                 owner: router.device,
                 hostConnectorNumber: hostConnectorNumber,
                 depth: router.depth,
-                ports: ports
+                ports: ports,
+                activeDisplayOutputCount: router.activeDisplayOutputCount
             )
         }.sorted {
             $0.hostConnectorNumber < $1.hostConnectorNumber
@@ -316,17 +318,44 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
 
         // Read only the immediate port. Walking to a root port would assign
         // downstream dock peripherals to the Mac's socket instead of the dock.
+        let properties = registryProperties(for: parent)?.values ?? [:]
+        if let number = Self.directUSBHostConnectorNumber(portProperties: properties) {
+            return number
+        }
+
+        // Newer hosts replace UsbCPortNumber with a reference to the physical
+        // IOPort. Follow that exact reference, never the logical USB PortNumber
+        // or a socket number parsed from a registry name/path.
+        guard let path = properties["UsbIOPort"] as? String,
+            path.hasPrefix("IOService:/")
+        else { return nil }
+        let physicalPort = IORegistryEntryFromPath(kIOMainPortDefault, path)
+        guard physicalPort != 0 else { return nil }
+        defer { IOObjectRelease(physicalPort) }
+        guard IOObjectConformsTo(physicalPort, "IOPort") != 0 else { return nil }
         return Self.directUSBHostConnectorNumber(
-            portProperties: registryProperties(for: parent)?.values ?? [:]
+            portProperties: properties,
+            referencedPortProperties: registryProperties(for: physicalPort)?.values
         )
     }
 
-    static func directUSBHostConnectorNumber(portProperties: [String: Any]) -> Int? {
+    static func directUSBHostConnectorNumber(
+        portProperties: [String: Any],
+        referencedPortProperties: [String: Any]? = nil
+    ) -> Int? {
         // UsbCPortNumber is the physical socket ordinal, unlike PortNumber,
         // the USB location ID or a Thunderbolt router's controller number.
         // The macOS 27 SDK's deprecated macro no longer imports into Swift.
         // Read its unchanged registry key when present; absent evidence stays unassigned.
-        guard let number = (portProperties["UsbCPortNumber"] as? NSNumber)?.intValue,
+        if let number = (portProperties["UsbCPortNumber"] as? NSNumber)?.intValue, number > 0 {
+            return number
+        }
+        guard let path = portProperties["UsbIOPort"] as? String,
+            path.hasPrefix("IOService:/"),
+            let referencedPortProperties,
+            referencedPortProperties["BuiltIn"] as? Bool == true,
+            referencedPortProperties["PortTypeDescription"] as? String == "USB-C",
+            let number = (referencedPortProperties["PortNumber"] as? NSNumber)?.intValue,
             number > 0
         else { return nil }
         return number
@@ -587,6 +616,43 @@ final class USBDeviceDiscovery: USBDeviceDiscovering {
         }
 
         return connectors.sorted { $0.hostPortNumber < $1.hostPortNumber }
+    }
+
+    private func activeDisplayOutputCount(for router: io_registry_entry_t) -> Int {
+        var iterator: io_iterator_t = 0
+        guard IORegistryEntryGetChildIterator(router, kIOServicePlane, &iterator) == KERN_SUCCESS else {
+            return 0
+        }
+        defer { IOObjectRelease(iterator) }
+        var count = 0
+        while case let port = IOIteratorNext(iterator), port != 0 {
+            defer { IOObjectRelease(port) }
+            guard let properties = registryProperties(for: port),
+                properties.intValue("Adapter Type") == 917_762
+            else { continue }
+            let hasTunnel = (properties.values["Hop Table"] as? [Any])?.isEmpty == false
+            var adapters: io_iterator_t = 0
+            guard IORegistryEntryGetChildIterator(port, kIOServicePlane, &adapters) == KERN_SUCCESS else {
+                continue
+            }
+            defer { IOObjectRelease(adapters) }
+            var isActive = false
+            while case let adapter = IOIteratorNext(adapters), adapter != 0 {
+                if let state = registryProperties(for: adapter) {
+                    isActive =
+                        isActive
+                        || DisplayPortConnectionEvidence.isActiveOutput(
+                            adapterType: properties.intValue("Adapter Type"),
+                            dpState: state.intValue("DP State"), hpdState: state.boolValue("HPD State"),
+                            establishedLaneCount: state.intValue("Established DP Lane Count"),
+                            hasTunnel: hasTunnel
+                        )
+                }
+                IOObjectRelease(adapter)
+            }
+            if isActive { count += 1 }
+        }
+        return count
     }
 
     private func firstThunderboltDeviceDescendant(
@@ -864,6 +930,7 @@ private struct ThunderboltDeviceRouterRecord {
     let protocolVersion: Int?
     let device: USBDevice
     let downstreamConnectors: [ThunderboltConnectorRecord]
+    let activeDisplayOutputCount: Int
     let usbPortMap: [ThunderboltUSBPortMapEntry]
 
     var attachment: ThunderboltDeviceAttachment {

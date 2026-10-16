@@ -24,6 +24,86 @@ author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
 
+## Lokale Port-Korrekturen auf dem neuen Mac — 2026-10-16
+
+Auslöser: `ASM1352R-Fast` erschien unter weiteren USB-Geräten, während sein
+Mac-Anschluss 2 als frei angezeigt wurde. Am Anker Thunderbolt 4 Mini Dock
+wurde auch die mit einem USB-C–DisplayPort-Kabel belegte Buchse als frei angezeigt.
+
+- Der neue Host liefert am unmittelbaren USB-Port kein `UsbCPortNumber`,
+  sondern `UsbIOPort`: einen expliziten IOService-Verweis auf den physischen
+  `IOPort`. Die Erkennung folgt diesem Verweis und liest dessen `PortNumber`
+  nur bei einem eingebauten USB-C-Port. Die bisherige Zuordnung bleibt erhalten;
+  logische USB-Portnummern, Controller-IDs und Pfadnamen werden nicht als
+  Ersatz für eine physische Portnummer interpretiert.
+- Ein mit den aktuellen Discovery-Quellen kompiliertes lokales Probeprogramm
+  bestätigte an der angeschlossenen Hardware: Host-Port 2 → `ASM1352R-Fast`,
+  5.000 Mbit/s. Anker an Host-Port 1, TDAS an 3, D1 SSD Pro an 4 sowie
+  Stream Deck Neo und Maono an Dock-Port 2/3 blieben korrekt zugeordnet.
+- Das Anker-Dock meldet einen aktiven DisplayPort-Ausgang an internem Adapter
+  13 (`HPD State=Yes`, `DP State=2`). Dieser Adapter ist keine physische
+  Buchsennummer. Das DROM beschreibt bevorzugte Tunnel-Lanes, nicht die
+  dynamische Zuordnung der zwei DP-Ausgänge zu drei Downstream-Buchsen.
+  Die konkrete Buchse 1 ist vom Nutzer bestätigt, aber in den ausgelesenen
+  Registry-Daten nicht eindeutig zugeordnet. Keine modellbezogene Zuordnung
+  und keine Ableitung aus der einzigen verbleibenden Buchse verwenden.
+- Aktive DisplayPort-Ausgänge werden jetzt am Dock angezeigt. Noch nicht
+  zugeordnete Dock-Ports erhalten bei aktivem DP-Ausgang „Belegung unbekannt“
+  statt „Frei“. Die Information erscheint auch in Details und Diagnoseexport;
+  bestehende USB-/Thunderbolt-Zuordnungen und Gerätezähler bleiben erhalten.
+  Bildschirmänderungen lösen eine um eine Sekunde verzögerte Aktualisierung aus.
+- Der Nutzer bestätigt: dieselbe Platte lief am Dock mit demselben Kabel mit
+  10 Gbit/s. Die aktuelle Direktverbindung meldet unabhängig vom App-Code
+  `UsbLinkSpeed=5000000000`, `USBSpeed=4`, `Device Speed=3`; am unmittelbaren
+  Host-Port steht außerdem `UsbHostPortLinkSpeedLimit=4`. Laut den installierten
+  IOKit-SDK-Definitionen sind dies konsistente 5-Gbit/s-Werte (Host- und
+  Legacy-Geschwindigkeitscodes sind unterschiedlich). Der Anker-USB-Hub meldet
+  aktuell 10 Gbit/s. Anschließend wechselte der Nutzer auf ein laut seiner
+  Angabe 80-Gbit/s-fähiges Kabel: direkt am Mac erneut stabil 5 Gbit/s;
+  beim Umstecken waren kurz sowohl ein 10- als auch ein 5-Gbit/s-Registry-Eintrag
+  sichtbar. Derselbe neue Aufbau am Anker-Dock meldete danach stabil
+  `UsbLinkSpeed=10000000000`, `USBSpeed=5`, `Device Speed=4`. Der Nutzer
+  bestätigte auch die 10-Gbit/s-Anzeige in der App. Die genaue Ursache der
+  Direktbegrenzung bleibt offen: keine passende veröffentlichte Regel in den
+  lokalen USB-Treiber-Plists und keine erklärende Kernelmeldung im geprüften
+  Fünf-Minuten-Fenster. Weder Kabeldefekt noch macOS-Fehler als bewiesen melden.
+  Keine Laufwerke auswerfen oder Verbindungen eigenständig ändern.
+- Endgültige, vom Nutzer gewünschte Verkabelung live bestätigt: Host-Port 2
+  ohne Gerät; ASM1352R-Fast am Anker-Dock-Port 2 mit 10 Gbit/s, Maono an
+  Dock-Port 3, aktiver DisplayPort-Ausgang und unklare Belegung an Dock-Port 1.
+  Stream Deck Neo hängt direkt am Mac (`Port-USB-A@2`, expliziter `UsbIOPort`
+  am unmittelbaren Parent) mit 480 Mbit/s. Es gehört deshalb weiterhin zur
+  USB-Geräteliste und nicht zu den Thunderbolt-Portzeilen. D1 SSD Plus (vom
+  Nutzer als das generisch benannte TDAS identifiziert) und D1 SSD Pro bleiben
+  an Host-Port 3/4 mit 40/80 Gbit/s. Eine generelle TB5-Inkompatibilität des
+  ASMedia-Gehäuses ist nicht bewiesen; beobachtet ist die geringere Rate der
+  direkten USB-Verbindung an diesem Mac.
+
+Nach der lokalen Prüfung autorisierte der Nutzer ausdrücklich Commit, Push
+und einen neuen Release. Vorbereitet ist 0.8.2 (Build 16) für Apple Silicon
+ab macOS 15; die endgültigen Veröffentlichungsbelege folgen separat.
+`/Applications/MenuBarIO.app` wird nicht automatisch ersetzt. Rohdaten und Probeprogramme
+liegen nur unter `/private/tmp/menubario-*20261016*` und werden nicht versioniert.
+Abschließende Prüfung: 110/110 Tests ohne Fehler oder übersprungene Tests,
+statische Analyse, Lokalisierungs-/Datenschutz-/Formatprüfungen und signiertes
+arm64-Prüfarchiv erfolgreich. `script/build_and_run.sh --verify` startet den
+lokalen Testbuild unter
+`/private/tmp/menubario-ports-debug-20261016/Build/Products/Debug/MenuBarIO.app`.
+Prüflog: `/private/tmp/menubario-ports-full-verify.log`; Xcode-Ergebnisse unter
+`/private/tmp/menubario-ports-full-20261016/Logs/Test/`. Der erste neue
+Diagnoseexport-Test erwartete unmaskierte Unterstriche; die Assertions wurden
+auf die bestehende Markdown-Maskierung korrigiert, dann bestand die volle Prüfung.
+Die automatisierte Sichtprüfung der Menüleisten-App scheiterte bislang am
+Computer-Use-Timeout; ein erfolgreicher Start ist keine visuelle Abnahme.
+
+Release-Vorprüfung 0.8.2: erneutes vollständiges `script/verify.sh` erfolgreich
+(`/private/tmp/menubario-082-final-check.log`), zusätzliche Codeprüfung ohne
+actionable Findings. Die G2-Signieridentität ist auf dem neuen Mac vorhanden.
+Das alte Keychain-Profil `MenuBarUSB-TB-notary` fehlt; das vorhandene `ToolBoxS`
+wurde erfolgreich mit `notarytool history` geprüft. Für diesen Release gilt
+der vorhandene per-command Override `MENUBARIO_NOTARY_PROFILE=ToolBoxS`;
+keine Änderung an Schlüsselbund, Credentials oder Skriptdefaults.
+
 ## Aktueller Abgleich und Sicherheitsscans — 2026-10-13
 
 ### Synchronisierter Projektstand

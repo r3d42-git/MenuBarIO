@@ -11,10 +11,17 @@ struct ThunderboltPortOwnerHeader: View {
                 .frame(width: 14)
                 .foregroundStyle(.secondary)
 
-            Text(group.owner.displayNameWithVendor)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(group.owner.displayNameWithVendor)
+                    .font(.caption.weight(.semibold))
+                    .lineLimit(1)
+                if group.activeDisplayOutputCount > 0 {
+                    Text("\("active_displayport_outputs".localized): \(group.activeDisplayOutputCount)")
+                        .font(.caption2)
+                        .help("displayport_connector_unknown".localized)
+                }
+            }
+            .foregroundStyle(.secondary)
 
             Spacer()
 

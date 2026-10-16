@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import IOKit
 import IOKit.usb
@@ -8,6 +9,8 @@ final class USBConnectionMonitor {
     private let onChange: () -> Void
     private var notificationPort: IONotificationPortRef?
     private var iterators: [io_iterator_t] = []
+    private var displayObserver: NSObjectProtocol?
+    private var pendingDisplayRefresh: DispatchWorkItem?
 
     init(onChange: @escaping () -> Void) {
         self.onChange = onChange
@@ -28,6 +31,16 @@ final class USBConnectionMonitor {
             CFRunLoopAddSource(CFRunLoopGetMain(), source, .defaultMode)
         }
 
+        // DP Alt Mode can change an existing router's adapter properties without
+        // creating/removing a USB or Thunderbolt service. Screen notifications
+        // trigger a fresh snapshot after the display tunnel has settled.
+        displayObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.didChangeScreenParametersNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            self?.scheduleDisplayRefresh()
+        }
+
         let classNames = USBDeviceDiscovery.usbDeviceClassNames + [Self.thunderboltClassName]
         for className in classNames {
             register(className: className, notification: kIOMatchedNotification, on: port)
@@ -36,6 +49,12 @@ final class USBConnectionMonitor {
     }
 
     func stop() {
+        pendingDisplayRefresh?.cancel()
+        pendingDisplayRefresh = nil
+        if let displayObserver {
+            NotificationCenter.default.removeObserver(displayObserver)
+            self.displayObserver = nil
+        }
         for iterator in iterators where iterator != 0 {
             IOObjectRelease(iterator)
         }
@@ -47,6 +66,15 @@ final class USBConnectionMonitor {
         }
         IONotificationPortDestroy(notificationPort)
         self.notificationPort = nil
+    }
+
+    private func scheduleDisplayRefresh() {
+        pendingDisplayRefresh?.cancel()
+        let refresh = DispatchWorkItem { [weak self] in
+            self?.onChange()
+        }
+        pendingDisplayRefresh = refresh
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: refresh)
     }
 
     private func register(
