@@ -94,3 +94,7 @@
 "group_collapsed" = "Eingeklappt";
 "last_successful_update" = "Letzte erfolgreiche Aktualisierung: %@";
 "battery_level" = "Akkustand";
+
+"port_occupancy_unknown" = "Belegung unbekannt";
+"active_displayport_outputs" = "Aktive DisplayPort-Ausgänge";
+"displayport_connector_unknown" = "DisplayPort ist an diesem Gerät aktiv. Der physische Anschluss ist nicht eindeutig zuordenbar; nicht zugeordnete Ports können belegt sein.";

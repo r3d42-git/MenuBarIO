@@ -86,7 +86,7 @@ struct ThunderboltPortRow: View {
             if isPowerSourceConnected {
                 return "\(portName) · \("power_supply".localized)"
             }
-            return "\(portName) · \("port_free".localized)"
+            return "\(portName) · \(port.unoccupiedStatusKey.localized)"
         }
         return "\(portName) · \(device.displayName)"
     }
@@ -100,6 +100,10 @@ struct ThunderboltPortRow: View {
                 )
             }
             return "power_supply".localized
+        }
+
+        if port.hasUnresolvedDisplayConnection {
+            return "displayport_connector_unknown".localized
         }
 
         var parts: [String] = []

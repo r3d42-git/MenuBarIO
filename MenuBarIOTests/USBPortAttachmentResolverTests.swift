@@ -338,6 +338,98 @@ final class USBPortAttachmentResolverTests: XCTestCase {
         XCTAssertNil(resolved.first?.connectedDevice)
     }
 
+    func testDisplayPortEvidenceRequiresEstablishedOutputTunnel() {
+        XCTAssertTrue(
+            DisplayPortConnectionEvidence.isActiveOutput(
+                adapterType: 917_762, dpState: 2, hpdState: true, establishedLaneCount: 2, hasTunnel: true))
+        for evidence in [
+            (917_762, 0, false, 0, false),  // inactive output from the live Anker snapshot
+            (917_761, 2, true, 2, true),  // DP input is not an attached display output
+            (917_762, 0, true, 2, true),
+            (917_762, 2, false, 2, true),
+            (917_762, 2, true, 0, true),
+            (917_762, 2, true, 2, false),
+        ] {
+            XCTAssertFalse(
+                DisplayPortConnectionEvidence.isActiveOutput(
+                    adapterType: evidence.0, dpState: evidence.1, hpdState: evidence.2,
+                    establishedLaneCount: evidence.3, hasTunnel: evidence.4))
+        }
+        XCTAssertFalse(
+            DisplayPortConnectionEvidence.isActiveOutput(
+                adapterType: nil, dpState: nil, hpdState: nil, establishedLaneCount: nil, hasTunnel: true))
+    }
+
+    func testActiveDisplayPortMarksOnlyUnassignedConnectorsAndDoesNotChangeCounts() {
+        let dock = makeThunderboltDevice()
+        let native = makeThunderboltDevice(name: "Native SSD")
+        let stick = makeUSBDevice(name: "Stick", productID: 1, locationID: 1)
+        let ports = [
+            makePorts()[0],
+            ThunderboltPort(
+                id: "usb", controllerID: 2, connectorNumber: 2,
+                protocolVersion: 32, maximumSpeedMbps: 40_000, connectedDevice: stick),
+            ThunderboltPort(
+                id: "native", controllerID: 2, connectorNumber: 3,
+                protocolVersion: 32, maximumSpeedMbps: 40_000, connectedDevice: native),
+        ]
+        let group = ExternalThunderboltPortGroup(
+            owner: dock, hostConnectorNumber: 1, depth: 1,
+            ports: ports, activeDisplayOutputCount: 2)
+        XCTAssertEqual(group.activeDisplayOutputCount, 2)
+        XCTAssertTrue(group.ports[0].hasUnresolvedDisplayConnection)
+        XCTAssertEqual(group.ports[0].unoccupiedStatusKey, "port_occupancy_unknown")
+        XCTAssertNil(group.ports[0].connectedDevice)  // never fabricate a physical display assignment
+        XCTAssertEqual(Array(group.ports.dropFirst()), Array(ports.dropFirst()))
+        let fullyOccupied = ExternalThunderboltPortGroup(
+            owner: dock, hostConnectorNumber: 1, depth: 1,
+            ports: Array(ports.dropFirst()), activeDisplayOutputCount: 1)
+        XCTAssertEqual(fullyOccupied.activeDisplayOutputCount, 1)
+        XCTAssertEqual(fullyOccupied.ports, Array(ports.dropFirst()))
+        XCTAssertTrue(fullyOccupied.ports.allSatisfy { !$0.hasUnresolvedDisplayConnection })
+        let groups = USBDeviceGroups(devices: [dock, native, stick], externalThunderboltPortGroups: [group])
+        XCTAssertEqual(groups.countedExternalDeviceCount, 3)
+        XCTAssertEqual(groups.portAttachedUSBDevices, [stick])
+
+        let disconnected = ExternalThunderboltPortGroup(
+            owner: dock, hostConnectorNumber: 1, depth: 1,
+            ports: group.ports, activeDisplayOutputCount: 0)
+        XCTAssertFalse(disconnected.ports[0].hasUnresolvedDisplayConnection)
+        XCTAssertEqual(disconnected.ports[0].unoccupiedStatusKey, "port_free")
+        XCTAssertEqual(Array(disconnected.ports.dropFirst()), Array(ports.dropFirst()))
+    }
+
+    func testUnresolvedDisplayOccupancyAppearsInDetailsCopyAndOverview() {
+        let dock = makeThunderboltDevice()
+        let group = ExternalThunderboltPortGroup(
+            owner: dock, hostConnectorNumber: 1, depth: 1,
+            ports: makePorts(), activeDisplayOutputCount: 1)
+        let port = group.ports[0]
+        let reportBuilder = DiagnosticReportBuilder(localize: { $0 })
+        let copy = reportBuilder.thunderboltPortDetails(port)
+        XCTAssertTrue(copy.contains("port_occupancy_unknown"))
+        XCTAssertTrue(copy.contains("displayport_connector_unknown"))
+        XCTAssertFalse(copy.contains("port_free"))
+        let details = DeviceDetailsBuilder(paths: .init(devices: [dock], hostPorts: [], externalGroups: [group]))
+        let content = details.port(port, powerConnected: false, powerWatts: nil)
+        XCTAssertTrue(content.notes.contains("displayport_connector_unknown"))
+        XCTAssertTrue(
+            content.fields.contains { $0.label == "status" && $0.value == "port_occupancy_unknown".localized })
+        XCTAssertTrue(details.usb(dock).notes.contains("displayport_connector_unknown"))
+        let now = Date(timeIntervalSince1970: 0)
+        let overview = reportBuilder.overview(
+            .init(
+                appVersion: "test", appBuild: "1", generatedAt: now, operatingSystemVersion: "macOS",
+                modelIdentifier: nil, devices: [dock], thunderboltPorts: [],
+                externalThunderboltPortGroups: [group], bluetoothDevices: [],
+                deviceSourceStatus: .ready(lastUpdated: now), bluetoothSourceStatus: .ready(lastUpdated: now),
+                powerSource: nil, powerSourceConnectorNumber: nil))
+        XCTAssertTrue(overview.contains("active_displayport_outputs"))
+        XCTAssertTrue(overview.contains("port\\_occupancy\\_unknown"))
+        XCTAssertTrue(overview.contains("displayport\\_connector\\_unknown"))
+        XCTAssertFalse(overview.contains("port_free"))
+    }
+
     private func makePorts() -> [ThunderboltPort] {
         (1...3).map { connectorNumber in
             ThunderboltPort(

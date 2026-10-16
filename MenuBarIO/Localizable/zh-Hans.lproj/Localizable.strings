@@ -94,3 +94,7 @@
 "group_collapsed" = "已折叠";
 "last_successful_update" = "上次成功更新：%@";
 "battery_level" = "电池电量";
+
+"port_occupancy_unknown" = "占用情况未知";
+"active_displayport_outputs" = "活动的DisplayPort输出";
+"displayport_connector_unknown" = "此设备上的DisplayPort已启用。无法确定具体的物理接口；未分配的端口可能正在使用。";

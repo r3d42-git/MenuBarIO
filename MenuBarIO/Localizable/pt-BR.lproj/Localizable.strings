@@ -94,3 +94,7 @@
 "group_collapsed" = "Recolhido";
 "last_successful_update" = "Última atualização bem-sucedida: %@";
 "battery_level" = "Nível da bateria";
+
+"port_occupancy_unknown" = "Ocupação desconhecida";
+"active_displayport_outputs" = "Saídas DisplayPort ativas";
+"displayport_connector_unknown" = "DisplayPort está ativo neste dispositivo. Não é possível determinar o conector físico; portas não atribuídas podem estar ocupadas.";

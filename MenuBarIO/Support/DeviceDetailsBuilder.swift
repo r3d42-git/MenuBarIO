@@ -18,21 +18,29 @@ struct DeviceDetailsBuilder {
     let paths: ConnectionPathResolver
 
     func usb(_ device: USBDevice) -> DeviceDetailContent {
-        DeviceDetailContent(
+        let displayOutputCount = activeDisplayOutputCount(for: device)
+        return DeviceDetailContent(
             title: device.displayName,
-            fields: deviceFields(device) + [pathField(paths.path(to: device))],
+            fields: deviceFields(device) + [pathField(paths.path(to: device))]
+                + (displayOutputCount > 0
+                    ? [.init(label: "active_displayport_outputs", value: "\(displayOutputCount)")] : []),
             technicalFields: technicalFields(device),
-            notes: ["link_speed_explanation"],
-            copyText: withPath(DiagnosticReportBuilder().usbDeviceDetails(device), paths.path(to: device))
+            notes: ["link_speed_explanation"] + (displayOutputCount > 0 ? ["displayport_connector_unknown"] : []),
+            copyText: withPath(
+                DiagnosticReportBuilder().usbDeviceDetails(device)
+                    + displayOutputCopy(count: displayOutputCount),
+                paths.path(to: device))
         )
     }
 
     func port(_ port: ThunderboltPort, powerConnected: Bool, powerWatts: Int?) -> DeviceDetailContent {
+        let displayOutputCount = activeDisplayOutputCount(for: port.connectedDevice)
         var fields: [DeviceDetailField] = []
         if let device = port.connectedDevice {
             fields = deviceFields(device).filter { $0.label != "port_max" }
         } else {
-            fields.append(.init(label: "status", value: (powerConnected ? "power_supply" : "port_free").localized))
+            fields.append(
+                .init(label: "status", value: (powerConnected ? "power_supply" : port.unoccupiedStatusKey).localized))
             fields.append(.init(label: "protocol", value: port.protocolDescription))
             if powerConnected, let powerWatts {
                 fields.append(.init(label: "adapter_power", value: "\(powerWatts) W"))
@@ -44,19 +52,25 @@ struct DeviceDetailsBuilder {
         if port.connectedDevice?.transport != .usb, let boost = port.bandwidthBoostSpeedMbps {
             fields.append(.init(label: "bandwidth_boost", value: USBFormatting.transferRate(boost)))
         }
+        if displayOutputCount > 0 {
+            fields.append(.init(label: "active_displayport_outputs", value: "\(displayOutputCount)"))
+        }
         fields.append(pathField(paths.path(to: port)))
         return DeviceDetailContent(
             title: "\("thunderbolt_port".localized) \(port.connectorNumber) · "
-                + (port.connectedDevice?.displayName ?? (powerConnected ? "power_supply" : "port_free").localized),
+                + (port.connectedDevice?.displayName
+                    ?? (powerConnected ? "power_supply" : port.unoccupiedStatusKey).localized),
             fields: fields,
             technicalFields: port.connectedDevice.map(technicalFields) ?? [],
             notes: ["link_speed_explanation"]
+                + (port.hasUnresolvedDisplayConnection || displayOutputCount > 0
+                    ? ["displayport_connector_unknown"] : [])
                 + (port.bandwidthBoostSpeedMbps == nil || port.connectedDevice?.transport == .usb
                     ? [] : ["bandwidth_boost_explanation"]),
             copyText: withPath(
                 DiagnosticReportBuilder().thunderboltPortDetails(
                     port, isPowerSourceConnected: powerConnected, powerSourceWatts: powerWatts
-                ), paths.path(to: port)
+                ) + displayOutputCopy(count: displayOutputCount), paths.path(to: port)
             )
         )
     }
@@ -73,6 +87,16 @@ struct DeviceDetailsBuilder {
             notes: [],
             copyText: DiagnosticReportBuilder().bluetoothDeviceDetails(device)
         )
+    }
+
+    private func activeDisplayOutputCount(for device: USBDevice?) -> Int {
+        guard let device else { return 0 }
+        return paths.externalGroups.first { $0.owner.id == device.id }?.activeDisplayOutputCount ?? 0
+    }
+
+    private func displayOutputCopy(count: Int) -> String {
+        guard count > 0 else { return "" }
+        return "\n\("active_displayport_outputs".localized): \(count)\n\("displayport_connector_unknown".localized)"
     }
 
     private func deviceFields(_ device: USBDevice) -> [DeviceDetailField] {
