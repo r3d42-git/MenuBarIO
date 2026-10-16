@@ -8,7 +8,7 @@ Thunderbolt/USB4 and Bluetooth devices. New releases target Apple Silicon
 Its product subtitle is `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-The current published product version is `0.8.1` (build 15). Version
+The current published product version is `0.8.2` (build 16). Version
 `0.7.2` (build 13) is retained for Intel and macOS 13/14. Releases are prepared from a reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target and project are named `MenuBarIO`; the test
 target is `MenuBarIOTests`. The legacy app bundle identifier
@@ -23,6 +23,54 @@ original author. There is no collaboration or affiliation with the original
 author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
+
+## Veröffentlicht: 0.8.2 — 2026-10-16
+
+- Release: [MenuBarIO v0.8.2](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.8.2),
+  veröffentlicht am 2026-10-16 um 14:48:35 UTC. Version 0.8.2, Build 16,
+  ausschließlich arm64, macOS 15+. Bundle-ID `de.r3d.menubarusb.tb`.
+- Korrekturen über [PR #55](https://github.com/r3d42-git/MenuBarIO/pull/55)
+  integriert; annotiertes Tag `v0.8.2` zeigt unverändert auf
+  `8a6a9b6136671fcc0d359628fead9e7f84a8da75`.
+- Alle Prüfungen des PR und des exakten Release-Commits erfolgreich:
+  [macOS verify](https://github.com/r3d42-git/MenuBarIO/actions/runs/38917877664),
+  [CodeQL](https://github.com/r3d42-git/MenuBarIO/actions/runs/38917877725),
+  [Pages build/deploy](https://github.com/r3d42-git/MenuBarIO/actions/runs/38917877654).
+  Lokal bestanden 110 Tests, statische Analyse, Audits und arm64-Prüfarchiv.
+- Öffentliches Asset:
+  [MenuBarIO-0.8.2-mac.dmg](https://github.com/r3d42-git/MenuBarIO/releases/download/v0.8.2/MenuBarIO-0.8.2-mac.dmg).
+  SHA-256: `0ce42d100fe343ad14d2b912a3b86de2200aa846bb4d3cf6b754b6bba0737394`.
+  Lokales DMG, separat heruntergeladenes DMG, veröffentlichte Prüfsummendatei
+  und GitHub-Asset-Digest stimmen überein.
+- Signiert mit `Developer ID Application: Philipp John Hild (G6JH37W285)`,
+  G2-Zertifikat `D548540E7FE1BD9B3C4518CC02D8786E1BFEB885`, Hardened Runtime.
+  Apple akzeptierte die App separat unter
+  `dac029d8-3bd9-426c-9e68-6f412f6faaf3` und das DMG unter
+  `2cdbd65b-034e-4b46-834e-38e3ead12f76`. Beide Tickets angeheftet und validiert.
+  Gatekeeper akzeptiert DMG und enthaltene App, auch aus dem öffentlichen Download.
+- `script/publish_release.sh` prüfte den Draft- und den öffentlichen Download.
+  Zusätzlich liegt ein frischer Download unter
+  `.release/0.8.2/independent-download/`; der vollständige Release-Verifier
+  bestand erneut. Version/Build und G2-Zertifikat wurden aus der App in genau
+  diesem schreibgeschützt eingebundenen Download bestätigt. Lizenzmaterial,
+  Quellcodeverweise, Hintergrund und Programme-Verknüpfung sind enthalten.
+- Lokale Ablaufbelege: `/private/tmp/menubario-082-release.log`,
+  `/private/tmp/menubario-082-packaging-resume.log`,
+  `/private/tmp/menubario-082-dmg-notary.log`,
+  `/private/tmp/menubario-082-publish.log` und
+  `/private/tmp/menubario-082-independent-verify.log`.
+- Umgebungsgrenze beim Verpacken: Finder quittierte zunächst
+  `set current view of container window to icon view` mit AppleEvent-Timeout
+  `-1712`. Nach Öffnen eines sichtbaren Finder-Fensters und erfolgreichem
+  Wechsel in die Symbolansicht lief dasselbe native Verpackungsskript mit
+  frischem Staging erfolgreich. Die bereits signierte, akzeptierte und
+  gestapelte App wurde unverändert wiederverwendet; keine doppelte App-Einreichung,
+  keine Änderung am Release-Skript und kein Finder-Neustart. Bei Wiederholung
+  zuerst den interaktiven Finder-Zustand prüfen, nicht den ganzen Release neu starten.
+- Der Installer-Inhalt wurde zusätzlich in Finder angesehen. Die vollständige
+  Sichtprüfung der Menüleisten-App bleibt wegen des zuvor dokumentierten
+  Computer-Use-Timeouts offen, ebenso Clean-Mac- und frische macOS-15-Abnahme.
+  `/Applications/MenuBarIO.app` wurde nicht ersetzt.
 
 ## Lokale Port-Korrekturen auf dem neuen Mac — 2026-10-16
 
@@ -80,8 +128,8 @@ wurde auch die mit einem USB-C–DisplayPort-Kabel belegte Buchse als frei angez
   direkten USB-Verbindung an diesem Mac.
 
 Nach der lokalen Prüfung autorisierte der Nutzer ausdrücklich Commit, Push
-und einen neuen Release. Vorbereitet ist 0.8.2 (Build 16) für Apple Silicon
-ab macOS 15; die endgültigen Veröffentlichungsbelege folgen separat.
+und einen neuen Release. 0.8.2 (Build 16) für Apple Silicon ab macOS 15
+ist veröffentlicht; die endgültigen Belege stehen im Abschnitt darüber.
 `/Applications/MenuBarIO.app` wird nicht automatisch ersetzt. Rohdaten und Probeprogramme
 liegen nur unter `/private/tmp/menubario-*20261016*` und werden nicht versioniert.
 Abschließende Prüfung: 110/110 Tests ohne Fehler oder übersprungene Tests,
