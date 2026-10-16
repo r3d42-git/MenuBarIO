@@ -67,7 +67,8 @@ After every change to IOKit discovery, check them once:
    once. Occupied ports show the attached device, actual protocol and negotiated
    speed; an empty port shows its maximum capability instead.
    Connect a USB2 device and a USB3 stick directly to each host socket on Apple
-   Silicon. With an explicit `UsbCPortNumber`, each must occupy that
+   Silicon. With an explicit `UsbCPortNumber` or a `UsbIOPort` reference to a
+   built-in USB-C IOPort, each must occupy that
    socket with its USB rate, disappear from Other USB Devices and count once.
    Check the detail path, then unplug/move it and verify that the previous port
    clears. Native Thunderbolt/dock assignments must retain priority. If the
@@ -120,6 +121,24 @@ After every change to IOKit discovery, check them once:
     be clearly labelled, while serial numbers, Bluetooth addresses, location
     IDs, stable internal IDs, usernames and paths must be absent. Check the
     separate USB, Bluetooth and Thunderbolt-port context-menu copies as well.
+
+### MenuBarIO 0.8.2 development validation — 2026-10-16
+
+110 local tests, static analysis and the arm64 archive passed on a Mac Studio
+with macOS 27.0.1 and Xcode 27.1. Direct ASM1352R-Fast attachment resolved to
+host port 2 through `UsbIOPort`; moving it back to the Anker dock cleared the
+host assignment and restored its mapped dock port. D1 SSD Plus and Pro retained
+40/80 Gbps links. The dock's active DisplayPort output was detected without
+inventing an exact physical socket. Details and exports cover unknown occupancy.
+The maintainer confirmed the disk's 10 Gbps dock display and requested release
+after the automated UI timeout was disclosed. Complete visual acceptance,
+all-host-socket USB2/USB3 permutations, display unplug/replug, clean-Mac install
+and a fresh macOS 15 hardware check remain open. No drive data was modified.
+
+For DP follow-up, connect/disconnect a display while leaving the dock connected:
+the output count and unknown occupancy should refresh after the display change,
+including when USB and DisplayPort coexist. Never infer a connector from a DP
+adapter's DROM preferred lane or the last apparently free dock port.
 
 ### MenuBarIO 0.8.0 development validation — 2026-09-15
 
