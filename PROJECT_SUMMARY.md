@@ -1,5 +1,14 @@
 # Project Summary
 
+## Abschluss PR-Wartung und lokale Synchronisierung — 16.10.2026
+
+- Auf Nutzerfreigabe [PR #52](https://github.com/r3d42-git/MenuBarIO/pull/52) und [PR #53](https://github.com/r3d42-git/MenuBarIO/pull/53) nach Aktualisierung auf den jeweiligen aktuellen `main` und grünen Prüfungen per Squash gemergt. Merge-Commits: `980948e19c4345e4bf97474dbf7ecd3d9360b9a0` und `4235d3ac8fa0457b75da1814e4876a3e0fd17030`.
+- Ausschließlich CodeQL-Referenzen in den beiden Workflows geändert: `init` und `analyze` sind jetzt auf den Commit `24c54180a607b1449ed407dd24f251e4e9147c8d` derselben Version 4.38.3 gepinnt. Keine Änderung am App-Code oder an der veröffentlichten Version.
+- Abschließende Prüfungen auf exakt `4235d3ac8fa0457b75da1814e4876a3e0fd17030` erfolgreich: [macOS-Prüfung mit Tests, statischer Analyse und Apple-Silicon-Archiv](https://github.com/r3d42-git/MenuBarIO/actions/runs/38962265778) sowie [CodeQL](https://github.com/r3d42-git/MenuBarIO/actions/runs/38962265775). Die vorgeschriebenen Pages-Build-Prüfungen der PRs waren ebenfalls grün; der optionale Swift-CodeQL-Lauf wurde nicht zusätzlich gestartet.
+- Lokalen Checkout `/Volumes/Media/codex/MenubarUSB` anschließend per Fast-forward synchronisiert. Kontrollierter Stand vor diesem Dokumentationsnachtrag: `HEAD = origin/main = 4235d3ac8fa0457b75da1814e4876a3e0fd17030`, Arbeitsbaum sauber, keine offenen PRs.
+- Kein neuer Release, keine Installation und keine Änderung an Nutzerdaten. Dieser Abschlussvermerk wird separat als reine Dokumentationsänderung versioniert. Alle vorherigen Einträge bleiben erhalten.
+
+
 ## Purpose and scope
 
 MenuBarIO is a local-only macOS menu-bar app for showing connected USB,
