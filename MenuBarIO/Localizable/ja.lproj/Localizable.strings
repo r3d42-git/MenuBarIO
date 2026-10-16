@@ -94,3 +94,7 @@
 "group_collapsed" = "折りたたみ済み";
 "last_successful_update" = "最終更新成功：%@";
 "battery_level" = "バッテリー残量";
+
+"port_occupancy_unknown" = "使用状況不明";
+"active_displayport_outputs" = "有効なDisplayPort出力";
+"displayport_connector_unknown" = "このデバイスではDisplayPortが有効です。物理的な接続端子を特定できないため、未割り当てのポートが使用中の可能性があります。";

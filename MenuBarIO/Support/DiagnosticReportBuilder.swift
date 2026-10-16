@@ -116,6 +116,11 @@ struct DiagnosticReportBuilder {
                 lines.append(fieldLine("vendor", vendor))
                 lines.append("")
             }
+            if group.activeDisplayOutputCount > 0 {
+                lines.append(fieldLine("active_displayport_outputs", "\(group.activeDisplayOutputCount)"))
+                lines.append(markdownText(localize("displayport_connector_unknown")))
+                lines.append("")
+            }
             for port in group.ports {
                 appendPort(port, headingLevel: 4, to: &lines)
             }
@@ -259,7 +264,10 @@ struct DiagnosticReportBuilder {
                 parts.append("\(localize("port_max")) \(USBFormatting.transferRate(maximum))")
             }
         } else {
-            parts.append(localize("port_free"))
+            parts.append(localize(port.unoccupiedStatusKey))
+            if port.hasUnresolvedDisplayConnection {
+                parts.append(localize("displayport_connector_unknown"))
+            }
             if let maximum = port.connectionMaximumSpeedMbps {
                 parts.append("\(localize("port_max")) \(USBFormatting.transferRate(maximum))")
             }
@@ -321,7 +329,7 @@ struct DiagnosticReportBuilder {
         } else if isPowerSourceConnected {
             portTitle = localize("power_supply")
         } else {
-            portTitle = localize("port_free")
+            portTitle = localize(port.unoccupiedStatusKey)
         }
 
         lines.append(
@@ -353,6 +361,9 @@ struct DiagnosticReportBuilder {
             if let maximum = port.connectionMaximumSpeedMbps {
                 lines.append(fieldLine("port_max", USBFormatting.transferRate(maximum)))
             }
+        }
+        if port.hasUnresolvedDisplayConnection {
+            lines.append(markdownText(localize("displayport_connector_unknown")))
         }
         if port.connectedDevice?.transport != .usb, let boost = port.bandwidthBoostSpeedMbps {
             lines.append(fieldLine("bandwidth_boost", USBFormatting.transferRate(boost)))

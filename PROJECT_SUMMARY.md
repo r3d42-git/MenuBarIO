@@ -8,7 +8,7 @@ Thunderbolt/USB4 and Bluetooth devices. New releases target Apple Silicon
 Its product subtitle is `USB, Thunderbolt, USB4 & Bluetooth Inspector for
 macOS`.
 
-The current published product version is `0.8.1` (build 15). Version
+The current published product version is `0.8.2` (build 16). Version
 `0.7.2` (build 13) is retained for Intel and macOS 13/14. Releases are prepared from a reviewed branch and integrated into protected `main` before tagging.
 The product, executable, target and project are named `MenuBarIO`; the test
 target is `MenuBarIOTests`. The legacy app bundle identifier
@@ -23,6 +23,208 @@ original author. There is no collaboration or affiliation with the original
 author, who is not involved in MenuBarIO development, maintenance, support or
 releases. GitHub contributor entries for upstream author accounts reflect only
 the preserved source history.
+
+## Veröffentlicht: 0.8.2 — 2026-10-16
+
+- Release: [MenuBarIO v0.8.2](https://github.com/r3d42-git/MenuBarIO/releases/tag/v0.8.2),
+  veröffentlicht am 2026-10-16 um 14:48:35 UTC. Version 0.8.2, Build 16,
+  ausschließlich arm64, macOS 15+. Bundle-ID `de.r3d.menubarusb.tb`.
+- Korrekturen über [PR #55](https://github.com/r3d42-git/MenuBarIO/pull/55)
+  integriert; annotiertes Tag `v0.8.2` zeigt unverändert auf
+  `8a6a9b6136671fcc0d359628fead9e7f84a8da75`.
+- Alle Prüfungen des PR und des exakten Release-Commits erfolgreich:
+  [macOS verify](https://github.com/r3d42-git/MenuBarIO/actions/runs/38917877664),
+  [CodeQL](https://github.com/r3d42-git/MenuBarIO/actions/runs/38917877725),
+  [Pages build/deploy](https://github.com/r3d42-git/MenuBarIO/actions/runs/38917877654).
+  Lokal bestanden 110 Tests, statische Analyse, Audits und arm64-Prüfarchiv.
+- Öffentliches Asset:
+  [MenuBarIO-0.8.2-mac.dmg](https://github.com/r3d42-git/MenuBarIO/releases/download/v0.8.2/MenuBarIO-0.8.2-mac.dmg).
+  SHA-256: `0ce42d100fe343ad14d2b912a3b86de2200aa846bb4d3cf6b754b6bba0737394`.
+  Lokales DMG, separat heruntergeladenes DMG, veröffentlichte Prüfsummendatei
+  und GitHub-Asset-Digest stimmen überein.
+- Signiert mit `Developer ID Application: Philipp John Hild (G6JH37W285)`,
+  G2-Zertifikat `D548540E7FE1BD9B3C4518CC02D8786E1BFEB885`, Hardened Runtime.
+  Apple akzeptierte die App separat unter
+  `dac029d8-3bd9-426c-9e68-6f412f6faaf3` und das DMG unter
+  `2cdbd65b-034e-4b46-834e-38e3ead12f76`. Beide Tickets angeheftet und validiert.
+  Gatekeeper akzeptiert DMG und enthaltene App, auch aus dem öffentlichen Download.
+- `script/publish_release.sh` prüfte den Draft- und den öffentlichen Download.
+  Zusätzlich liegt ein frischer Download unter
+  `.release/0.8.2/independent-download/`; der vollständige Release-Verifier
+  bestand erneut. Version/Build und G2-Zertifikat wurden aus der App in genau
+  diesem schreibgeschützt eingebundenen Download bestätigt. Lizenzmaterial,
+  Quellcodeverweise, Hintergrund und Programme-Verknüpfung sind enthalten.
+- Lokale Ablaufbelege: `/private/tmp/menubario-082-release.log`,
+  `/private/tmp/menubario-082-packaging-resume.log`,
+  `/private/tmp/menubario-082-dmg-notary.log`,
+  `/private/tmp/menubario-082-publish.log` und
+  `/private/tmp/menubario-082-independent-verify.log`.
+- Umgebungsgrenze beim Verpacken: Finder quittierte zunächst
+  `set current view of container window to icon view` mit AppleEvent-Timeout
+  `-1712`. Nach Öffnen eines sichtbaren Finder-Fensters und erfolgreichem
+  Wechsel in die Symbolansicht lief dasselbe native Verpackungsskript mit
+  frischem Staging erfolgreich. Die bereits signierte, akzeptierte und
+  gestapelte App wurde unverändert wiederverwendet; keine doppelte App-Einreichung,
+  keine Änderung am Release-Skript und kein Finder-Neustart. Bei Wiederholung
+  zuerst den interaktiven Finder-Zustand prüfen, nicht den ganzen Release neu starten.
+- Der Installer-Inhalt wurde zusätzlich in Finder angesehen. Die vollständige
+  Sichtprüfung der Menüleisten-App bleibt wegen des zuvor dokumentierten
+  Computer-Use-Timeouts offen, ebenso Clean-Mac- und frische macOS-15-Abnahme.
+  `/Applications/MenuBarIO.app` wurde nicht ersetzt.
+
+## Lokale Port-Korrekturen auf dem neuen Mac — 2026-10-16
+
+Auslöser: `ASM1352R-Fast` erschien unter weiteren USB-Geräten, während sein
+Mac-Anschluss 2 als frei angezeigt wurde. Am Anker Thunderbolt 4 Mini Dock
+wurde auch die mit einem USB-C–DisplayPort-Kabel belegte Buchse als frei angezeigt.
+
+- Der neue Host liefert am unmittelbaren USB-Port kein `UsbCPortNumber`,
+  sondern `UsbIOPort`: einen expliziten IOService-Verweis auf den physischen
+  `IOPort`. Die Erkennung folgt diesem Verweis und liest dessen `PortNumber`
+  nur bei einem eingebauten USB-C-Port. Die bisherige Zuordnung bleibt erhalten;
+  logische USB-Portnummern, Controller-IDs und Pfadnamen werden nicht als
+  Ersatz für eine physische Portnummer interpretiert.
+- Ein mit den aktuellen Discovery-Quellen kompiliertes lokales Probeprogramm
+  bestätigte an der angeschlossenen Hardware: Host-Port 2 → `ASM1352R-Fast`,
+  5.000 Mbit/s. Anker an Host-Port 1, TDAS an 3, D1 SSD Pro an 4 sowie
+  Stream Deck Neo und Maono an Dock-Port 2/3 blieben korrekt zugeordnet.
+- Das Anker-Dock meldet einen aktiven DisplayPort-Ausgang an internem Adapter
+  13 (`HPD State=Yes`, `DP State=2`). Dieser Adapter ist keine physische
+  Buchsennummer. Das DROM beschreibt bevorzugte Tunnel-Lanes, nicht die
+  dynamische Zuordnung der zwei DP-Ausgänge zu drei Downstream-Buchsen.
+  Die konkrete Buchse 1 ist vom Nutzer bestätigt, aber in den ausgelesenen
+  Registry-Daten nicht eindeutig zugeordnet. Keine modellbezogene Zuordnung
+  und keine Ableitung aus der einzigen verbleibenden Buchse verwenden.
+- Aktive DisplayPort-Ausgänge werden jetzt am Dock angezeigt. Noch nicht
+  zugeordnete Dock-Ports erhalten bei aktivem DP-Ausgang „Belegung unbekannt“
+  statt „Frei“. Die Information erscheint auch in Details und Diagnoseexport;
+  bestehende USB-/Thunderbolt-Zuordnungen und Gerätezähler bleiben erhalten.
+  Bildschirmänderungen lösen eine um eine Sekunde verzögerte Aktualisierung aus.
+- Der Nutzer bestätigt: dieselbe Platte lief am Dock mit demselben Kabel mit
+  10 Gbit/s. Die aktuelle Direktverbindung meldet unabhängig vom App-Code
+  `UsbLinkSpeed=5000000000`, `USBSpeed=4`, `Device Speed=3`; am unmittelbaren
+  Host-Port steht außerdem `UsbHostPortLinkSpeedLimit=4`. Laut den installierten
+  IOKit-SDK-Definitionen sind dies konsistente 5-Gbit/s-Werte (Host- und
+  Legacy-Geschwindigkeitscodes sind unterschiedlich). Der Anker-USB-Hub meldet
+  aktuell 10 Gbit/s. Anschließend wechselte der Nutzer auf ein laut seiner
+  Angabe 80-Gbit/s-fähiges Kabel: direkt am Mac erneut stabil 5 Gbit/s;
+  beim Umstecken waren kurz sowohl ein 10- als auch ein 5-Gbit/s-Registry-Eintrag
+  sichtbar. Derselbe neue Aufbau am Anker-Dock meldete danach stabil
+  `UsbLinkSpeed=10000000000`, `USBSpeed=5`, `Device Speed=4`. Der Nutzer
+  bestätigte auch die 10-Gbit/s-Anzeige in der App. Die genaue Ursache der
+  Direktbegrenzung bleibt offen: keine passende veröffentlichte Regel in den
+  lokalen USB-Treiber-Plists und keine erklärende Kernelmeldung im geprüften
+  Fünf-Minuten-Fenster. Weder Kabeldefekt noch macOS-Fehler als bewiesen melden.
+  Keine Laufwerke auswerfen oder Verbindungen eigenständig ändern.
+- Endgültige, vom Nutzer gewünschte Verkabelung live bestätigt: Host-Port 2
+  ohne Gerät; ASM1352R-Fast am Anker-Dock-Port 2 mit 10 Gbit/s, Maono an
+  Dock-Port 3, aktiver DisplayPort-Ausgang und unklare Belegung an Dock-Port 1.
+  Stream Deck Neo hängt direkt am Mac (`Port-USB-A@2`, expliziter `UsbIOPort`
+  am unmittelbaren Parent) mit 480 Mbit/s. Es gehört deshalb weiterhin zur
+  USB-Geräteliste und nicht zu den Thunderbolt-Portzeilen. D1 SSD Plus (vom
+  Nutzer als das generisch benannte TDAS identifiziert) und D1 SSD Pro bleiben
+  an Host-Port 3/4 mit 40/80 Gbit/s. Eine generelle TB5-Inkompatibilität des
+  ASMedia-Gehäuses ist nicht bewiesen; beobachtet ist die geringere Rate der
+  direkten USB-Verbindung an diesem Mac.
+
+Nach der lokalen Prüfung autorisierte der Nutzer ausdrücklich Commit, Push
+und einen neuen Release. 0.8.2 (Build 16) für Apple Silicon ab macOS 15
+ist veröffentlicht; die endgültigen Belege stehen im Abschnitt darüber.
+`/Applications/MenuBarIO.app` wird nicht automatisch ersetzt. Rohdaten und Probeprogramme
+liegen nur unter `/private/tmp/menubario-*20261016*` und werden nicht versioniert.
+Abschließende Prüfung: 110/110 Tests ohne Fehler oder übersprungene Tests,
+statische Analyse, Lokalisierungs-/Datenschutz-/Formatprüfungen und signiertes
+arm64-Prüfarchiv erfolgreich. `script/build_and_run.sh --verify` startet den
+lokalen Testbuild unter
+`/private/tmp/menubario-ports-debug-20261016/Build/Products/Debug/MenuBarIO.app`.
+Prüflog: `/private/tmp/menubario-ports-full-verify.log`; Xcode-Ergebnisse unter
+`/private/tmp/menubario-ports-full-20261016/Logs/Test/`. Der erste neue
+Diagnoseexport-Test erwartete unmaskierte Unterstriche; die Assertions wurden
+auf die bestehende Markdown-Maskierung korrigiert, dann bestand die volle Prüfung.
+Die automatisierte Sichtprüfung der Menüleisten-App scheiterte bislang am
+Computer-Use-Timeout; ein erfolgreicher Start ist keine visuelle Abnahme.
+
+Release-Vorprüfung 0.8.2: erneutes vollständiges `script/verify.sh` erfolgreich
+(`/private/tmp/menubario-082-final-check.log`), zusätzliche Codeprüfung ohne
+actionable Findings. Die G2-Signieridentität ist auf dem neuen Mac vorhanden.
+Das alte Keychain-Profil `MenuBarUSB-TB-notary` fehlt; das vorhandene `ToolBoxS`
+wurde erfolgreich mit `notarytool history` geprüft. Für diesen Release gilt
+der vorhandene per-command Override `MENUBARIO_NOTARY_PROFILE=ToolBoxS`;
+keine Änderung an Schlüsselbund, Credentials oder Skriptdefaults.
+
+## Aktueller Abgleich und Sicherheitsscans — 2026-10-13
+
+### Synchronisierter Projektstand
+
+- Lokales `main` und `origin/main` wurden auf
+  `a76a2a6257aea7e6e97f1830ace38c9b175aac38` abgeglichen. Der zuvor lokale Stand
+  `833f9478e6d79b2e38b5b0223b74a2e460b6824f` lag drei Commits zurück; die
+  Übernahme erfolgte ohne eigenen Merge-Commit per Fast-Forward:
+  - `98dfe9b` / PR #49: Dependabot-Gruppierung und PR-Limits.
+  - `fd6cca8` / PR #51: CodeQL-Action auf v4.38.3, weiterhin per SHA fixiert.
+  - `a76a2a6` / PR #50: `lucide-react` 1.55.0, Rolldown 1.2.13 und zugehörige
+    Lockdatei-Aktualisierungen.
+- `npm ci` in `website/` hat die lokale Installation an diese Lockdatei
+  angepasst. Die zuvor noch installierte `source-map-js` 1.2.1 ist ersetzt;
+  lokal und in der Lockdatei gilt jetzt 1.2.2.
+- Am exakten Stand `a76a2a6` erfolgreich: `npm ci` (0 bekannte
+  Schwachstellen), `npm run lint`, `npm run typecheck`, `npm run build` und
+  `npm run check:artifact` mit 19/19 Tests und 26 geprüften statischen Dateien.
+- Alle 26 Dateien des lokalen Produktionsbuilds wurden online abgerufen und
+  bytegleich mit der [öffentlichen Website](https://r3d42-git.github.io/MenuBarIO/)
+  verglichen; auch die öffentlichen Routen bestanden `verify-public.mjs`.
+  Der [Pages-Lauf für diesen Commit](https://github.com/r3d42-git/MenuBarIO/actions/runs/38153797486)
+  sowie macOS-CI und CodeQL waren erfolgreich.
+- App-Quellen und Release-Skripte sind gegenüber `v0.8.1` unverändert. Die
+  lokale `.release/0.8.1/MenuBarIO-0.8.1-mac.dmg` stimmt mit dem online
+  ausgewiesenen SHA-256-Digest
+  `3ab6edfde56ee334ea36f5f7aaaa16236c6e90516a916e86584d70da37d06ddd` überein.
+  Dafür waren kein neuer Commit, Push oder App-Release erforderlich.
+- Vor dieser Dokumentation war der Arbeitsbaum sauber und ohne Abstand zu
+  `origin/main`. Dieser Handoff-Eintrag wird als separate Dokumentationsänderung
+  versioniert; App-Version und Release-Tag bleiben unverändert.
+
+### Abgeschlossene Codex-Security-Prüfungen
+
+1. **Standardscan** `12b45a50-232f-47ea-8793-d1e07a62b781` auf
+   `833f9478e6d79b2e38b5b0223b74a2e460b6824f`: **0 neue Sicherheitsbefunde**,
+   abgeschlossen und versiegelt. Geprüft wurden 253 versionierte Text-/Quelldateien
+   einschließlich nativer App, Tests, Website/Architekturdiagrammen, Build- und
+   Release-Skripten, CI und Konfiguration. 39 binäre Bild-/Fontdateien wurden
+   inventarisiert, aber nicht inhaltlich sicherheitsgeprüft.
+2. **Ergänzender Änderungsscan** `f7945d50-f195-4d07-ae5d-3d0cf554f660` für
+   `833f9478e6d79b2e38b5b0223b74a2e460b6824f..a76a2a6257aea7e6e97f1830ace38c9b175aac38`:
+   **0 neue Sicherheitsbefunde**, abgeschlossen und versiegelt. Alle fünf
+   geänderten Dateien der drei nachgezogenen Commits wurden geprüft, einschließlich
+   Dependabot-Konfiguration und Lockdatei. Der neue CodeQL-Pin wurde direkt mit
+   dem offiziellen Tag abgeglichen; CI-Berechtigungen und relevante
+   Website-Vertrauensgrenzen bleiben unverändert.
+
+Beide Prüfungen zusammen decken den synchronisierten Quellstand `a76a2a6` ab;
+der Änderungsscan ergänzt den Vollscan und ersetzt ihn nicht. Beide haben
+vollständige Abdeckung ihres dokumentierten Prüfumfangs und keine offenen
+Prüfkandidaten. Die drei historischen Befunde vom 25.08.2026 wurden zuvor als
+`closed` / `already_fixed` geschlossen: Steuer-/Bidi-Zeichen in Metadaten,
+ungültige numerische Metadaten und überlappende Hardware-Scans. Ihre Korrekturen
+aus `351cd398ee68d6af6a94bda4d3c286223e667036` bestehen im heutigen App-Code fort.
+
+Die versiegelten Berichte und kanonischen JSON-Dateien liegen lokal außerhalb
+des Repositories. Für den nächsten Chat sind dies die Einstiegspunkte:
+
+- [Standardscan-Bericht](/Users/r3d/.codex/state/plugins/codex-security/scans/MenubarUSB/833f9478e6d79b2e38b5b0223b74a2e460b6824f_20261013T071842Z_wylmn1ub/report.md)
+- [Änderungsscan-Bericht](/Users/r3d/.codex/state/plugins/codex-security/scans/MenubarUSB/a76a2a6257aea7e6e97f1830ace38c9b175aac38_20261013T074320Z_wg6oeciz/report.md)
+- Neben jedem Bericht: `scan-manifest.json`, `findings.json`, `coverage.json`
+  und `threatmodel.md`. Die absoluten Pfade gelten auf diesem Mac; sie sind
+  keine öffentlich erreichbaren Bericht-URLs.
+
+Prüfgrenzen: überwiegend statische Quellprüfung mit gezielten Regressionstests;
+keine neuen Hardware-/Fuzzingtests und kein vollständiges Audit sämtlicher
+Fremdbibliotheken oder nativer Bundler-Binärdateien. Der Standardscan enthielt
+keinen Live-Abgleich neuer Advisories; das anschließende `npm ci` meldete für die
+aktuelle Lockdatei 0 bekannte Schwachstellen. Das ist keine Garantie gegen
+unbekannte Schwachstellen. Die im unverändert übernommenen Bedrohungsmodell
+erwähnte alte lokale `node_modules`-Installation beschreibt den Zustand vor
+dem Abgleich; sie ist inzwischen aktualisiert.
 
 ## Dependency maintenance — 2026-10-11
 
