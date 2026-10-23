@@ -1,5 +1,45 @@
 # Project Summary
 
+## Abschluss PR-Wartung und lokale Synchronisierung — 23.10.2026
+
+- Auf Nutzerfreigabe zuerst [PR #58](https://github.com/r3d42-git/MenuBarIO/pull/58)
+  und anschließend [PR #59](https://github.com/r3d42-git/MenuBarIO/pull/59)
+  nach grünen Prüfungen per Squash gemergt. Merge-Commits:
+  `abe26c5ba45314b5d9de9220dab4666b87933314` und
+  `13471fede54cf1a2325b2eb7bec8aaddfaad6943`.
+- PR #58 aktualisiert ausschließlich Website-Abhängigkeiten und Lockdatei:
+  `lucide-react` 1.55.0 → 1.57.0, `react` und `react-dom` gemeinsam
+  19.3.0 → 19.3.1 sowie `oxlint` 1.87.0 → 1.88.0. Installation, Lint,
+  Typprüfung, Produktions-Build und Artefaktprüfung bestanden; der
+  [Pages-Build und die Veröffentlichung auf dem ersten Merge-Commit](https://github.com/r3d42-git/MenuBarIO/actions/runs/40018432246)
+  einschließlich der Prüfung öffentlicher Routen und Assets waren erfolgreich.
+- PR #59 wurde vor dem Merge um den neuen `main` aus PR #58 aktualisiert
+  (geprüfter PR-Head `a40da8f67628242b04ed46003456c4d4ecec785e`).
+  Ausschließlich die vier `init`-/`analyze`-Referenzen in den beiden
+  CodeQL-Workflows wurden auf den mit dem offiziellen Release abgeglichenen
+  Commit `6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee` der Version 4.39.0
+  angehoben. Die frischen PR-Prüfungen für
+  [macOS](https://github.com/r3d42-git/MenuBarIO/actions/runs/40018475289),
+  [CodeQL](https://github.com/r3d42-git/MenuBarIO/actions/runs/40018475266) und
+  [Website-Build](https://github.com/r3d42-git/MenuBarIO/actions/runs/40018475279)
+  waren erfolgreich.
+- Abschließende Prüfungen auf exakt
+  `13471fede54cf1a2325b2eb7bec8aaddfaad6943` erfolgreich:
+  [macOS-Prüfung mit Tests, statischer Analyse und Apple-Silicon-Archiv](https://github.com/r3d42-git/MenuBarIO/actions/runs/40018850488)
+  sowie [CodeQL für JavaScript/TypeScript und Actions](https://github.com/r3d42-git/MenuBarIO/actions/runs/40018850352).
+  Der zweite Merge änderte keine Website-Dateien und löste daher keinen
+  weiteren Pages-Deploy aus. Der optionale Swift-CodeQL-Lauf wurde nicht
+  zusätzlich gestartet.
+- Lokalen Checkout `/Volumes/Media/codex/MenubarUSB` anschließend per
+  Fast-forward synchronisiert. Kontrollierter Stand vor diesem
+  Dokumentationsnachtrag:
+  `HEAD = origin/main = 13471fede54cf1a2325b2eb7bec8aaddfaad6943`,
+  Arbeitsbaum sauber, Abstand zu `origin/main` 0/0, keine offenen PRs.
+- App-Code, veröffentlichte Version 0.8.2 (Build 16) und Release-Tags bleiben
+  unverändert. Kein neuer App-Release, keine Installation und keine Änderung
+  an Nutzerdaten. Dieser Abschlussvermerk wird separat als reine
+  Dokumentationsänderung versioniert; die historischen Einträge bleiben erhalten.
+
 ## Abschluss PR-Wartung und lokale Synchronisierung — 16.10.2026
 
 - Auf Nutzerfreigabe [PR #52](https://github.com/r3d42-git/MenuBarIO/pull/52) und [PR #53](https://github.com/r3d42-git/MenuBarIO/pull/53) nach Aktualisierung auf den jeweiligen aktuellen `main` und grünen Prüfungen per Squash gemergt. Merge-Commits: `980948e19c4345e4bf97474dbf7ecd3d9360b9a0` und `4235d3ac8fa0457b75da1814e4876a3e0fd17030`.
