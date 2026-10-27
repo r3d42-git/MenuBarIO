@@ -1,5 +1,63 @@
 # Project Summary
 
+## Dependabot-Merges und Branch-Bereinigung — 27.10.2026
+
+- Auf Nutzerfreigabe zuerst [PR #61](https://github.com/r3d42-git/MenuBarIO/pull/61)
+  und anschließend [PR #62](https://github.com/r3d42-git/MenuBarIO/pull/62)
+  nach erfolgreichen Prüfungen per Squash gemergt. Merge-Commits:
+  `a1fd28e667a17e478887c897ccaff20847212f33` und
+  `73dd9ebc2454a80a3eaf68fa9a55a3ab44a25481`.
+- PR #61 aktualisiert ausschließlich Website-Abhängigkeiten und Lockdatei:
+  `lucide-react` 1.57.0 → 1.61.0, `oxlint` 1.88.0 → 1.89.0 und
+  `vite` 8.3.4 → 8.3.5 einschließlich zugehöriger transitiver Pakete.
+  In einer isolierten Kopie des PR-Stands bestanden Installation, Lint,
+  Typprüfung, Produktions-Build, 19 Regressionstests und 26 Artefaktprüfungen.
+  Das aktuelle npm-Audit meldete keine bekannten Schwachstellen.
+  [Pages-Build, Veröffentlichung und Prüfung der öffentlichen Routen und Assets](https://github.com/r3d42-git/MenuBarIO/actions/runs/40578739699)
+  auf dem ersten Merge-Commit waren erfolgreich.
+- PR #62 wurde vor dem Merge mit dem neuen `main` aus PR #61 aktualisiert.
+  Der geprüfte PR-Head `2e8783038f151fc25ef9e864c5d184a3db20c849`
+  enthält diesen neuen `main` als Elterncommit. Der Diff beschränkt sich auf
+  die vier `init`-/`analyze`-Referenzen in den beiden CodeQL-Workflows:
+  Version 4.39.0 → 4.39.1, gepinnt auf den mit dem offiziellen Release
+  abgeglichenen Commit `9b3254085494b55a0f7c4c2b3d2d52cc712ce370`.
+  Vor dem zweiten Merge wurden die frischen Prüfungen für
+  [macOS](https://github.com/r3d42-git/MenuBarIO/actions/runs/40578757324),
+  [CodeQL](https://github.com/r3d42-git/MenuBarIO/actions/runs/40578757303) und
+  [Website-Build](https://github.com/r3d42-git/MenuBarIO/actions/runs/40578757311)
+  vollständig erfolgreich abgewartet.
+- Auch die abschließenden Prüfungen auf exakt
+  `73dd9ebc2454a80a3eaf68fa9a55a3ab44a25481` waren erfolgreich:
+  [macOS-Prüfung](https://github.com/r3d42-git/MenuBarIO/actions/runs/40579279468)
+  und [CodeQL für JavaScript/TypeScript und Actions](https://github.com/r3d42-git/MenuBarIO/actions/runs/40579279451).
+  Der zweite Merge änderte keine Website-Dateien und löste keinen weiteren
+  Pages-Deploy aus. Der optionale Swift-CodeQL-Lauf wurde nicht gestartet.
+- Lokalen Checkout `/Volumes/Media/codex/MenubarUSB` per Fast-forward
+  synchronisiert und die lokalen Website-Abhängigkeiten mit `npm ci` an
+  die neue Lockdatei angeglichen; dabei keine bekannten Schwachstellen.
+  Kontrollierter Stand vor diesem Dokumentationsnachtrag:
+  `HEAD = origin/main = 73dd9ebc2454a80a3eaf68fa9a55a3ab44a25481`,
+  Arbeitsbaum sauber, Abstand zu `origin/main` 0/0, keine offenen PRs.
+- Vor den Merges 39 erledigte Remote-Branches gelöscht. Für jeden Branch
+  waren der unveränderte Head des gemergten PRs und dessen Merge-Commit in
+  `main` nachgewiesen. GitHubs automatische Löschung nach PR-Merges aktiviert;
+  die beiden Dependabot-Branches wurden nach ihren Merges automatisch entfernt.
+  Auf GitHub bleibt ausschließlich der geschützte Branch `main`.
+- Den sauberen alten Security-Worktree unter
+  `/Users/r3d/.codex/worktrees/github-security/MenubarUSB` samt lokalem Branch
+  `codex/architecture-security` entfernt. Anschließend 31 weitere alte lokale
+  Branches nach Prüfung gelöscht: Ihre Spitzen waren entweder Vorfahren von
+  `main` oder entsprachen exakt dem Head eines vollständig nach `main`
+  gemergten PRs. Lokal bleibt ebenfalls ausschließlich `main`.
+- Vor den Löschungen Git-Bundles erstellt und verifiziert. Das Backup vor der
+  Remote-Bereinigung liegt unter
+  `/private/tmp/menubario-branch-audit-20261027/before-cleanup-20261027T202200Z.bundle`.
+  Das dauerhafte, nicht versionierte lokale Branch-Backup samt Zuordnung und
+  Löschprotokoll liegt unter `.release/branch-cleanup-2026-10-27/`
+  (`before-cleanup-20261027T203923Z.bundle`, `classification.json`, `result.json`).
+  App-Code, veröffentlichte Version 0.8.2 (Build 16) und Release-Tags bleiben
+  unverändert; kein neuer App-Release und keine Installation.
+
 ## Abschluss PR-Wartung und lokale Synchronisierung — 23.10.2026
 
 - Auf Nutzerfreigabe zuerst [PR #58](https://github.com/r3d42-git/MenuBarIO/pull/58)
